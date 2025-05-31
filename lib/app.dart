@@ -21,8 +21,36 @@ import 'features/quran/presentation/bloc/surah/surah_bloc.dart';
 import 'features/setting/presentation/bloc/language_setting/language_setting_bloc.dart';
 import 'features/setting/presentation/bloc/styling_setting/styling_setting_bloc.dart';
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key});
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // When app is resumed, check for location changes and update notifications
+      final context = App.navigatorKey.currentContext;
+      if (context != null) {
+        context.read<ShalatBloc>().add(const ShalatEvent.checkAndUpdateNotificationsEvent());
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

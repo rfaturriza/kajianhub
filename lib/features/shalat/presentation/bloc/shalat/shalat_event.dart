@@ -42,4 +42,12 @@ abstract class ShalatEvent with _$ShalatEvent {
 
   const factory ShalatEvent.schedulePrayerAlarmEvent() =
       _SchedulePrayerAlarmEvent;
+      
+  const factory ShalatEvent.schedulePrayerAlarmWithLocationEvent({
+    required GeoLocation location,
+    @Default(false) bool forceUpdate,
+  }) = _SchedulePrayerAlarmWithLocationEvent;
+  
+  const factory ShalatEvent.checkAndUpdateNotificationsEvent() =
+      _CheckAndUpdateNotificationsEvent;
 }

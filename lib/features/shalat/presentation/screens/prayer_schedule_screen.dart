@@ -37,7 +37,7 @@ class PrayerScheduleScreen extends StatelessWidget {
 
           context
               .read<ShalatBloc>()
-              .add(ShalatEvent.schedulePrayerAlarmEvent());
+              .add(const ShalatEvent.checkAndUpdateNotificationsEvent());
           context.pop(false);
         },
         child: Scaffold(

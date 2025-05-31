@@ -34,8 +34,15 @@ def update_flutter_version(type)
   )
 end
 
-def build_flutter_app
-  sh "flutter build appbundle -v --no-deferred-components"
+def build_flutter_app(build_type = "appbundle")
+  case build_type
+  when "appbundle"
+    sh "flutter build appbundle -v --no-deferred-components"
+  when "apk"
+    sh "flutter build apk -v --no-deferred-components --split-per-abi"
+  else
+    UI.user_error!("Invalid build type: #{build_type}")
+  end
 end
 
 def upload_app(track, promote_to: nil)
@@ -52,26 +59,79 @@ def upload_app(track, promote_to: nil)
   )
 end
 
-def release_lane(update_type: nil, target:)
+def generate_release_notes(commit_count = 10)
+  # Get the latest commits and format them for release notes
+  changelog = "Release Notes:\n\n"
+  
+  # Get the latest tag to use as a reference point
+  latest_tag = sh("git describe --tags --abbrev=0 2>/dev/null || echo ''", log: false).strip
+  
+  if latest_tag.empty?
+    # If no tags exist, get the latest commits
+    commits = sh("git log -#{commit_count} --pretty=format:'* %s (%an)' --no-merges", log: false)
+  else
+    # Get commits since the latest tag
+    commits = sh("git log #{latest_tag}..HEAD --pretty=format:'* %s (%an)' --no-merges", log: false)
+    
+    # If no commits since last tag, get the latest commits
+    if commits.empty?
+      commits = sh("git log -#{commit_count} --pretty=format:'* %s (%an)' --no-merges", log: false)
+    end
+  end
+  
+  # Add version information
+  version_name = flutter_get_version_name(path_to_yaml: "../pubspec.yaml")
+  version_code = flutter_get_version_code(path_to_yaml: "../pubspec.yaml")
+  
+  changelog += "Version: #{version_name} (#{version_code})\n\n"
+  changelog += "Changes:\n#{commits}\n\n"
+  changelog += "Built on: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
+  
+  return changelog
+end
+
+def distribute_to_firebase(groups, release_notes = nil)
+  # Generate release notes if not provided
+  release_notes ||= generate_release_notes
+  
+  # Use the arm64-v8a APK for Firebase Distribution
+  firebase_app_distribution(
+    app: ENV['FIREBASE_APP_ID'],
+    groups: groups,
+    release_notes: release_notes,
+    apk_path: '../build/app/outputs/flutter-apk/app-arm64-v8a-release.apk',
+    firebase_cli_token: ENV['FIREBASE_CLI_TOKEN']
+  )
+end
+
+def release_lane(update_type: nil, target:, firebase_groups: nil)
   update_flutter_version(update_type) if update_type
-  build_flutter_app
-  sleep(5) # helps avoid upload rejection due to build mismatch
   
   case target
-  when "internal"
-    upload_app('internal')
-  when "beta"
-    upload_app('beta')
-  when "production"
-    upload_app('production')
-  when "promote_internal_to_beta"
-    upload_app('internal', promote_to: 'beta')
-  when "promote_internal_to_production"
-    upload_app('internal', promote_to: 'production')
-  when "promote_beta_to_production"
-    upload_app('beta', promote_to: 'production')
+  when "firebase_distribution"
+    build_flutter_app("apk")
+    release_notes = generate_release_notes
+    distribute_to_firebase(firebase_groups, release_notes)
   else
-    UI.user_error!("Invalid target: #{target}")
+    build_flutter_app
+    sleep(5) # helps avoid upload rejection due to build mismatch
+    
+    case target
+    when "internal"
+      upload_app('internal')
+    when "beta"
+      upload_app('beta')
+    when "production"
+      upload_app('production')
+    when "promote_internal_to_beta"
+      upload_app('internal', promote_to: 'beta')
+    when "promote_internal_to_production"
+      upload_app('internal', promote_to: 'production')
+    when "promote_beta_to_production"
+      upload_app('beta', promote_to: 'production')
+    else
+      UI.user_error!("Invalid target: #{target}")
+    end
   end
 end
 
@@ -119,5 +179,24 @@ platform :android do
   desc "Promote BETA track to PRODUCTION"
   lane :promote_beta_to_production do
     release_lane(target: "promote_beta_to_production")
+  end
+
+  # Firebase Distribution lanes
+  desc "Submit patch update to Firebase App Distribution"
+  lane :firebase_dist_patch do |options|
+    groups = options[:groups] || "testers"
+    release_lane(update_type: "patch", target: "firebase_distribution", firebase_groups: groups)
+  end
+
+  desc "Submit minor update to Firebase App Distribution"
+  lane :firebase_dist_minor do |options|
+    groups = options[:groups] || "testers"
+    release_lane(update_type: "minor", target: "firebase_distribution", firebase_groups: groups)
+  end
+
+  desc "Submit major update to Firebase App Distribution"
+  lane :firebase_dist_major do |options|
+    groups = options[:groups] || "testers"
+    release_lane(update_type: "major", target: "firebase_distribution", firebase_groups: groups)
   end
 end

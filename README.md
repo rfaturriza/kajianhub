@@ -22,6 +22,7 @@ Muslim Book is a Flutter project designed to provide a modern and user-friendly 
 - Get It & Injectable
 - Github action CI
 - Fastlane CD
+- Firebase App Distribution
 
 ## Features
 - [✔] Display Quranic (Surah and Juz mode) text with translations.
@@ -68,6 +69,35 @@ To run this Flutter project on your local machine, follow these steps:
     ```bash
     flutter run
     
+## CI/CD with GitHub Actions
+
+This project uses GitHub Actions for continuous integration and deployment. The following workflows are available:
+
+### Android Build & Deploy
+- Builds and deploys the Android app to Google Play Store or Firebase App Distribution
+- Supports version bumping (patch, minor, major)
+- Auto-generates release notes from commit history for Firebase Distribution
+
+#### Available Lanes:
+- **Google Play Store:**
+  - `internal_patch`, `internal_minor`, `internal_major`: Deploy to internal testing track
+  - `production_patch`, `production_minor`, `production_major`: Deploy to production track
+  - `promote_internal_to_beta`, `promote_beta_to_production`, `promote_internal_to_production`: Promote between tracks
+
+- **Firebase Distribution:**
+  - `firebase_dist_patch`, `firebase_dist_minor`, `firebase_dist_major`: Deploy to Firebase App Distribution
+
+### Required Secrets for Firebase Distribution:
+- `FIREBASE_APP_ID`: Your Firebase App ID for the Android app
+- `FIREBASE_CLI_TOKEN`: Firebase CLI token for authentication
+
+### How to Use:
+1. Go to the "Actions" tab in your GitHub repository
+2. Select the "Android Build & Deploy" workflow
+3. Click "Run workflow"
+4. Choose the desired lane and Firebase Distribution groups (if applicable)
+5. Click "Run workflow" to start the build and deployment process
+
 ## Contributing
 We welcome contributions from the community to help improve and expand the Muslim Book project. If you'd like to contribute, please follow these guidelines:
 

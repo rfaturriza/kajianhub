@@ -1,5 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:injectable/injectable.dart';
 import 'package:quranku/features/setting/data/datasources/local/styling/styling_setting_local_data_source.dart';
 
@@ -137,7 +137,8 @@ class StylingSettingLocalDataSourceImpl
   }
 
   @override
-  Future<Either<Failure, Unit>> setLastReadReminder(LastReadReminderModes mode) async {
+  Future<Either<Failure, Unit>> setLastReadReminder(
+      LastReadReminderModes mode) async {
     try {
       var box = await hive.openBox(HiveConst.settingBox);
       await box.put(HiveConst.lastReadRemindersModeKey, mode.name);
@@ -156,7 +157,8 @@ class StylingSettingLocalDataSourceImpl
     try {
       var box = await hive.openBox(HiveConst.settingBox);
       final mode = box.get(HiveConst.lastReadRemindersModeKey);
-      final LastReadReminderModes isReminders = LastReadReminderModes.values.firstWhere(
+      final LastReadReminderModes isReminders =
+          LastReadReminderModes.values.firstWhere(
         (e) => e.name == mode,
       );
       return right(isReminders);

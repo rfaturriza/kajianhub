@@ -1,7 +1,7 @@
 part of 'midtrans_bloc.dart';
 
 @freezed
-class MidtransState with _$MidtransState {
+abstract class MidtransState with _$MidtransState {
   const factory MidtransState({
     @Default(FormzSubmissionStatus.initial) FormzSubmissionStatus status,
     Either<Failure, TransactionMidtrans?>? transaction,

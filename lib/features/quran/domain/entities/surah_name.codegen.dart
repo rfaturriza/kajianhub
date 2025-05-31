@@ -6,7 +6,7 @@ import 'language.codegen.dart';
 part 'surah_name.codegen.freezed.dart';
 
 @freezed
-class SurahName with _$SurahName {
+abstract class SurahName with _$SurahName {
   const factory SurahName({
     String? short,
     String? long,
@@ -17,9 +17,9 @@ class SurahName with _$SurahName {
   const SurahName._();
 
   SurahNameModel toModel() => SurahNameModel(
-    short: short,
-    long: long,
-    transliteration: transliteration?.toModel(),
-    translation: translation?.toModel(),
-  );
+        short: short,
+        long: long,
+        transliteration: transliteration?.toModel(),
+        translation: translation?.toModel(),
+      );
 }

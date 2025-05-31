@@ -7,7 +7,7 @@ part 'cities_response_model.codegen.freezed.dart';
 part 'cities_response_model.codegen.g.dart';
 
 @freezed
-class CitiesResponseModel with _$CitiesResponseModel {
+abstract class CitiesResponseModel with _$CitiesResponseModel {
   const factory CitiesResponseModel({
     List<DataCitiesModel>? data,
   }) = _CitiesResponseModel;
@@ -17,7 +17,7 @@ class CitiesResponseModel with _$CitiesResponseModel {
 }
 
 @freezed
-class DataCitiesModel with _$DataCitiesModel {
+abstract class DataCitiesModel with _$DataCitiesModel {
   const factory DataCitiesModel({
     int? id,
     String? name,

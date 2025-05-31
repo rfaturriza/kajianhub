@@ -25,7 +25,7 @@ class QuranScreen extends StatelessWidget {
     final appBar = MainAppBar(
       onPressedMenu: () {},
       onPressedQibla: () {
-        context.goNamed(RootRouter.qiblaRoute.name);
+        context.pushNamed(RootRouter.qiblaRoute.name);
       },
     );
     final controller = ScrollController();

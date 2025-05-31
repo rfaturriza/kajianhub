@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:quranku/core/utils/extension/string_ext.dart';
 import 'package:quranku/features/shalat/domain/entities/schedule.codegen.dart';
 
@@ -10,7 +10,7 @@ part 'geolocation.codegen.g.dart';
 
 @freezed
 @HiveType(typeId: HiveTypeConst.geoLocation)
-class GeoLocation with _$GeoLocation {
+abstract class GeoLocation with _$GeoLocation {
   const factory GeoLocation({
     @HiveField(0) List<String?>? cities,
     @HiveField(1) List<String?>? regions,

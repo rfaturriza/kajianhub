@@ -8,7 +8,7 @@ part 'provinces_response_model.codegen.freezed.dart';
 part 'provinces_response_model.codegen.g.dart';
 
 @freezed
-class ProvincesResponseModel with _$ProvincesResponseModel {
+abstract class ProvincesResponseModel with _$ProvincesResponseModel {
   const factory ProvincesResponseModel({
     List<DataProvincesModel>? data,
   }) = _ProvincesResponseModel;
@@ -18,7 +18,7 @@ class ProvincesResponseModel with _$ProvincesResponseModel {
 }
 
 @freezed
-class DataProvincesModel with _$DataProvincesModel {
+abstract class DataProvincesModel with _$DataProvincesModel {
   const factory DataProvincesModel({
     int? id,
     String? name,

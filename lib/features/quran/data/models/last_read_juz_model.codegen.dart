@@ -6,7 +6,7 @@ part 'last_read_juz_model.codegen.freezed.dart';
 part 'last_read_juz_model.codegen.g.dart';
 
 @freezed
-class LastReadJuzModel with _$LastReadJuzModel {
+abstract class LastReadJuzModel with _$LastReadJuzModel {
   const factory LastReadJuzModel({
     required String name,
     required int number,
@@ -31,7 +31,7 @@ class LastReadJuzModel with _$LastReadJuzModel {
       );
 
   LastReadJuz toEntity() => LastReadJuz(
-    name: name,
+        name: name,
         number: number,
         description: description,
         versesNumber: versesNumber.toEntity(),

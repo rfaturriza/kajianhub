@@ -1,8 +1,7 @@
 part of 'detail_juz_bloc.dart';
 
-
 @freezed
-class JuzDetailState with _$JuzDetailState {
+abstract class JuzDetailState with _$JuzDetailState {
   const factory JuzDetailState({
     @Default(false) bool isLoading,
     Either<Failure, DetailJuz?>? detailJuzResult,

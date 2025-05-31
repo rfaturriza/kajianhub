@@ -5,7 +5,7 @@ import '../../../quran/domain/entities/juz.codegen.dart';
 part 'juz_bookmark.codegen.freezed.dart';
 
 @freezed
-class JuzBookmark with _$JuzBookmark {
+abstract class JuzBookmark with _$JuzBookmark {
   const factory JuzBookmark({
     required String name,
     required int number,

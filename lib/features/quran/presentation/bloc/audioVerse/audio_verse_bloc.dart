@@ -77,21 +77,45 @@ class AudioVerseBloc extends Bloc<AudioVerseEvent, AudioVerseState> {
     PlayAudioVerse event,
     Emitter<AudioVerseState> emit,
   ) async {
-    if (event.audioVerse?.primary?.isNotEmpty == true) {
-      await _audioPlayer
-          .play(UrlSource(event.audioVerse?.primary ?? emptyString));
-    } else if (event.audioVerse?.secondary?.isNotEmpty == true) {
-      await _audioPlayer
-          .play(UrlSource(event.audioVerse?.secondary?.first ?? emptyString));
-    } else {
-      emit(state.copyWith(errorMessage: LocaleKeys.audioNotAvailable.tr()));
-      return;
+    try {
+      emit(state.copyWith(
+        isShowBottomNavPlayer: true,
+        isLoading: true,
+      ));
+      await _audioPlayer.stop();
+
+      if (event.audioVerse?.primary?.isNotEmpty == true) {
+        await _audioPlayer.setSource(
+          UrlSource(event.audioVerse?.primary ?? emptyString),
+        );
+      } else if (event.audioVerse?.secondary?.isNotEmpty == true) {
+        await _audioPlayer.setSource(
+          UrlSource(event.audioVerse?.secondary?.first ?? emptyString),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            errorMessage: LocaleKeys.audioNotAvailable.tr(),
+            isShowBottomNavPlayer: false,
+            isLoading: false,
+          ),
+        );
+        return;
+      }
+      await _audioPlayer.resume();
+      emit(state.copyWith(
+        audioVersePlaying: event.audioVerse,
+        playerState: _audioPlayer.state,
+        isShowBottomNavPlayer: true,
+        isLoading: false,
+      ));
+    } catch (e) {
+      emit(state.copyWith(
+        errorMessage: LocaleKeys.unknownErrorException.tr(),
+        isShowBottomNavPlayer: false,
+        isLoading: false,
+      ));
     }
-    emit(state.copyWith(
-      audioVersePlaying: event.audioVerse,
-      playerState: _audioPlayer.state,
-      isShowBottomNavPlayer: true,
-    ));
   }
 
   void _onNextAudioVerse(

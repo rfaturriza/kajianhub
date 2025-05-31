@@ -7,7 +7,7 @@ import 'language.codegen.dart';
 part 'last_read_surah.codegen.freezed.dart';
 
 @freezed
-class LastReadSurah with _$LastReadSurah {
+abstract class LastReadSurah with _$LastReadSurah {
   const factory LastReadSurah({
     required SurahName? surahName,
     required int surahNumber,

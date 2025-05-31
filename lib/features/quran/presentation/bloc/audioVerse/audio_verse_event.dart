@@ -1,7 +1,7 @@
 part of 'audio_verse_bloc.dart';
 
 @freezed
-class AudioVerseEvent with _$AudioVerseEvent {
+abstract class AudioVerseEvent with _$AudioVerseEvent {
   const factory AudioVerseEvent.playAudioVerse({
     required Audio? audioVerse,
   }) = PlayAudioVerse;

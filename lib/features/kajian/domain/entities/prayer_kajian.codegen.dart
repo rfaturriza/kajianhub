@@ -6,7 +6,7 @@ import 'package:quranku/features/shalat/presentation/helper/helper_time_shalat.d
 part 'prayer_kajian.codegen.freezed.dart';
 
 @freezed
-class PrayerKajian with _$PrayerKajian {
+abstract class PrayerKajian with _$PrayerKajian {
   const factory PrayerKajian({
     required String id,
     required String name,

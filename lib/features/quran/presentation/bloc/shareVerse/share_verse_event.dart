@@ -1,7 +1,7 @@
 part of 'share_verse_bloc.dart';
 
 @freezed
-class ShareVerseEvent with _$ShareVerseEvent {
+abstract class ShareVerseEvent with _$ShareVerseEvent {
   const factory ShareVerseEvent.onInit({
     required final Verses verse,
     final JuzConstant? juz,

@@ -1,7 +1,7 @@
 part of 'kajian_bloc.dart';
 
 @freezed
-class KajianEvent with _$KajianEvent {
+abstract class KajianEvent with _$KajianEvent {
   const factory KajianEvent.fetchKajian({
     required int pageNumber,
     required Locale locale,

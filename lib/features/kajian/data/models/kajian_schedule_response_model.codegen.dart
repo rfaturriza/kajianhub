@@ -7,7 +7,7 @@ part 'kajian_schedule_response_model.codegen.freezed.dart';
 part 'kajian_schedule_response_model.codegen.g.dart';
 
 @freezed
-class KajianScheduleResponseModel with _$KajianScheduleResponseModel {
+abstract class KajianScheduleResponseModel with _$KajianScheduleResponseModel {
   const factory KajianScheduleResponseModel({
     DataKajianScheduleModel? data,
   }) = _KajianScheduleResponseModel;

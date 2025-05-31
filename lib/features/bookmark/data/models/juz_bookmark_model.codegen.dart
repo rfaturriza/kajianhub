@@ -7,7 +7,7 @@ part 'juz_bookmark_model.codegen.freezed.dart';
 part 'juz_bookmark_model.codegen.g.dart';
 
 @freezed
-class JuzBookmarkModel with _$JuzBookmarkModel {
+abstract class JuzBookmarkModel with _$JuzBookmarkModel {
   const factory JuzBookmarkModel({
     required String name,
     required int number,

@@ -7,7 +7,7 @@ import '../../../quran/domain/entities/surah_name.codegen.dart';
 part 'verse_bookmark.codegen.freezed.dart';
 
 @freezed
-class VerseBookmark with _$VerseBookmark {
+abstract class VerseBookmark with _$VerseBookmark {
   const factory VerseBookmark({
     SurahName? surahName,
     int? surahNumber,

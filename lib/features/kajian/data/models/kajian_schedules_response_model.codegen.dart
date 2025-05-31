@@ -7,7 +7,8 @@ part 'kajian_schedules_response_model.codegen.freezed.dart';
 part 'kajian_schedules_response_model.codegen.g.dart';
 
 @freezed
-class KajianSchedulesResponseModel with _$KajianSchedulesResponseModel {
+abstract class KajianSchedulesResponseModel
+    with _$KajianSchedulesResponseModel {
   const factory KajianSchedulesResponseModel({
     List<DataKajianScheduleModel>? data,
     LinksKajianScheduleModel? links,
@@ -39,7 +40,7 @@ class KajianSchedulesResponseModel with _$KajianSchedulesResponseModel {
 }
 
 @freezed
-class DataKajianScheduleModel with _$DataKajianScheduleModel {
+abstract class DataKajianScheduleModel with _$DataKajianScheduleModel {
   const factory DataKajianScheduleModel({
     int? id,
     String? title,
@@ -126,7 +127,7 @@ class DataKajianScheduleModel with _$DataKajianScheduleModel {
 }
 
 @freezed
-class HistoryKajianModel with _$HistoryKajianModel {
+abstract class HistoryKajianModel with _$HistoryKajianModel {
   const factory HistoryKajianModel({
     int? id,
     @JsonKey(name: 'kajian_id') String? kajianId,
@@ -174,7 +175,7 @@ class HistoryKajianModel with _$HistoryKajianModel {
 }
 
 @freezed
-class StudyLocationModel with _$StudyLocationModel {
+abstract class StudyLocationModel with _$StudyLocationModel {
   const factory StudyLocationModel({
     int? id,
     String? name,
@@ -256,7 +257,7 @@ class StudyLocationModel with _$StudyLocationModel {
 }
 
 @freezed
-class ProvinceModel with _$ProvinceModel {
+abstract class ProvinceModel with _$ProvinceModel {
   const factory ProvinceModel({
     int? id,
     String? name,
@@ -288,7 +289,7 @@ class ProvinceModel with _$ProvinceModel {
 }
 
 @freezed
-class CityModel with _$CityModel {
+abstract class CityModel with _$CityModel {
   const factory CityModel({
     int? id,
     String? name,
@@ -324,7 +325,7 @@ class CityModel with _$CityModel {
 }
 
 @freezed
-class UstadzModel with _$UstadzModel {
+abstract class UstadzModel with _$UstadzModel {
   const factory UstadzModel({
     int? id,
     @JsonKey(name: 'ustadz_id') String? ustadzId,
@@ -376,7 +377,7 @@ class UstadzModel with _$UstadzModel {
 }
 
 @freezed
-class KajianThemeModel with _$KajianThemeModel {
+abstract class KajianThemeModel with _$KajianThemeModel {
   const factory KajianThemeModel({
     int? id,
     @JsonKey(name: 'theme_id') String? themeId,
@@ -412,7 +413,7 @@ class KajianThemeModel with _$KajianThemeModel {
 }
 
 @freezed
-class DailyScheduleModel with _$DailyScheduleModel {
+abstract class DailyScheduleModel with _$DailyScheduleModel {
   const factory DailyScheduleModel({
     int? id,
     @JsonKey(name: 'day_id') String? dayId,
@@ -448,7 +449,7 @@ class DailyScheduleModel with _$DailyScheduleModel {
 }
 
 @freezed
-class LinksKajianScheduleModel with _$LinksKajianScheduleModel {
+abstract class LinksKajianScheduleModel with _$LinksKajianScheduleModel {
   const factory LinksKajianScheduleModel({
     String? first,
     String? last,
@@ -488,7 +489,7 @@ class LinksKajianScheduleModel with _$LinksKajianScheduleModel {
 }
 
 @freezed
-class MetaKajianScheduleModel with _$MetaKajianScheduleModel {
+abstract class MetaKajianScheduleModel with _$MetaKajianScheduleModel {
   const factory MetaKajianScheduleModel({
     @JsonKey(name: 'current_page') int? currentPage,
     int? from,
@@ -544,7 +545,7 @@ class MetaKajianScheduleModel with _$MetaKajianScheduleModel {
 }
 
 @freezed
-class LinksMetaModel with _$LinksMetaModel {
+abstract class LinksMetaModel with _$LinksMetaModel {
   const factory LinksMetaModel({
     String? url,
     String? label,

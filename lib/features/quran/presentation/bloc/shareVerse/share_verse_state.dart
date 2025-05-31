@@ -1,7 +1,7 @@
 part of 'share_verse_bloc.dart';
 
 @freezed
-class ShareVerseState with _$ShareVerseState {
+abstract class ShareVerseState with _$ShareVerseState {
   const factory ShareVerseState({
     Verses? verse,
     JuzConstant? juz,

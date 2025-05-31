@@ -4,7 +4,7 @@ import 'package:quranku/core/utils/pair.dart';
 part 'filter_kajian_schedule.codegen.freezed.dart';
 
 @freezed
-class FilterKajianSchedule with _$FilterKajianSchedule {
+abstract class FilterKajianSchedule with _$FilterKajianSchedule {
   const factory FilterKajianSchedule({
     Pair<String, String>? studyLocationProvinceId,
     Pair<String, String>? studyLocationCityId,

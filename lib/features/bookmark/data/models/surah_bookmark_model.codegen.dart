@@ -8,7 +8,7 @@ part 'surah_bookmark_model.codegen.freezed.dart';
 part 'surah_bookmark_model.codegen.g.dart';
 
 @freezed
-class SurahBookmarkModel with _$SurahBookmarkModel {
+abstract class SurahBookmarkModel with _$SurahBookmarkModel {
   const factory SurahBookmarkModel({
     required SurahNameModel surahName,
     required int surahNumber,

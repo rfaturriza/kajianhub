@@ -1,6 +1,6 @@
 import 'package:adhan/adhan.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:quranku/features/shalat/presentation/helper/helper_time_shalat.dart';
 
 import '../../../../core/constants/hive_constants.dart';
@@ -11,7 +11,7 @@ part 'prayer_schedule_setting_model.codegen.g.dart';
 
 @freezed
 @HiveType(typeId: HiveTypeConst.prayerScheduleSettingModel)
-class PrayerScheduleSettingModel with _$PrayerScheduleSettingModel {
+abstract class PrayerScheduleSettingModel with _$PrayerScheduleSettingModel {
   const factory PrayerScheduleSettingModel({
     @HiveField(0) @Default([]) List<PrayerAlarmModel> alarms,
     @HiveField(1) @Default('egyptian') String calculationMethod,
@@ -55,7 +55,7 @@ class PrayerScheduleSettingModel with _$PrayerScheduleSettingModel {
 
 @freezed
 @HiveType(typeId: HiveTypeConst.prayerAlarmModel)
-class PrayerAlarmModel with _$PrayerAlarmModel {
+abstract class PrayerAlarmModel with _$PrayerAlarmModel {
   const factory PrayerAlarmModel({
     @HiveField(0) DateTime? time,
     @HiveField(1) String? prayer,

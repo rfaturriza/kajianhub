@@ -4,7 +4,7 @@ part 'kajian_schedule_request_model.codegen.freezed.dart';
 part 'kajian_schedule_request_model.codegen.g.dart';
 
 @freezed
-class KajianScheduleRequestModel with _$KajianScheduleRequestModel {
+abstract class KajianScheduleRequestModel with _$KajianScheduleRequestModel {
   const factory KajianScheduleRequestModel({
     /// type:pagination/collection
     required String type,
@@ -51,5 +51,6 @@ class KajianScheduleRequestModel with _$KajianScheduleRequestModel {
     json['options'] = json['options[]'];
     json.remove('options[]');
     json.removeWhere((k, v) => v == null);
-    return json.cast<String, Object>();  }
+    return json.cast<String, Object>();
+  }
 }

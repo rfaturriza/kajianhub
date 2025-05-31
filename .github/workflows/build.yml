@@ -1,43 +1,48 @@
-name: Build Flutter
+name: Build and Test
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main, develop ]
   pull_request:
+    branches: [ main, develop ]
 
 jobs:
   build:
     name: Build ${{ matrix.target }}
-    runs-on: macos-15
-    outputs:
-      flutter_version: ${{ steps.read_fvm_config.outputs.content }}
+    runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
-        target: ["apk --debug", "appbundle --debug", "ios --no-codesign"]
+        target: [ios --no-codesign, apk --debug]
+        include:
+          - target: ios --no-codesign
+            os: macos-15
+          - target: apk --debug
+            os: ubuntu-latest
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        if: ${{ matrix.target != 'ios --no-codesign' }}
+      - uses: actions/checkout@v4
+      
+      - name: Setup Java
+        if: matrix.target != 'ios --no-codesign'
         uses: actions/setup-java@v3
         with:
-          java-version: 17
-          distribution: "temurin"
+          java-version: '17'
+          distribution: 'temurin'
 
-      - name: Read Version Flutter
-        id: read_fvm_config
-        uses: juliangruber/read-file-action@v1.1.6
+      - name: Read Flutter Version
+        id: read_version
+        uses: juliangruber/read-file-action@v1
         with:
           path: ./.fvm/fvm_config.json
-
-      - name: Set up Flutter
+          trim: true
+          
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{fromJson(steps.read_fvm_config.outputs.content).flutterSdkVersion}}
-
+          flutter-version: ${{fromJson(steps. read_version.outputs.content).flutterSdkVersion}}
+          channel: 'stable'
+          cache: true
+          
       - name: Configure Firebase and Environment
         run: |
           echo "$FIREBASE_OPTIONS" | base64 --decode > lib/firebase_options.dart
@@ -55,13 +60,16 @@ jobs:
           FIREBASE_ANDROID_JSON: ${{ secrets.GOOGLE_SERVICE_ANDROID_JSON_FILE }}
           FIREBASE_IOS_PLIST: ${{ secrets.GOOGLE_SERVICE_IOS_PLIST_FILE }}
           ENV_FILE: ${{ secrets.ENV_FILE }}
-
-      - name: Install dependencies
+          
+      - name: Install Dependencies
         run: |
           flutter pub get
-          flutter pub run build_runner build --delete-conflicting-outputs
-          flutter pub run easy_localization:generate -f keys -o locale_keys.g.dart --source-dir assets/translations
+          dart run build_runner build --delete-conflicting-outputs
+          dart run easy_localization:generate -f keys -o locale_keys.g.dart --source-dir assets/translations
           dart pub global activate flutterfire_cli
+      
+      - name: Run Tests
+        run: flutter test --no-pub --coverage
 
-      - name: Build
+      - name: Build ${{ matrix.target }}
         run: flutter build ${{ matrix.target }}

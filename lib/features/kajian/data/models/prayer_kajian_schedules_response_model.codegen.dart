@@ -7,7 +7,7 @@ part 'prayer_kajian_schedules_response_model.codegen.freezed.dart';
 part 'prayer_kajian_schedules_response_model.codegen.g.dart';
 
 @freezed
-class PrayerKajianSchedulesByMosqueResponseModel
+abstract class PrayerKajianSchedulesByMosqueResponseModel
     with _$PrayerKajianSchedulesByMosqueResponseModel {
   const factory PrayerKajianSchedulesByMosqueResponseModel({
     String? prayDate,
@@ -20,7 +20,8 @@ class PrayerKajianSchedulesByMosqueResponseModel
 }
 
 @freezed
-class PrayerKajianSchedulesResponseModel with _$PrayerKajianSchedulesResponseModel {
+abstract class PrayerKajianSchedulesResponseModel
+    with _$PrayerKajianSchedulesResponseModel {
   const factory PrayerKajianSchedulesResponseModel({
     List<PrayerKajianScheduleModel>? data,
     LinksKajianScheduleModel? links,
@@ -43,7 +44,8 @@ class PrayerKajianSchedulesResponseModel with _$PrayerKajianSchedulesResponseMod
 }
 
 @freezed
-class DataPrayerKajianScheduleModel with _$DataPrayerKajianScheduleModel {
+abstract class DataPrayerKajianScheduleModel
+    with _$DataPrayerKajianScheduleModel {
   const factory DataPrayerKajianScheduleModel({
     StudyLocationModel? studyLocation,
     List<PrayerKajianScheduleModel>? schedules,
@@ -54,7 +56,7 @@ class DataPrayerKajianScheduleModel with _$DataPrayerKajianScheduleModel {
 }
 
 @freezed
-class PrayerKajianScheduleModel with _$PrayerKajianScheduleModel {
+abstract class PrayerKajianScheduleModel with _$PrayerKajianScheduleModel {
   const factory PrayerKajianScheduleModel({
     int? id,
     @JsonKey(name: 'pray_date') String? prayDate,

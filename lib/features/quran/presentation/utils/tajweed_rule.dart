@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:quranku/generated/locale_keys.g.dart';
 
 part 'tajweed_rule.g.dart';
@@ -164,7 +164,7 @@ enum TajweedRule {
       case TajweedRule.izhar:
         return "مِنْ غَفُورٍ رَحِيمَ";
       case TajweedRule.ikhfaa:
-        return  "رِيحًا صَرْصَرًا";
+        return "رِيحًا صَرْصَرًا";
       case TajweedRule.idghamWithGhunna:
         return "مِنْ قَبْلِ أَنْ يَتَمَاسَّا";
       case TajweedRule.iqlab:

@@ -10,7 +10,7 @@ part 'verse_bookmark_model.codegen.freezed.dart';
 part 'verse_bookmark_model.codegen.g.dart';
 
 @freezed
-class VerseBookmarkModel with _$VerseBookmarkModel {
+abstract class VerseBookmarkModel with _$VerseBookmarkModel {
   const factory VerseBookmarkModel({
     SurahNameModel? surahName,
     int? surahNumber,

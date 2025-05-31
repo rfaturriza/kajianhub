@@ -5,7 +5,7 @@ import 'package:quranku/generated/locale_keys.g.dart';
 part 'week_kajian.codegen.freezed.dart';
 
 @freezed
-class WeekKajian with _$WeekKajian {
+abstract class WeekKajian with _$WeekKajian {
   const factory WeekKajian({
     required String id,
     required String name,

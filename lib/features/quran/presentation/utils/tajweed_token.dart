@@ -1,4 +1,4 @@
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 
 import 'tajweed_rule.dart';
 import 'tajweed_subrule.dart';

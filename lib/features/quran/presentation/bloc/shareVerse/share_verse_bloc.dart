@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -125,14 +124,16 @@ class ShareVerseBloc extends Bloc<ShareVerseEvent, ShareVerseState> {
       return;
     }
     emit(state.copyWith(isLoading: false));
-    Share.shareXFiles(
-      [
-        XFile.fromData(
-          pngBytes,
-          name: 'verse-story.png',
-          mimeType: 'image/png',
-        ),
-      ],
+    SharePlus.instance.share(
+      ShareParams(
+        files: [
+          XFile.fromData(
+            pngBytes,
+            name: 'verse-story.png',
+            mimeType: 'image/png',
+          ),
+        ],
+      ),
     );
   }
 

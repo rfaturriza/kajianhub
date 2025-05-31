@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:injectable/injectable.dart';
 import 'package:quranku/core/constants/hive_constants.dart';
 import 'package:quranku/core/error/failures.dart';
@@ -89,7 +89,8 @@ class BookmarkLocalDataSourceImpl implements BookmarkLocalDataSource {
       return right(unit);
     } catch (e) {
       return left(
-        CacheFailure(message: LocaleKeys.errorRemovingJuzBookmark.tr(
+        CacheFailure(
+            message: LocaleKeys.errorRemovingJuzBookmark.tr(
           args: [juzBookmark.number.toString()],
         )),
       );
@@ -108,7 +109,8 @@ class BookmarkLocalDataSourceImpl implements BookmarkLocalDataSource {
     } catch (e) {
       return Future.value(
         left(
-          CacheFailure(message: LocaleKeys.errorRemovingSurahBookmark.tr(
+          CacheFailure(
+              message: LocaleKeys.errorRemovingSurahBookmark.tr(
             args: [surahBookmark.surahName.short ?? emptyString],
           )),
         ),
@@ -127,7 +129,8 @@ class BookmarkLocalDataSourceImpl implements BookmarkLocalDataSource {
       return right(unit);
     } catch (e) {
       return left(
-        CacheFailure(message: LocaleKeys.errorRemovingVerseBookmark.tr(
+        CacheFailure(
+            message: LocaleKeys.errorRemovingVerseBookmark.tr(
           args: [
             (verseBookmark.surahName?.short ?? emptyString),
             verseBookmark.verseNumber.toString(),
@@ -154,7 +157,8 @@ class BookmarkLocalDataSourceImpl implements BookmarkLocalDataSource {
   }
 
   @override
-  Future<Either<Failure, List<SurahBookmarkModel>>> getListSurahBookmark() async {
+  Future<Either<Failure, List<SurahBookmarkModel>>>
+      getListSurahBookmark() async {
     try {
       var box = await Hive.openBox(HiveConst.surahBookmarkBox);
       final list = box.values.map((e) => jsonDecode(e)).toList();
@@ -170,7 +174,8 @@ class BookmarkLocalDataSourceImpl implements BookmarkLocalDataSource {
   }
 
   @override
-  Future<Either<Failure, List<VerseBookmarkModel>>> getListVersesBookmark() async {
+  Future<Either<Failure, List<VerseBookmarkModel>>>
+      getListVersesBookmark() async {
     try {
       var box = await Hive.openBox(HiveConst.verseBookmarkBox);
       final list = box.values.map((e) => jsonDecode(e)).toList();

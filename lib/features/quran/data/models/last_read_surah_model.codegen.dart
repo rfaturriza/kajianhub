@@ -9,7 +9,7 @@ part 'last_read_surah_model.codegen.freezed.dart';
 part 'last_read_surah_model.codegen.g.dart';
 
 @freezed
-class LastReadSurahModel with _$LastReadSurahModel {
+abstract class LastReadSurahModel with _$LastReadSurahModel {
   const factory LastReadSurahModel({
     required SurahNameModel? surahName,
     required int surahNumber,
@@ -37,7 +37,7 @@ class LastReadSurahModel with _$LastReadSurahModel {
       );
 
   LastReadSurah toEntity() => LastReadSurah(
-    surahName: surahName?.toEntity(),
+        surahName: surahName?.toEntity(),
         surahNumber: surahNumber,
         revelation: revelation?.toEntity(),
         totalVerses: totalVerses,

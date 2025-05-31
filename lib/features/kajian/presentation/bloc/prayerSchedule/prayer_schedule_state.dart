@@ -1,7 +1,7 @@
 part of 'prayer_schedule_bloc.dart';
 
 @freezed
-class PrayerScheduleState with _$PrayerScheduleState {
+abstract class PrayerScheduleState with _$PrayerScheduleState {
   const factory PrayerScheduleState({
     @Default(FormzSubmissionStatus.initial) FormzSubmissionStatus status,
     @Default([]) List<PrayerKajianSchedule> prayerKajianSchedules,

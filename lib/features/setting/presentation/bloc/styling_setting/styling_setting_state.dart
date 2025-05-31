@@ -1,7 +1,7 @@
 part of 'styling_setting_bloc.dart';
 
 @freezed
-class StylingSettingState with _$StylingSettingState {
+abstract class StylingSettingState with _$StylingSettingState {
   const factory StylingSettingState({
     @Default(FormzSubmissionStatus.initial)
     FormzSubmissionStatus statusArabicFontSize,
@@ -15,7 +15,8 @@ class StylingSettingState with _$StylingSettingState {
     @Default(FontConst.lpmqIsepMisbah) String fontFamilyArabic,
     @Default(FontConst.defaultLatinFontSize) double latinFontSize,
     @Default(FontConst.defaultTranslationFontSize) double translationFontSize,
-    @Default(LastReadReminderModes.on) LastReadReminderModes lastReadReminderMode,
+    @Default(LastReadReminderModes.on)
+    LastReadReminderModes lastReadReminderMode,
     @Default(true) bool isShowLatin,
     @Default(true) bool isShowTranslation,
     @Default(true) bool isColoredTajweedEnabled,

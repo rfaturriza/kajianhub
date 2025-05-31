@@ -6,7 +6,7 @@ part 'ustadz_response_model.codegen.freezed.dart';
 part 'ustadz_response_model.codegen.g.dart';
 
 @freezed
-class UstadzResponseModel with _$UstadzResponseModel {
+abstract class UstadzResponseModel with _$UstadzResponseModel {
   const factory UstadzResponseModel({
     List<DataUstadzModel>? data,
   }) = _UstadzResponseModel;
@@ -16,7 +16,7 @@ class UstadzResponseModel with _$UstadzResponseModel {
 }
 
 @freezed
-class DataUstadzModel with _$DataUstadzModel {
+abstract class DataUstadzModel with _$DataUstadzModel {
   const factory DataUstadzModel({
     int? id,
     String? name,
@@ -62,7 +62,7 @@ class DataUstadzModel with _$DataUstadzModel {
 }
 
 @freezed
-class UstadzRolesModel with _$UstadzRolesModel {
+abstract class UstadzRolesModel with _$UstadzRolesModel {
   const factory UstadzRolesModel({
     int? id,
     @JsonKey(name: 'user_id') String? userId,

@@ -92,9 +92,6 @@ platform :ios do
       workspace: "Runner.xcworkspace",
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
-      configuration: "Release",
-      silent: true,
-      clean: true,
       output_directory: "./fastlane/build",
       output_name: "app.ipa",
       configuration: "Release",
@@ -102,6 +99,9 @@ platform :ios do
       clean: true,
       output_directory: "./fastlane/build",
       output_name: "app.ipa",
+      configuration: "Release",
+      silent: true,
+      clean: true,
       export_method: "app-store"
     )
   end
@@ -151,6 +151,7 @@ platform :ios do
   lane :internal_minor do
     release_lane(update_type: "minor", target: :internal)
   end
+  
 
   desc "Internal release - major"
   desc "Internal release - minor"

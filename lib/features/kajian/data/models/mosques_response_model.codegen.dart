@@ -6,7 +6,7 @@ part 'mosques_response_model.codegen.freezed.dart';
 part 'mosques_response_model.codegen.g.dart';
 
 @freezed
-class MosquesResponseModel with _$MosquesResponseModel {
+abstract class MosquesResponseModel with _$MosquesResponseModel {
   const factory MosquesResponseModel({
     List<DataMosqueModel>? data,
   }) = _MosquesResponseModel;
@@ -16,7 +16,7 @@ class MosquesResponseModel with _$MosquesResponseModel {
 }
 
 @freezed
-class DataMosqueModel with _$DataMosqueModel {
+abstract class DataMosqueModel with _$DataMosqueModel {
   const factory DataMosqueModel({
     int? id,
     String? name,

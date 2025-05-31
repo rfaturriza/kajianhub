@@ -24,6 +24,9 @@ import 'features/setting/presentation/bloc/styling_setting/styling_setting_bloc.
 class App extends StatefulWidget {
   const App({super.key});
 
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
   @override
   State<App> createState() => _AppState();
 }
@@ -47,7 +50,9 @@ class _AppState extends State<App> with WidgetsBindingObserver {
       // When app is resumed, check for location changes and update notifications
       final context = App.navigatorKey.currentContext;
       if (context != null) {
-        context.read<ShalatBloc>().add(const ShalatEvent.checkAndUpdateNotificationsEvent());
+        context
+            .read<ShalatBloc>()
+            .add(const ShalatEvent.checkAndUpdateNotificationsEvent());
       }
     }
   }

@@ -18,7 +18,6 @@ import 'package:quranku/features/shalat/domain/usecase/get_location_manual_useca
 import 'package:quranku/features/shalat/domain/usecase/schedule_prayer_alarm_usecase.dart';
 import 'package:quranku/features/shalat/domain/usecase/schedule_prayer_alarm_with_location_usecase.dart';
 import 'package:quranku/features/shalat/domain/usecase/set_location_manual_usecase.dart';
-import 'package:quranku/features/shalat/presentation/helper/location_helper.dart';
 
 import '../../../../../core/error/failures.dart';
 import '../../../../../core/usecases/usecase.dart';

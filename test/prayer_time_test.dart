@@ -2,6 +2,7 @@ import 'package:adhan/adhan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quranku/features/shalat/domain/entities/geolocation.codegen.dart';
+import 'package:quranku/features/shalat/domain/entities/schedule.codegen.dart';
 import 'package:quranku/features/shalat/presentation/helper/location_helper.dart';
 
 void main() {
@@ -46,11 +47,11 @@ void main() {
       const double lat2 = -6.9175;
       const double lon2 = 107.6191;
       
-      // Expected distance between Jakarta and Bandung is approximately 126.7 km
+      // Expected distance between Jakarta and Bandung is approximately 116.24 km
       final double distance = LocationHelper.calculateDistance(lat1, lon1, lat2, lon2);
       
       // Allow for some margin of error in the calculation
-      expect(distance, closeTo(126.7, 5.0));
+      expect(distance, closeTo(116.24, 5.0));
     });
     
     test('should detect significant location changes', () {
@@ -58,13 +59,12 @@ void main() {
       final location1 = GeoLocation(
         coordinate: Coordinate(lat: -6.2088, lon: 106.8456),
         country: 'Indonesia',
-        place: 'Jakarta',
+        regions: List.from(['Jakarta']),
       );
       
       final location2 = GeoLocation(
         coordinate: Coordinate(lat: -6.9175, lon: 107.6191),
         country: 'Indonesia',
-        place: 'Bandung',
       );
       
       // Should detect as significantly different
@@ -74,13 +74,11 @@ void main() {
       final location3 = GeoLocation(
         coordinate: Coordinate(lat: -6.2088, lon: 106.8456),
         country: 'Indonesia',
-        place: 'Jakarta',
       );
       
       final location4 = GeoLocation(
         coordinate: Coordinate(lat: -6.2090, lon: 106.8458),
         country: 'Indonesia',
-        place: 'Jakarta',
       );
       
       // Should not detect as significantly different
@@ -94,7 +92,6 @@ void main() {
       final locationWithNullCoordinate = GeoLocation(
         coordinate: null,
         country: 'Indonesia',
-        place: 'Jakarta',
       );
       
       expect(LocationHelper.isLocationSignificantlyDifferent(locationWithNullCoordinate, location2), true);

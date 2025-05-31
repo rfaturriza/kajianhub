@@ -72,3 +72,8 @@ firebase_app_id_file.json
 firebase_options*.dart
 **/google-services*.json
 **/GoogleService-Info*.plist
+
+# mocks generated
+*.mocks.dart
+# coverage
+coverage/

@@ -7,7 +7,7 @@ part 'juz.codegen.freezed.dart';
 part 'juz.codegen.g.dart';
 
 @freezed
-class JuzConstant with _$JuzConstant {
+abstract class JuzConstant with _$JuzConstant {
   const factory JuzConstant({
     required int number,
     required String name,

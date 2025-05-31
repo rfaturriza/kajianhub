@@ -1,7 +1,7 @@
 part of 'kajian_bloc.dart';
 
 @freezed
-class KajianState with _$KajianState {
+abstract class KajianState with _$KajianState {
   const factory KajianState({
     @Default(FormzSubmissionStatus.initial)
     FormzSubmissionStatus statusRecommended,

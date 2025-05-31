@@ -1,7 +1,7 @@
 part of 'qibla_bloc.dart';
 
 @freezed
-class QiblaEvent with _$QiblaEvent {
+abstract class QiblaEvent with _$QiblaEvent {
   const factory QiblaEvent.streamLocationEvent(
     Either<Failure, LocationStatus>? locationStatus,
   ) = StreamLocationEvent;

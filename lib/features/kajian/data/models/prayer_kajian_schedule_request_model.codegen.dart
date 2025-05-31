@@ -4,7 +4,7 @@ part 'prayer_kajian_schedule_request_model.codegen.freezed.dart';
 part 'prayer_kajian_schedule_request_model.codegen.g.dart';
 
 @freezed
-class PrayerKajianScheduleByMosqueRequestModel
+abstract class PrayerKajianScheduleByMosqueRequestModel
     with _$PrayerKajianScheduleByMosqueRequestModel {
   const factory PrayerKajianScheduleByMosqueRequestModel({
     @JsonKey(name: 'pray_date') String? prayDate,
@@ -24,7 +24,8 @@ class PrayerKajianScheduleByMosqueRequestModel
 }
 
 @freezed
-class PrayerKajianScheduleRequestModel with _$PrayerKajianScheduleRequestModel {
+abstract class PrayerKajianScheduleRequestModel
+    with _$PrayerKajianScheduleRequestModel {
   const factory PrayerKajianScheduleRequestModel({
     /// type:pagination/collection
     required String type,

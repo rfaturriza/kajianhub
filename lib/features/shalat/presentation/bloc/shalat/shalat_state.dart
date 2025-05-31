@@ -1,7 +1,7 @@
 part of 'shalat_bloc.dart';
 
 @freezed
-class ShalatState with _$ShalatState {
+abstract class ShalatState with _$ShalatState {
   const factory ShalatState({
     @Default(Locale("en", "US")) Locale locale,
     LocationStatus? locationStatus,

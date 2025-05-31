@@ -62,6 +62,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/app/.cxx
 *.env
 
 # FVM Version Cache
@@ -71,3 +72,8 @@ firebase_app_id_file.json
 firebase_options*.dart
 **/google-services*.json
 **/GoogleService-Info*.plist
+
+# mocks generated
+*.mocks.dart
+# coverage
+coverage/

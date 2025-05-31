@@ -7,7 +7,7 @@ part 'transaction_response_model.codegen.freezed.dart';
 part 'transaction_response_model.codegen.g.dart';
 
 @freezed
-class TransactionResponseModel with _$TransactionResponseModel {
+abstract class TransactionResponseModel with _$TransactionResponseModel {
   const factory TransactionResponseModel({
     String? token,
     @JsonKey(name: "redirect_url") String? redirectUrl,

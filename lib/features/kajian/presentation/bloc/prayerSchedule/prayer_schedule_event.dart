@@ -1,7 +1,7 @@
 part of 'prayer_schedule_bloc.dart';
 
 @freezed
-class PrayerScheduleEvent with _$PrayerScheduleEvent {
+abstract class PrayerScheduleEvent with _$PrayerScheduleEvent {
   const factory PrayerScheduleEvent.fetchPrayerKajianSchedules({
     required Locale locale,
     required int pageNumber,

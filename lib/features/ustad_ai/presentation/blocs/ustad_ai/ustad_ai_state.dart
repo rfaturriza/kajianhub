@@ -1,7 +1,7 @@
 part of 'ustad_ai_bloc.dart';
 
 @freezed
-class UstadAiState with _$UstadAiState {
+abstract class UstadAiState with _$UstadAiState {
   const factory UstadAiState.initial() = UstadAiInitialState;
   const factory UstadAiState.streaming({
     required String text,

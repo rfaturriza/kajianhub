@@ -10,7 +10,7 @@ part 'detail_surah_model.codegen.freezed.dart';
 part 'detail_surah_model.codegen.g.dart';
 
 @freezed
-class DetailSurahResponseModel with _$DetailSurahResponseModel {
+abstract class DetailSurahResponseModel with _$DetailSurahResponseModel {
   const factory DetailSurahResponseModel({
     int? code,
     String? status,
@@ -23,7 +23,7 @@ class DetailSurahResponseModel with _$DetailSurahResponseModel {
 }
 
 @freezed
-class DataDetailSurahModel with _$DataDetailSurahModel {
+abstract class DataDetailSurahModel with _$DataDetailSurahModel {
   const factory DataDetailSurahModel({
     int? number,
     int? sequence,
@@ -65,7 +65,7 @@ class DataDetailSurahModel with _$DataDetailSurahModel {
 }
 
 @freezed
-class PreBismillahModel with _$PreBismillahModel {
+abstract class PreBismillahModel with _$PreBismillahModel {
   const factory PreBismillahModel({
     VersesTextModel? text,
   }) = _PreBismillahModel;

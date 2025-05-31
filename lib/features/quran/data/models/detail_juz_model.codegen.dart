@@ -7,7 +7,7 @@ part 'detail_juz_model.codegen.freezed.dart';
 part 'detail_juz_model.codegen.g.dart';
 
 @freezed
-class DetailJuzResponseModel with _$DetailJuzResponseModel {
+abstract class DetailJuzResponseModel with _$DetailJuzResponseModel {
   const factory DetailJuzResponseModel({
     int? code,
     String? status,
@@ -20,7 +20,7 @@ class DetailJuzResponseModel with _$DetailJuzResponseModel {
 }
 
 @freezed
-class DataDetailJuzModel with _$DataDetailJuzModel {
+abstract class DataDetailJuzModel with _$DataDetailJuzModel {
   const factory DataDetailJuzModel({
     int? juz,
     int? juzStartSurahNumber,

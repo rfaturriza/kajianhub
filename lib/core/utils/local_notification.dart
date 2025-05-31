@@ -110,8 +110,6 @@ class LocalNotification {
       body,
       tzDateTime,
       platformChannelSpecifics,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
       matchDateTimeComponents: DateTimeComponents.dateAndTime,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -161,8 +159,6 @@ class LocalNotification {
       body,
       firstSchedule,
       platformChannelSpecifics,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
       matchDateTimeComponents: DateTimeComponents.time,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,

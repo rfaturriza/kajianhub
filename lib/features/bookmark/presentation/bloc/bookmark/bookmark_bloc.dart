@@ -69,13 +69,16 @@ class BookmarkBloc extends Bloc<BookmarkEvent, BookmarkState> {
     }
 
     on<BookmarkEvent>((event, emit) async {
-      await event.when<Future<void>>(
-        getListVersesBookmark: () => onGetListVersesBookmark(emit),
-        getListSurahBookmark: () => onGetListSurahBookmark(emit),
-        getListJuzBookmark: () => onGetListJuzBookmark(emit),
-        onChangedExpansionPanel: (int index, bool isExpanded) =>
-            onChangedExpansionPanel(emit, index, isExpanded),
-      );
+      switch (event) {
+        case _GetListVersesBookmark():
+          await onGetListVersesBookmark(emit);
+        case _GetListSurahBookmark():
+          await onGetListSurahBookmark(emit);
+        case _GetListJuzBookmark():
+          await onGetListJuzBookmark(emit);
+        case _OnChangedExpansionPanel(:final index, :final isExpanded):
+          await onChangedExpansionPanel(emit, index, isExpanded);
+      }
     });
   }
 }

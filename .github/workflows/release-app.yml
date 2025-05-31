@@ -9,6 +9,10 @@ on:
       lane:
         required: true
         type: string
+      firebase_groups:
+        required: false
+        type: string
+        default: "testers"
 
 jobs:
   build:
@@ -18,6 +22,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for release notes generation
 
       - name: Set up JDK 17
         if: ${{ inputs.platform == 'android' }}
@@ -77,7 +83,12 @@ jobs:
             echo "keyAlias=$KEYSTORE_KEY_ALIAS" >> key.properties
             echo "storePassword=$KEYSTORE_STORE_PASSWORD" >> key.properties
             echo "keyPassword=$KEYSTORE_KEY_PASSWORD" >> key.properties
-            bundle exec fastlane ${{ inputs.lane }}
+            
+            if [[ "${{ inputs.lane }}" == firebase_dist* ]]; then
+              bundle exec fastlane ${{ inputs.lane }} groups:${{ inputs.firebase_groups }}
+            else
+              bundle exec fastlane ${{ inputs.lane }}
+            fi
           else
             flutter build ipa --no-codesign
             bundle exec fastlane match appstore --readonly
@@ -91,6 +102,10 @@ jobs:
           KEYSTORE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           PLAY_STORE_CONFIG_JSON: ${{ secrets.GPLAY_SERVICE_ACCOUNT_KEY_JSON }}
+          
+          # Firebase Distribution
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_CLI_TOKEN: ${{ secrets.FIREBASE_CLI_TOKEN }}
 
           # iOS
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}

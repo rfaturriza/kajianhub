@@ -4,7 +4,7 @@ import 'package:quranku/core/utils/pair.dart';
 part 'filter_prayer_schedule.codegen.freezed.dart';
 
 @freezed
-class FilterPrayerSchedule with _$FilterPrayerSchedule {
+abstract class FilterPrayerSchedule with _$FilterPrayerSchedule {
   const factory FilterPrayerSchedule({
     Pair<String, String>? studyLocationProvinceId,
     Pair<String, String>? studyLocationCityId,

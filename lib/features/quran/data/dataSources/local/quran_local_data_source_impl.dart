@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:injectable/injectable.dart';
 import 'package:quranku/core/error/failures.dart';
 import 'package:quranku/features/quran/data/dataSources/local/quran_local_data_source.dart';
@@ -187,7 +187,8 @@ class QuranLocalDataSourceImpl implements QuranLocalDataSource {
 
   @override
   Future<Either<Failure, Unit>> setLastReadSurah(
-    LastReadSurahModel surah,) async {
+    LastReadSurahModel surah,
+  ) async {
     try {
       var box = await Hive.openBox(HiveConst.lastReadSurahBox);
       final key = surah.createdAt.millisecondsSinceEpoch.toString();

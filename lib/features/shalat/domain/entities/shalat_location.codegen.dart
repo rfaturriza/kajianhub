@@ -4,7 +4,7 @@ import 'package:quranku/features/shalat/data/models/shalat_location_model.codege
 part 'shalat_location.codegen.freezed.dart';
 
 @freezed
-class ShalatLocation with _$ShalatLocation{
+abstract class ShalatLocation with _$ShalatLocation {
   const factory ShalatLocation({
     String? id,
     String? location,
@@ -12,7 +12,7 @@ class ShalatLocation with _$ShalatLocation{
 
   const ShalatLocation._();
   ShalatLocationModel toModel() => ShalatLocationModel(
-    id: id,
-    location: location,
-  );
+        id: id,
+        location: location,
+      );
 }

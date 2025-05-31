@@ -7,7 +7,7 @@ part 'shalat_location_model.codegen.freezed.dart';
 part 'shalat_location_model.codegen.g.dart';
 
 @freezed
-class ShalatLocationResponseModel with _$ShalatLocationResponseModel {
+abstract class ShalatLocationResponseModel with _$ShalatLocationResponseModel {
   const factory ShalatLocationResponseModel({
     bool? status,
     List<ShalatLocationModel>? data,
@@ -17,11 +17,12 @@ class ShalatLocationResponseModel with _$ShalatLocationResponseModel {
   factory ShalatLocationResponseModel.fromJson(Map<String, dynamic> json) =>
       _$ShalatLocationResponseModelFromJson(json);
 
-  List<ShalatLocation> toEntity() => data?.map((e) => e.toEntity()).toList() ?? [];
+  List<ShalatLocation> toEntity() =>
+      data?.map((e) => e.toEntity()).toList() ?? [];
 }
 
 @freezed
-class ShalatLocationModel with _$ShalatLocationModel {
+abstract class ShalatLocationModel with _$ShalatLocationModel {
   const factory ShalatLocationModel({
     String? id,
     @JsonKey(name: 'lokasi') String? location,
@@ -31,13 +32,14 @@ class ShalatLocationModel with _$ShalatLocationModel {
   factory ShalatLocationModel.fromJson(Map<String, dynamic> json) =>
       _$ShalatLocationModelFromJson(json);
 
-  factory ShalatLocationModel.fromEntity(ShalatLocation entity) => ShalatLocationModel(
-    id: entity.id,
-    location: entity.location,
-  );
+  factory ShalatLocationModel.fromEntity(ShalatLocation entity) =>
+      ShalatLocationModel(
+        id: entity.id,
+        location: entity.location,
+      );
 
   ShalatLocation toEntity() => ShalatLocation(
-    id: id,
-    location: location,
-  );
+        id: id,
+        location: location,
+      );
 }

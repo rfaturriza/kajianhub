@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'kajian_schedule.codegen.freezed.dart';
 
 @freezed
-class KajianSchedules with _$KajianSchedules {
+abstract class KajianSchedules with _$KajianSchedules {
   const factory KajianSchedules({
     required List<DataKajianSchedule> data,
     required LinksKajianSchedule links,
@@ -12,7 +12,7 @@ class KajianSchedules with _$KajianSchedules {
 }
 
 @freezed
-class DataKajianSchedule with _$DataKajianSchedule {
+abstract class DataKajianSchedule with _$DataKajianSchedule {
   const factory DataKajianSchedule({
     required int id,
     required String title,
@@ -34,7 +34,7 @@ class DataKajianSchedule with _$DataKajianSchedule {
   const DataKajianSchedule._();
 
   static DataKajianSchedule empty() {
-    return  const DataKajianSchedule(
+    return const DataKajianSchedule(
       id: 0,
       title: '',
       type: '',
@@ -70,7 +70,7 @@ class DataKajianSchedule with _$DataKajianSchedule {
 }
 
 @freezed
-class HistoryKajian with _$HistoryKajian {
+abstract class HistoryKajian with _$HistoryKajian {
   const factory HistoryKajian({
     required int id,
     required String kajianId,
@@ -81,7 +81,7 @@ class HistoryKajian with _$HistoryKajian {
 }
 
 @freezed
-class StudyLocation with _$StudyLocation {
+abstract class StudyLocation with _$StudyLocation {
   const factory StudyLocation({
     required int id,
     required String name,
@@ -101,7 +101,7 @@ class StudyLocation with _$StudyLocation {
 }
 
 @freezed
-class Province with _$Province {
+abstract class Province with _$Province {
   const factory Province({
     required int id,
     required String name,
@@ -109,7 +109,7 @@ class Province with _$Province {
 }
 
 @freezed
-class City with _$City {
+abstract class City with _$City {
   const factory City({
     required int id,
     required String name,
@@ -118,7 +118,7 @@ class City with _$City {
 }
 
 @freezed
-class Ustadz with _$Ustadz {
+abstract class Ustadz with _$Ustadz {
   const factory Ustadz({
     required int id,
     required String ustadzId,
@@ -131,7 +131,7 @@ class Ustadz with _$Ustadz {
 }
 
 @freezed
-class KajianTheme with _$KajianTheme {
+abstract class KajianTheme with _$KajianTheme {
   const factory KajianTheme({
     required int id,
     required String themeId,
@@ -140,7 +140,7 @@ class KajianTheme with _$KajianTheme {
 }
 
 @freezed
-class DailySchedule with _$DailySchedule {
+abstract class DailySchedule with _$DailySchedule {
   const factory DailySchedule({
     required int id,
     required String dayId,
@@ -149,7 +149,7 @@ class DailySchedule with _$DailySchedule {
 }
 
 @freezed
-class LinksKajianSchedule with _$LinksKajianSchedule {
+abstract class LinksKajianSchedule with _$LinksKajianSchedule {
   const factory LinksKajianSchedule({
     String? first,
     String? last,
@@ -159,7 +159,7 @@ class LinksKajianSchedule with _$LinksKajianSchedule {
 }
 
 @freezed
-class MetaKajianSchedule with _$MetaKajianSchedule {
+abstract class MetaKajianSchedule with _$MetaKajianSchedule {
   const factory MetaKajianSchedule({
     int? currentPage,
     int? from,
@@ -173,7 +173,7 @@ class MetaKajianSchedule with _$MetaKajianSchedule {
 }
 
 @freezed
-class LinksMeta with _$LinksMeta {
+abstract class LinksMeta with _$LinksMeta {
   const factory LinksMeta({
     String? url,
     String? label,

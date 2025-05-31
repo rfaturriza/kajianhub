@@ -9,7 +9,7 @@ part 'surah_model.codegen.freezed.dart';
 part 'surah_model.codegen.g.dart';
 
 @freezed
-class SurahResponseModel with _$SurahResponseModel {
+abstract class SurahResponseModel with _$SurahResponseModel {
   const factory SurahResponseModel({
     int? code,
     String? status,
@@ -22,7 +22,7 @@ class SurahResponseModel with _$SurahResponseModel {
 }
 
 @freezed
-class DataSurahModel with _$DataSurahModel {
+abstract class DataSurahModel with _$DataSurahModel {
   const factory DataSurahModel({
     int? number,
     int? sequence,

@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:injectable/injectable.dart';
 import 'package:quranku/core/constants/font_constants.dart';
 import 'package:quranku/features/setting/domain/entities/last_read_reminder_mode_entity.dart';
@@ -275,7 +275,8 @@ class StylingSettingBloc
 
   void _onGetColoredTajweedStatus(_GetColoredTajweedStatus event, emit) async {
     final settingBox = await Hive.openBox(HiveConst.settingBox);
-    final isColoredTajweedEnabled = settingBox.get(HiveConst.tajweedStatusKey) ?? true;
+    final isColoredTajweedEnabled =
+        settingBox.get(HiveConst.tajweedStatusKey) ?? true;
     emit(state.copyWith(
       isColoredTajweedEnabled: isColoredTajweedEnabled,
     ));

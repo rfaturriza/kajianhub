@@ -7,7 +7,7 @@ import 'surah_name.codegen.dart';
 part 'surah.codegen.freezed.dart';
 
 @freezed
-class Surah with _$Surah {
+abstract class Surah with _$Surah {
   const factory Surah({
     int? number,
     int? sequence,

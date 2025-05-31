@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:injectable/injectable.dart';
 import 'package:quranku/core/constants/hive_constants.dart';
 

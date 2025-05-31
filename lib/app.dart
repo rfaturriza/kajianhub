@@ -45,8 +45,10 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       // When app is resumed, check for location changes and update notifications
-      final shalatBloc = sl<ShalatBloc>();
-      shalatBloc.add(const ShalatEvent.checkAndUpdateNotificationsEvent());
+      final context = App.navigatorKey.currentContext;
+      if (context != null) {
+        context.read<ShalatBloc>().add(const ShalatEvent.checkAndUpdateNotificationsEvent());
+      }
     }
   }
 

@@ -13,46 +13,23 @@ platform :ios do
 
     setup_ci
 
-    # Ensure required environment variables are set
-    %w[
-      APP_STORE_CONNECT_KEY_ID
-      APP_STORE_CONNECT_ISSUER_ID
-      APP_STORE_CONNECT_API_KEY_CONTENT
-    ].each do |var|
-      UI.user_error!("Missing environment variable: #{var}") if ENV[var].to_s.empty?
-    end
-
-    setup_ci
-
     app_store_connect_api_key(
       key_id: ENV["APP_STORE_CONNECT_KEY_ID"],
       issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
-      key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"],
-      is_key_content_base64: true,
       key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"],
       is_key_content_base64: true,
       in_house: false
     )
 
     sync_code_signing(type: "appstore")
-
-    sync_code_signing(type: "appstore")
   end
-
-  private_lane :update_ios_version do |options|
-    type = options[:type]
 
   private_lane :update_ios_version do |options|
     type = options[:type]
     current_version = get_version_number(xcodeproj: "Runner.xcodeproj")
     current_build_number = app_store_build_number()
     version_parts = current_version.split(".").map(&:to_i)
-    current_build_number = app_store_build_number()
-    version_parts = current_version.split(".").map(&:to_i)
 
-    case type
-    when "major"
-      version_parts[0] += 1
     case type
     when "major"
       version_parts[0] += 1
@@ -60,13 +37,7 @@ platform :ios do
       version_parts[2] = 0
     when "minor"
       version_parts[1] += 1
-    when "minor"
-      version_parts[1] += 1
       version_parts[2] = 0
-    when "patch"
-      version_parts[2] += 1
-    else
-      UI.user_error!("Invalid update type: #{type}")
     when "patch"
       version_parts[2] += 1
     else
@@ -75,14 +46,7 @@ platform :ios do
 
     updated_version = version_parts.join(".")
     updated_build_number = current_build_number + 1
-    updated_version = version_parts.join(".")
-    updated_build_number = current_build_number + 1
 
-    increment_version_number(version_number: updated_version, xcodeproj: "Runner.xcodeproj")
-    increment_build_number(build_number: updated_build_number, xcodeproj: "Runner.xcodeproj")
-  end
-
-  private_lane :build_ios do
     increment_version_number(version_number: updated_version, xcodeproj: "Runner.xcodeproj")
     increment_build_number(build_number: updated_build_number, xcodeproj: "Runner.xcodeproj")
   end
@@ -90,13 +54,7 @@ platform :ios do
   private_lane :build_ios do
     build_ios_app(
       workspace: "Runner.xcworkspace",
-      workspace: "Runner.xcworkspace",
       scheme: "Runner",
-      output_directory: "./fastlane/build",
-      output_name: "app.ipa",
-      configuration: "Release",
-      silent: true,
-      clean: true,
       output_directory: "./fastlane/build",
       output_name: "app.ipa",
       configuration: "Release",
@@ -105,13 +63,9 @@ platform :ios do
       export_method: "app-store"
     )
   end
-  end
 
   private_lane :upload_internal do
-  private_lane :upload_internal do
     upload_to_testflight(
-      ipa: "./fastlane/build/app.ipa",
-      skip_submission: true,
       ipa: "./fastlane/build/app.ipa",
       skip_submission: true,
       skip_waiting_for_build_processing: true
@@ -154,12 +108,6 @@ platform :ios do
   
 
   desc "Internal release - major"
-  desc "Internal release - minor"
-  lane :internal_minor do
-    release_lane(update_type: "minor", target: :internal)
-  end
-
-  desc "Internal release - major"
   lane :internal_major do
     release_lane(update_type: "major", target: :internal)
   end
@@ -172,22 +120,8 @@ platform :ios do
   desc "Production release - minor"
   lane :production_minor do
     release_lane(update_type: "minor", target: :production)
-    release_lane(update_type: "major", target: :internal)
   end
 
-  desc "Production release - patch"
-  lane :production_patch do
-    release_lane(update_type: "patch", target: :production)
-  end
-
-  desc "Production release - minor"
-  lane :production_minor do
-    release_lane(update_type: "minor", target: :production)
-  end
-
-  desc "Production release - major"
-  lane :production_major do
-    release_lane(update_type: "major", target: :production)
   desc "Production release - major"
   lane :production_major do
     release_lane(update_type: "major", target: :production)

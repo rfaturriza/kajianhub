@@ -89,12 +89,12 @@ end
 def distribute_to_firebase(groups, release_notes = nil)
   # Generate release notes if not provided
   release_notes ||= generate_release_notes
-  
+
   firebase_app_distribution(
     app: ENV['FIREBASE_APP_ID'],
     groups: groups,
     release_notes: release_notes,
-    apk_path: '../build/app/outputs/flutter-apk/app-#{apk_build_mode}.apk',
+    apk_path: "../build/app/outputs/flutter-apk/app-#{apk_build_mode}.apk",
     firebase_cli_token: ENV['FIREBASE_CLI_TOKEN']
   )
 end

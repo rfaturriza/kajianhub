@@ -79,11 +79,6 @@ def generate_release_notes(commit_count = 10)
     end
   end
   
-  # Add version information
-  version_name = flutter_get_version_name(path_to_yaml: "../pubspec.yaml")
-  version_code = flutter_get_version_code(path_to_yaml: "../pubspec.yaml")
-  
-  changelog += "Version: #{version_name} (#{version_code})\n\n"
   changelog += "Changes:\n#{commits}\n\n"
   changelog += "Built on: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
   

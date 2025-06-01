@@ -25,6 +25,7 @@ import '../components/error_screen.dart';
 import 'root_router.dart';
 
 final router = GoRouter(
+  navigatorKey: App.navigatorKey,
   initialLocation: RootRouter.rootRoute.path,
   debugLogDiagnostics: kDebugMode,
   routes: [

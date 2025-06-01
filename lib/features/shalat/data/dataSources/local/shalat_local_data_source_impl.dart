@@ -5,9 +5,9 @@ import 'package:quranku/core/constants/hive_constants.dart';
 import 'package:quranku/core/error/failures.dart';
 import 'package:quranku/features/shalat/data/dataSources/local/shalat_local_data_source.dart';
 import 'package:quranku/features/shalat/data/models/prayer_schedule_setting_model.codegen.dart';
-import 'package:quranku/features/shalat/presentation/helper/helper_time_shalat.dart';
 
 import '../../../domain/entities/geolocation.codegen.dart';
+import '../../../domain/entities/prayer_in_app.dart';
 
 @LazySingleton(as: ShalatLocalDataSource)
 class ShalatLocalDataSourceImpl implements ShalatLocalDataSource {

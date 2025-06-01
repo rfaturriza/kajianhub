@@ -10,7 +10,6 @@ import 'package:quranku/features/shalat/data/models/prayer_schedule_setting_mode
 import 'package:quranku/features/shalat/domain/entities/geolocation.codegen.dart';
 import 'package:quranku/features/shalat/domain/entities/prayer_schedule_setting.codegen.dart';
 import 'package:quranku/features/shalat/domain/entities/prayer_in_app.dart';
-import 'package:quranku/features/shalat/domain/entities/schedule.codegen.dart';
 import 'package:quranku/features/shalat/presentation/helper/location_helper.dart';
 import 'package:quranku/generated/locale_keys.g.dart';
 
@@ -86,28 +85,29 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
     });
     return right(unit);
   }
-  
+
   @override
-  Future<Either<Failure, Unit>> schedulePrayerAlarmWithLocation(GeoLocation location) async {
+  Future<Either<Failure, Unit>> schedulePrayerAlarmWithLocation(
+      GeoLocation location) async {
     try {
       // Get current prayer settings
       final settingsResult = await localDataSource.getPrayerScheduleSetting();
       if (settingsResult.isLeft()) {
         return left(settingsResult.asLeft());
       }
-      
+
       final currentSettings = settingsResult.asRight()?.toEntity();
       if (currentSettings == null) {
         return left(GeneralFailure(message: 'Prayer settings not found'));
       }
-      
+
       // Calculate prayer times based on the new location
       final coordinate = Coordinates(
         location.coordinate?.lat ?? 0,
         location.coordinate?.lon ?? 0,
         validate: true,
       );
-      
+
       // Use the same calculation method and madhab from current settings
       final params = CalculationMethod.values
           .firstWhere(
@@ -116,17 +116,16 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
           )
           .getParameters();
       params.madhab = currentSettings.madhab;
-      
+
       // Calculate prayer times for today
       final prayerTimes = PrayerTimes.today(coordinate, params);
-      final schedule = Schedule.fromPrayerTimes(prayerTimes);
-      
+
       // Update alarm times based on the new prayer times
       final updatedAlarms = currentSettings.alarms.map((alarm) {
         if (!alarm.isAlarmActive || alarm.prayer == null) {
           return alarm;
         }
-        
+
         // Get the new time for this prayer based on the new location
         DateTime? newTime;
         switch (alarm.prayer) {
@@ -161,36 +160,36 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
           default:
             newTime = alarm.time;
         }
-        
+
         // Return updated alarm with new time
         return alarm.copyWith(time: newTime);
       }).toList();
-      
+
       // Create updated settings with new location and alarm times
       final updatedSettings = currentSettings.copyWith(
         alarms: updatedAlarms,
-        location: location.place ?? location.country ?? '',
+        location: location.place,
       );
-      
+
       // Save updated settings
       final saveResult = await localDataSource.setPrayerScheduleSetting(
         PrayerScheduleSettingModel.fromEntity(updatedSettings),
       );
-      
+
       if (saveResult.isLeft()) {
         return left(saveResult.asLeft());
       }
-      
+
       // Schedule notifications with the updated times
-      updatedSettings.alarms.forEach((element) async {
-        if (element.time == null || !element.isAlarmActive) return;
-        
+      for (final element in updatedSettings.alarms) {
+        if (element.time == null || !element.isAlarmActive) continue;
+
         final hour = TimeOfDay.fromDateTime(element.time!).hour;
         final minute = TimeOfDay.fromDateTime(element.time!).minute;
-        
+
         // Cancel existing notification before scheduling a new one
         await localNotification.cancel(element.prayer?.index ?? 0);
-        
+
         await localNotification.scheduleDaily(
           id: element.prayer?.index ?? 0,
           title: LocaleKeys.notificationPrayerTitle.tr(namedArgs: {
@@ -204,35 +203,37 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
           ),
           timeOfDay: TimeOfDay.fromDateTime(element.time!),
         );
-      });
-      
+      }
+
       return right(unit);
     } catch (e) {
       return left(GeneralFailure(message: e.toString()));
     }
   }
-  
+
   @override
-  Future<Either<Failure, bool>> shouldUpdateNotifications(GeoLocation currentLocation) async {
+  Future<Either<Failure, bool>> shouldUpdateNotifications(
+      GeoLocation currentLocation) async {
     try {
       // Get the stored location
-      final storedLocationResult = await localDataSource.getPrayerLocationManual();
+      final storedLocationResult =
+          await localDataSource.getPrayerLocationManual();
       final storedLocation = storedLocationResult.fold(
         (failure) => null,
         (location) => location,
       );
-      
+
       // Check if the locations are significantly different
       final shouldUpdate = LocationHelper.isLocationSignificantlyDifferent(
         storedLocation,
         currentLocation,
       );
-      
+
       // If we should update, store the new location
       if (shouldUpdate) {
         await localDataSource.setPrayerLocationManual(currentLocation);
       }
-      
+
       return right(shouldUpdate);
     } catch (e) {
       return left(GeneralFailure(message: e.toString()));

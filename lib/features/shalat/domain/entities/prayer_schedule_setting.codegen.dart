@@ -1,6 +1,7 @@
 import 'package:adhan/adhan.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:quranku/features/shalat/presentation/helper/helper_time_shalat.dart';
+
+import 'prayer_in_app.dart';
 
 part 'prayer_schedule_setting.codegen.freezed.dart';
 

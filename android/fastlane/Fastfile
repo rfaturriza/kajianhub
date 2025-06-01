@@ -34,12 +34,13 @@ def update_flutter_version(type)
   )
 end
 
+apk_build_mode = ENV['APK_BUILD_MODE'] || 'profile'
 def build_flutter_app(build_type = "appbundle")
   case build_type
   when "appbundle"
     sh "flutter build appbundle -v --no-deferred-components"
   when "apk"
-    sh "flutter build apk"
+    sh "flutter build apk --#{apk_build_mode}"
   else
     UI.user_error!("Invalid build type: #{build_type}")
   end
@@ -93,7 +94,7 @@ def distribute_to_firebase(groups, release_notes = nil)
     app: ENV['FIREBASE_APP_ID'],
     groups: groups,
     release_notes: release_notes,
-    apk_path: '../build/app/outputs/flutter-apk/app-release.apk',
+    apk_path: '../build/app/outputs/flutter-apk/app-#{apk_build_mode}.apk',
     firebase_cli_token: ENV['FIREBASE_CLI_TOKEN']
   )
 end

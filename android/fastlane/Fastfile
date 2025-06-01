@@ -39,7 +39,7 @@ def build_flutter_app(build_type = "appbundle")
   when "appbundle"
     sh "flutter build appbundle -v --no-deferred-components"
   when "apk"
-    sh "flutter build apk -v --no-deferred-components --split-per-abi"
+    sh "flutter build apk"
   else
     UI.user_error!("Invalid build type: #{build_type}")
   end
@@ -94,12 +94,11 @@ def distribute_to_firebase(groups, release_notes = nil)
   # Generate release notes if not provided
   release_notes ||= generate_release_notes
   
-  # Use the arm64-v8a APK for Firebase Distribution
   firebase_app_distribution(
     app: ENV['FIREBASE_APP_ID'],
     groups: groups,
     release_notes: release_notes,
-    apk_path: '../build/app/outputs/flutter-apk/app-arm64-v8a-release.apk',
+    apk_path: '../build/app/outputs/flutter-apk/app-release.apk',
     firebase_cli_token: ENV['FIREBASE_CLI_TOKEN']
   )
 end

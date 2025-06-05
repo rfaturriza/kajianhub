@@ -28,14 +28,14 @@ class NetworkConfig {
 
   static Dio getDio() {
     final dio = Dio(_baseOptions);
-    dio.interceptors.add(LogInterceptor(
-      request: true,
-      responseBody: true,
-      requestBody: true,
-      requestHeader: true,
-      responseHeader: true,
-    ));
     if (kDebugMode) {
+      dio.interceptors.add(LogInterceptor(
+        request: true,
+        responseBody: true,
+        requestBody: true,
+        requestHeader: true,
+        responseHeader: true,
+      ));
       dio.interceptors.add(alice.getDioInterceptor());
     }
     return dio;
@@ -50,14 +50,14 @@ class NetworkConfig {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
-    dio.interceptors.add(LogInterceptor(
-      request: true,
-      responseBody: true,
-      requestBody: true,
-      requestHeader: true,
-      responseHeader: true,
-    ));
     if (kDebugMode) {
+      dio.interceptors.add(LogInterceptor(
+        request: true,
+        responseBody: true,
+        requestBody: true,
+        requestHeader: true,
+        responseHeader: true,
+      ));
       dio.interceptors.add(alice.getDioInterceptor());
     }
     return dio;

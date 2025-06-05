@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -28,7 +27,7 @@ void main() async {
   await registerHiveAdapter();
   await configureDependencies();
   await dotenv.load(fileName: ".env");
-  unawaited(MobileAds.instance.initialize());
+  MobileAds.instance.initialize();
   MobileAds.instance.updateRequestConfiguration(
     RequestConfiguration(
       testDeviceIds: kDebugMode ? AdMobConst.testDevice : [],

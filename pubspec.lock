@@ -1118,7 +1118,7 @@ packages:
     source: hosted
     version: "3.4.0"
   overlay_support:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: overlay_support
       sha256: fc39389bfd94e6985e1e13b2a88a125fc4027608485d2d4e2847afe1b2bb339c

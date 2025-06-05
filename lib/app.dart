@@ -15,6 +15,7 @@ import 'package:quranku/features/shalat/presentation/bloc/shalat/shalat_bloc.dar
 import 'package:quranku/generated/locale_keys.g.dart';
 import 'package:quranku/injection.dart';
 import 'package:quranku/theme_provider.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 import 'core/route/router.dart';
 import 'features/quran/presentation/bloc/surah/surah_bloc.dart';
@@ -102,26 +103,28 @@ class _AppState extends State<App> with WidgetsBindingObserver {
               final isDynamicColor = themeProvider.dynamicColor;
               return DynamicColorBuilder(
                 builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-                  return MaterialApp.router(
-                    routerConfig: router,
-                    title: LocaleKeys.appName.tr(),
-                    debugShowCheckedModeBanner: false,
-                    theme: themeData(
-                      isDarkMode: false,
-                      colorScheme: isDynamicColor ? lightDynamic : null,
+                  return OverlaySupport(
+                    child: MaterialApp.router(
+                      routerConfig: router,
+                      title: LocaleKeys.appName.tr(),
+                      debugShowCheckedModeBanner: false,
+                      theme: themeData(
+                        isDarkMode: false,
+                        colorScheme: isDynamicColor ? lightDynamic : null,
+                      ),
+                      darkTheme: themeData(
+                        isDarkMode: true,
+                        colorScheme: isDynamicColor ? darkDynamic : null,
+                      ),
+                      themeMode: themeProvider.themeMode,
+                      localizationsDelegates: [
+                        for (var delegate in context.localizationDelegates)
+                          delegate,
+                        const LocaleNamesLocalizationsDelegate(),
+                      ],
+                      supportedLocales: context.supportedLocales,
+                      locale: context.locale,
                     ),
-                    darkTheme: themeData(
-                      isDarkMode: true,
-                      colorScheme: isDynamicColor ? darkDynamic : null,
-                    ),
-                    themeMode: themeProvider.themeMode,
-                    localizationsDelegates: [
-                      for (var delegate in context.localizationDelegates)
-                        delegate,
-                      const LocaleNamesLocalizationsDelegate(),
-                    ],
-                    supportedLocales: context.supportedLocales,
-                    locale: context.locale,
                   );
                 },
               );

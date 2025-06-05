@@ -62,6 +62,7 @@ dependencies:
   timezone: ^0.10.0
   material_symbols_icons: ^4.2815.0
   flutter_alice: ^2.0.1
+  overlay_support: ^2.1.0
 
 dev_dependencies:
   flutter_test:

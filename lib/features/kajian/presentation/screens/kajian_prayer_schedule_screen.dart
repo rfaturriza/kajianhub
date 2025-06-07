@@ -900,21 +900,22 @@ class _MosqueFilterSection extends StatelessWidget {
           );
         }
         var items = state.mosques
-            .map((e) => Pair(e.name.orEmpty(), e.id.toString()))
+            .map((e) => Pair(e.name?.orEmpty() ?? '', e.id?.toString() ?? ''))
             .toList();
         final selectedProvinceId = state.filter.studyLocationProvinceId;
         if (selectedProvinceId != null) {
           items = state.mosques
-              .where(
-                  (e) => e.province?.id.toString() == selectedProvinceId.second)
-              .map((e) => Pair(e.name.orEmpty(), e.id.toString()))
+              .where((e) =>
+                  (e as dynamic)?.province?.id?.toString() ==
+                  selectedProvinceId.second)
+              .map((e) => Pair(e.name?.orEmpty() ?? '', e.id?.toString() ?? ''))
               .toList();
         }
         final selectedCityId = state.filter.studyLocationCityId;
         if (selectedCityId != null) {
           items = state.mosques
-              .where((e) => e.city?.id.toString() == selectedCityId.second)
-              .map((e) => Pair(e.name.orEmpty(), e.id.toString()))
+              .where((e) => e.city?.id?.toString() == selectedCityId.second)
+              .map((e) => Pair(e.name?.orEmpty() ?? '', e.id?.toString() ?? ''))
               .toList();
         }
         return ItemOnBottomSheet(

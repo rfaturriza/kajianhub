@@ -6,7 +6,7 @@ import 'package:quranku/features/kajian/data/models/cities_response_model.codege
 import 'package:quranku/features/kajian/data/models/kajian_schedule_request_model.codegen.dart';
 import 'package:quranku/features/kajian/data/models/kajian_schedules_response_model.codegen.dart';
 import 'package:quranku/features/kajian/data/models/kajian_themes_response_model.codegen.dart';
-import 'package:quranku/features/kajian/data/models/mosques_response_model.codegen.dart';
+import 'package:quranku/features/kajian/data/models/study_locations_response_model.codegen.dart';
 import 'package:quranku/features/kajian/data/models/provinces_response_model.codegen.dart';
 import 'package:quranku/features/kajian/data/models/prayer_kajian_schedules_response_model.codegen.dart';
 import 'package:quranku/features/kajian/data/models/ustadz_response_model.codegen.dart';
@@ -116,7 +116,7 @@ class KajianHubRemoteDataSourceImpl implements KajianHubRemoteDataSource {
   }
 
   @override
-  Future<Either<Exception, MosquesResponseModel>> getMosques({
+  Future<Either<Exception, StudyLocationResponseModel>> getMosques({
     String? type = 'collection',
     String? orderBy = 'name',
     String? sortBy = 'asc',
@@ -135,7 +135,7 @@ class KajianHubRemoteDataSourceImpl implements KajianHubRemoteDataSource {
       );
 
       final data = response.data;
-      return right(MosquesResponseModel.fromJson(data));
+      return right(StudyLocationResponseModel.fromJson(data));
     } catch (e) {
       throw left(e);
     }

@@ -14,7 +14,7 @@ abstract class KajianState with _$KajianState {
     @Default(FormzSubmissionStatus.initial) FormzSubmissionStatus citiesStatus,
     @Default([]) List<City> cities,
     @Default(FormzSubmissionStatus.initial) FormzSubmissionStatus mosquesStatus,
-    @Default([]) List<DataMosqueModel> mosques,
+    @Default([]) List<DataStudyLocationModel> mosques,
     @Default(FormzSubmissionStatus.initial)
     FormzSubmissionStatus kajianThemesStatus,
     @Default([]) List<KajianTheme> kajianThemes,

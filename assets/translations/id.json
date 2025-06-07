@@ -227,5 +227,8 @@
     "description": "Tanyakan pertanyaan seputar Islam kepada Ustadz AI",
     "labelTextField": "Tanya apa saja tentang Islam",
     "generating": "Ditunggu ya, pertanyaan kamu sedang diproses"
-  }
+  },
+  "totalStudies": "Total Kajian",
+  "subscribe": "Berlangganan",
+  "subscribers": "Pengikut"
 }

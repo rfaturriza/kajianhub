@@ -4,7 +4,7 @@ import 'package:quranku/features/kajian/data/models/kajian_schedule_request_mode
 import 'package:quranku/features/kajian/data/models/kajian_schedule_response_model.codegen.dart';
 import 'package:quranku/features/kajian/data/models/kajian_schedules_response_model.codegen.dart';
 import 'package:quranku/features/kajian/data/models/kajian_themes_response_model.codegen.dart';
-import 'package:quranku/features/kajian/data/models/mosques_response_model.codegen.dart';
+import 'package:quranku/features/kajian/data/models/study_locations_response_model.codegen.dart';
 import 'package:quranku/features/kajian/data/models/provinces_response_model.codegen.dart';
 import 'package:quranku/features/kajian/data/models/prayer_kajian_schedule_request_model.codegen.dart';
 import 'package:quranku/features/kajian/data/models/prayer_kajian_schedules_response_model.codegen.dart';
@@ -42,7 +42,7 @@ abstract class KajianHubRemoteDataSource {
     String? sortBy,
   });
 
-  Future<Either<Exception, MosquesResponseModel>> getMosques({
+  Future<Either<Exception, StudyLocationResponseModel>> getMosques({
     String? type,
     String? orderBy,
     String? sortBy,

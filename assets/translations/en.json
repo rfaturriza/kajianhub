@@ -227,5 +227,8 @@
     "description": "Ask questions about Islam to Ustadz AI",
     "labelTextField": "Ask anything about Islam",
     "generating": "Please wait, your question is being processed"
-  }
+  },
+  "totalStudies": "Total Studies",
+  "subscribe": "Subscribe",
+  "subscribers": "Subscribers"
 }

@@ -1,7 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:quranku/features/kajian/data/models/study_locations_response_model.codegen.dart';
 
 import '../../../../core/utils/extension/string_ext.dart';
 import '../../domain/entities/kajian_schedule.codegen.dart';
+import '../../domain/entities/study_location_entity.dart';
 
 part 'kajian_schedules_response_model.codegen.freezed.dart';
 part 'kajian_schedules_response_model.codegen.g.dart';
@@ -51,12 +53,13 @@ abstract class DataKajianScheduleModel with _$DataKajianScheduleModel {
     @JsonKey(name: 'time_end') String? timeEnd,
     @JsonKey(name: 'jadwal_shalat') String? prayerSchedule,
     @JsonKey(name: 'location_id') String? locationId,
-    StudyLocationModel? studyLocation,
+    DataStudyLocationModel? studyLocation,
     List<UstadzModel>? ustadz,
     List<KajianThemeModel>? themes,
     List<DailyScheduleModel>? dailySchedules,
     List<HistoryKajianModel>? histories,
     List<dynamic>? customSchedules,
+    @JsonKey(name: 'distance_in_km') double? distanceInKm,
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
     @JsonKey(name: 'deleted_at') String? deletedAt,
@@ -81,7 +84,7 @@ abstract class DataKajianScheduleModel with _$DataKajianScheduleModel {
       timeEnd: entity.timeEnd,
       prayerSchedule: entity.prayerSchedule,
       locationId: entity.locationId,
-      studyLocation: StudyLocationModel.fromEntity(entity.studyLocation),
+      studyLocation: DataStudyLocationModel.fromEntity(entity.studyLocation),
       ustadz: entity.ustadz.map((e) => UstadzModel.fromEntity(e)).toList(),
       themes: entity.themes.map((e) => KajianThemeModel.fromEntity(e)).toList(),
       dailySchedules: entity.dailySchedules
@@ -115,13 +118,13 @@ abstract class DataKajianScheduleModel with _$DataKajianScheduleModel {
       }(),
       prayerSchedule: prayerSchedule?.capitalize() ?? emptyString,
       locationId: locationId ?? emptyString,
-      studyLocation:
-          studyLocation?.toEntity() ?? StudyLocationModel.empty().toEntity(),
+      studyLocation: studyLocation?.toEntity() ?? StudyLocationEntity(),
       ustadz: ustadz?.map((e) => e.toEntity()).toList() ?? [],
       themes: themes?.map((e) => e.toEntity()).toList() ?? [],
       dailySchedules: dailySchedules?.map((e) => e.toEntity()).toList() ?? [],
       histories: histories?.map((e) => e.toEntity()).toList() ?? [],
       customSchedules: customSchedules ?? [],
+      distanceInKm: distanceInKm?.toString() ?? emptyString,
     );
   }
 }
@@ -170,88 +173,6 @@ abstract class HistoryKajianModel with _$HistoryKajianModel {
       url: url ?? emptyString,
       title: title ?? emptyString,
       publishedAt: publishedAt ?? emptyString,
-    );
-  }
-}
-
-@freezed
-abstract class StudyLocationModel with _$StudyLocationModel {
-  const factory StudyLocationModel({
-    int? id,
-    String? name,
-    String? village,
-    String? address,
-    @JsonKey(name: 'province_id') String? provinceId,
-    @JsonKey(name: 'city_id') String? cityId,
-    @JsonKey(name: 'google_maps') String? googleMaps,
-    String? longitude,
-    String? latitude,
-    @JsonKey(name: 'contact_person') String? contactPerson,
-    String? picture,
-    @JsonKey(name: 'picture_url') String? pictureUrl,
-    ProvinceModel? province,
-    CityModel? city,
-    @JsonKey(name: 'created_at') String? createdAt,
-    @JsonKey(name: 'updated_at') String? updatedAt,
-  }) = _StudyLocationModel;
-
-  const StudyLocationModel._();
-
-  factory StudyLocationModel.fromJson(Map<String, dynamic> json) =>
-      _$StudyLocationModelFromJson(json);
-
-  factory StudyLocationModel.empty() => const StudyLocationModel(
-        id: 0,
-        name: emptyString,
-        village: emptyString,
-        address: emptyString,
-        provinceId: emptyString,
-        cityId: emptyString,
-        googleMaps: emptyString,
-        longitude: emptyString,
-        latitude: emptyString,
-        contactPerson: emptyString,
-        picture: emptyString,
-        pictureUrl: emptyString,
-        province: ProvinceModel(id: 0, name: emptyString),
-        city: CityModel(id: 0, name: emptyString, provinceId: emptyString),
-      );
-
-  factory StudyLocationModel.fromEntity(StudyLocation entity) {
-    return StudyLocationModel(
-      id: entity.id,
-      name: entity.name,
-      village: entity.village,
-      address: entity.address,
-      provinceId: entity.provinceId,
-      cityId: entity.cityId,
-      googleMaps: entity.googleMaps,
-      longitude: entity.longitude,
-      latitude: entity.latitude,
-      contactPerson: entity.contactPerson,
-      picture: entity.picture,
-      pictureUrl: entity.pictureUrl,
-      province: ProvinceModel.fromEntity(entity.province),
-      city: CityModel.fromEntity(entity.city),
-    );
-  }
-
-  StudyLocation toEntity() {
-    return StudyLocation(
-      id: id ?? 0,
-      name: name ?? emptyString,
-      village: village ?? emptyString,
-      address: address ?? emptyString,
-      provinceId: provinceId ?? emptyString,
-      cityId: cityId ?? emptyString,
-      googleMaps: googleMaps ?? emptyString,
-      longitude: longitude ?? emptyString,
-      latitude: latitude ?? emptyString,
-      contactPerson: contactPerson ?? emptyString,
-      picture: picture ?? emptyString,
-      pictureUrl: pictureUrl ?? emptyString,
-      province: province?.toEntity() ?? ProvinceModel.empty().toEntity(),
-      city: city?.toEntity() ?? CityModel.empty().toEntity(),
     );
   }
 }

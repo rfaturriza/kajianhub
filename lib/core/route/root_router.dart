@@ -88,6 +88,18 @@ class RootRouter {
     parent: rootRoute,
   );
 
+  static const RouteModel studyLocationRoute = RouteModel(
+    name: 'studyLocation',
+    path: '/study-location',
+    parent: rootRoute,
+  );
+
+  static const RouteModel studyLocationDetailRoute = RouteModel(
+    name: 'studyLocationDetail',
+    path: '/:id',
+    parent: studyLocationRoute,
+  );
+
   static const RouteModel ustadAiRoute = RouteModel(
     name: 'ustadAi',
     path: '/ustad-ai',

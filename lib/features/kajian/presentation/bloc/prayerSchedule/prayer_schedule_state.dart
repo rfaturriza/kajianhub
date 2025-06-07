@@ -11,7 +11,7 @@ abstract class PrayerScheduleState with _$PrayerScheduleState {
     @Default(FormzSubmissionStatus.initial) FormzSubmissionStatus citiesStatus,
     @Default([]) List<City> cities,
     @Default(FormzSubmissionStatus.initial) FormzSubmissionStatus mosquesStatus,
-    @Default([]) List<DataMosqueModel> mosques,
+    @Default([]) List<DataStudyLocationModel> mosques,
     @Default(1) int currentPage,
     int? lastPage,
     int? totalData,

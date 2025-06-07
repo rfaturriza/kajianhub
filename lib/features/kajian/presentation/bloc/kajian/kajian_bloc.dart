@@ -15,7 +15,7 @@ import 'package:quranku/features/kajian/domain/usecases/get_ustadz_list_usecase.
 import '../../../../../core/utils/pair.dart';
 import '../../../../shalat/domain/usecase/get_current_location_usecase.dart';
 import '../../../data/models/kajian_schedule_request_model.codegen.dart';
-import '../../../data/models/mosques_response_model.codegen.dart';
+import '../../../data/models/study_locations_response_model.codegen.dart';
 import '../../../domain/usecases/get_cities_usecase.dart';
 import '../../../domain/usecases/get_kajian_list_usecase.dart';
 import '../../../domain/usecases/get_kajian_themes_usecase.dart';
@@ -87,14 +87,8 @@ class KajianBloc extends Bloc<KajianEvent, KajianState> {
     }
     try {
       var request = KajianScheduleRequestModel(
-        type: 'pagination',
         page: event.pageNumber,
         limit: limit,
-        orderBy: 'id',
-        sortBy: 'asc',
-        options: [],
-        relations:
-            'ustadz,studyLocation.province,studyLocation.city,dailySchedules,customSchedules,themes,histories',
       );
       if (state.filter.studyLocationProvinceId != null) {
         request = request.copyWith(

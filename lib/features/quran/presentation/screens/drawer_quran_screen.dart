@@ -100,6 +100,14 @@ class _ListItemMenu extends StatelessWidget {
           },
           withDecoration: false,
         ),
+        ButtonDrawer(
+          icon: Icons.mosque,
+          title: LocaleKeys.mosque.tr(),
+          onTap: () {
+            context.pushNamed(RootRouter.studyLocationRoute.name);
+          },
+          withDecoration: false,
+        ),
         if (ustadAiConfig.show) ...[
           ButtonDrawer(
             icon: Symbols.star_shine,

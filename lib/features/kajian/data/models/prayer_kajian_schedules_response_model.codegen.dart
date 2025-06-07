@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../domain/entities/prayer_kajian_schedules.codegen.dart';
 import 'kajian_schedules_response_model.codegen.dart';
+import 'study_locations_response_model.codegen.dart';
 
 part 'prayer_kajian_schedules_response_model.codegen.freezed.dart';
 part 'prayer_kajian_schedules_response_model.codegen.g.dart';
@@ -47,7 +48,7 @@ abstract class PrayerKajianSchedulesResponseModel
 abstract class DataPrayerKajianScheduleModel
     with _$DataPrayerKajianScheduleModel {
   const factory DataPrayerKajianScheduleModel({
-    StudyLocationModel? studyLocation,
+    DataStudyLocationModel? studyLocation,
     List<PrayerKajianScheduleModel>? schedules,
   }) = _DataPrayerKajianScheduleModel;
 
@@ -69,7 +70,7 @@ abstract class PrayerKajianScheduleModel with _$PrayerKajianScheduleModel {
     String? khatib,
     String? imam,
     String? link,
-    StudyLocationModel? studyLocation,
+    DataStudyLocationModel? studyLocation,
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
     @JsonKey(name: 'deleted_at') String? deletedAt,

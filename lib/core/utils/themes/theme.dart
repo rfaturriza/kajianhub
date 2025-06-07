@@ -53,6 +53,11 @@ ThemeData themeData({
         color:
             isDarkMode ? darkColorScheme.onSurface : lightColorScheme.onSurface,
       ),
+      titleTextStyle: textTheme.titleMedium?.copyWith(
+        fontWeight: FontWeight.bold,
+        color:
+            isDarkMode ? darkColorScheme.onSurface : lightColorScheme.onSurface,
+      ),
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness:

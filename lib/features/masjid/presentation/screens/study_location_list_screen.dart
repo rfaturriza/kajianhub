@@ -5,6 +5,7 @@ import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
+import 'package:quranku/core/utils/extension/string_ext.dart';
 import 'package:quranku/generated/locale_keys.g.dart';
 import '../../../../core/components/search_box.dart';
 import '../../../../core/route/root_router.dart';
@@ -122,16 +123,22 @@ class _StudyLocationListScaffoldState
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
-            child: SearchBox(
-              initialValue: '',
-              hintText: LocaleKeys.search.tr(),
-              onChanged: (value) {
-                context.read<StudyLocationListBloc>().add(
-                      LoadMasjidList(
-                        querySearch: value,
-                        locale: Localizations.localeOf(context),
-                      ),
-                    );
+            child: BlocBuilder<StudyLocationListBloc, StudyLocationListState>(
+              buildWhen: (state, previous) =>
+                  state.querySearch != previous.querySearch,
+              builder: (context, state) {
+                return SearchBox(
+                  initialValue: state.querySearch ?? emptyString,
+                  hintText: LocaleKeys.searchMosqueHint.tr(),
+                  onChanged: (value) {
+                    context.read<StudyLocationListBloc>().add(
+                          LoadMasjidList(
+                            querySearch: value,
+                            locale: Localizations.localeOf(context),
+                          ),
+                        );
+                  },
+                );
               },
             ),
           ),
@@ -159,33 +166,51 @@ class _StudyLocationListScaffoldState
                           ? state.errorMessage
                           : LocaleKeys.defaultErrorMessage.tr(),
                     ),
-                    leading: const Icon(Symbols.warning_amber_rounded),
+                    leading: const Icon(Symbols.priority_high_rounded),
+                  );
+                }
+                if (state.studyLocations == null ||
+                    state.studyLocations!.isEmpty) {
+                  return ListTile(
+                    title: Text(LocaleKeys.searchMosqueEmpty.tr()),
+                    leading: const Icon(Symbols.info_rounded),
                   );
                 }
                 final studyLocations = state.studyLocations ?? [];
-                return ListView.builder(
-                  controller: _scrollController,
-                  itemCount: state.isLoadingMore
-                      ? studyLocations.length + 1
-                      : studyLocations.length,
-                  itemBuilder: (context, index) {
-                    if (state.isLoadingMore && index == studyLocations.length) {
-                      return const Center(
-                        child: LinearProgressIndicator(),
-                      );
-                    }
-                    final mosque = studyLocations[index];
-                    return MosqueTile(
-                      location: mosque,
-                      onTap: (mosque) {
-                        context.pushNamed(
-                          RootRouter.studyLocationDetailRoute.name,
-                          pathParameters: {'id': mosque.id.toString()},
-                          extra: mosque,
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    context.read<StudyLocationListBloc>().add(
+                          LoadMasjidList(
+                            querySearch: state.querySearch,
+                            locale: Localizations.localeOf(context),
+                          ),
                         );
-                      },
-                    );
                   },
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    itemCount: state.isLoadingMore
+                        ? studyLocations.length + 1
+                        : studyLocations.length,
+                    itemBuilder: (context, index) {
+                      if (state.isLoadingMore &&
+                          index == studyLocations.length) {
+                        return const Center(
+                          child: LinearProgressIndicator(),
+                        );
+                      }
+                      final mosque = studyLocations[index];
+                      return MosqueTile(
+                        location: mosque,
+                        onTap: (mosque) {
+                          context.pushNamed(
+                            RootRouter.studyLocationDetailRoute.name,
+                            pathParameters: {'id': mosque.id.toString()},
+                            extra: mosque,
+                          );
+                        },
+                      );
+                    },
+                  ),
                 );
               },
             ),

@@ -132,7 +132,7 @@ class _StudySchedulesListState extends State<_StudySchedulesList> {
         if (schedules.isEmpty) {
           return ListTile(
             title: Text(LocaleKeys.searchKajianEmpty.tr()),
-            leading: const Icon(Symbols.warning_amber_rounded),
+            leading: const Icon(Symbols.info_rounded),
           );
         }
         return ListView.builder(

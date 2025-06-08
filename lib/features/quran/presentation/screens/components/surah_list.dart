@@ -50,7 +50,6 @@ class SurahList extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
                 child: SearchBox(
-                  isDense: true,
                   initialValue: surahBloc.state.query ?? emptyString,
                   hintText: LocaleKeys.search.tr(),
                   onChanged: (val) {

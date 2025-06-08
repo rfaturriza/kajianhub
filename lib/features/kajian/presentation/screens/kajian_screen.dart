@@ -31,7 +31,6 @@ class KajianScreen extends StatelessWidget {
           buildWhen: (previous, current) => previous.search != current.search,
           builder: (context, state) {
             return SearchBox(
-              isDense: true,
               initialValue: state.search ?? emptyString,
               hintText: LocaleKeys.searchKajianHint.tr(),
               onClear: () {

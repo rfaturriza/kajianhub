@@ -37,7 +37,6 @@ class KajianPrayerScheduleScreen extends StatelessWidget {
           },
           builder: (context, state) {
             return SearchBox(
-              isDense: true,
               initialValue: state.search ?? emptyString,
               hintText: LocaleKeys.searchRamadhanHint.tr(),
               onClear: () {

@@ -102,9 +102,9 @@ class _ListItemMenu extends StatelessWidget {
         ),
         ButtonDrawer(
           icon: Symbols.menu_book_rounded,
-          title: LocaleKeys.mosque.tr(),
+          title: LocaleKeys.kajian.tr(),
           onTap: () {
-            context.pushNamed(RootRouter.studyLocationRoute.name);
+            context.pushNamed(RootRouter.kajianRoute.name);
           },
           withDecoration: false,
         ),

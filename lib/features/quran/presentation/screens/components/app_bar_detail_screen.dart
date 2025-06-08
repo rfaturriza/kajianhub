@@ -13,15 +13,9 @@ class AppBarDetailScreen extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      centerTitle: true,
       backgroundColor: Colors.transparent,
       elevation: 0,
-      title: Text(
-        title,
-        style: context.textTheme.titleLarge?.copyWith(
-          color: context.theme.colorScheme.onSurface,
-        ),
-      ),
+      title: Text(title),
     );
   }
 
@@ -45,19 +39,12 @@ class SliverAppBarDetailScreen extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      centerTitle: true,
-      backgroundColor: Colors.transparent,
       pinned: false,
       floating: true,
       elevation: 0,
       title: Text(
         title,
-        style: context.textTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.w700,
-          color: context.theme.colorScheme.onSurface,
-        ),
       ),
-      
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 8),

@@ -34,6 +34,7 @@ class StudyLocationDetailScreen extends StatelessWidget {
                   imageUrl: masjid.pictureUrl ?? '',
                   label: "Youtube",
                   youtubeUrl: masjid.youtubeChannelLink ?? '',
+                  instagramUrl: masjid.instagramLink ?? '',
                 ),
                 const SizedBox(height: 8),
                 Padding(
@@ -64,6 +65,7 @@ class StudyLocationDetailScreen extends StatelessWidget {
           SliverToBoxAdapter(
             child: _StudySchedulesList(
               studyLocationId: masjid.id?.toString() ?? '',
+              distanceInKm: masjid.distanceInKm ?? '',
             ),
           ),
         ],
@@ -73,8 +75,12 @@ class StudyLocationDetailScreen extends StatelessWidget {
 }
 
 class _StudySchedulesList extends StatefulWidget {
+  final String distanceInKm;
   final String studyLocationId;
-  const _StudySchedulesList({required this.studyLocationId});
+  const _StudySchedulesList({
+    required this.studyLocationId,
+    this.distanceInKm = '',
+  });
 
   @override
   _StudySchedulesListState createState() => _StudySchedulesListState();
@@ -166,7 +172,9 @@ class _StudySchedulesListState extends State<_StudySchedulesList> {
             final kajian = schedules[index];
             return KajianTile(
               key: Key(index.toString()),
-              kajian: kajian,
+              kajian: kajian.copyWith(
+                distanceInKm: widget.distanceInKm,
+              ),
             );
           },
         );
@@ -178,11 +186,13 @@ class _StudySchedulesListState extends State<_StudySchedulesList> {
 class _ImageSection extends StatelessWidget {
   final String imageUrl;
   final String youtubeUrl;
+  final String instagramUrl;
   final String label;
 
   const _ImageSection({
     required this.imageUrl,
     this.youtubeUrl = '',
+    this.instagramUrl = '',
     required this.label,
   });
 
@@ -205,41 +215,29 @@ class _ImageSection extends StatelessWidget {
             ),
           ),
         ),
-        if (youtubeUrl.isNotEmpty) ...[
-          Positioned(
-            bottom: 4,
-            right: 4,
-            child: GestureDetector(
-              onTap: () {
-                final youtubeUrl =
-                    this.youtubeUrl.isNotEmpty ? this.youtubeUrl : '';
-                if (youtubeUrl.isNotEmpty) {
-                  final uri = Uri.parse(youtubeUrl);
-                  launchUrl(uri, mode: LaunchMode.externalApplication);
-                } else {
-                  context.showErrorToast(LocaleKeys.defaultErrorMessage.tr());
-                }
-              },
-              child: Chip(
-                backgroundColor: context.theme.colorScheme.primary,
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                side: BorderSide.none,
-                avatar: const Icon(
-                  Symbols.youtube_activity_rounded,
-                  color: Colors.white,
-                  size: 18,
+        // Social media buttons
+        Positioned(
+          bottom: 4,
+          right: 4,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (instagramUrl.isNotEmpty) ...[
+                _SocialButton(
+                  iconUrl: AssetConst.instagramIconUrl,
+                  url: instagramUrl,
                 ),
-                label: Text(
-                  label,
-                  style: context.textTheme.titleSmall?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+              ],
+              if (youtubeUrl.isNotEmpty) ...[
+                const SizedBox(width: 4),
+                _SocialButton(
+                  iconUrl: AssetConst.youtubeIconUrl,
+                  url: youtubeUrl,
                 ),
-              ),
-            ),
+              ],
+            ],
           ),
-        ],
+        ),
       ],
     );
   }
@@ -406,5 +404,41 @@ class _SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
     return true;
+  }
+}
+
+/// Simple social link icon button
+class _SocialButton extends StatelessWidget {
+  final String iconUrl;
+  final String url;
+  const _SocialButton({required this.iconUrl, required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(8),
+      onTap: () async {
+        if (url.isNotEmpty) {
+          final uri = Uri.parse(url);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          } else {
+            context.showErrorToast(LocaleKeys.defaultErrorMessage.tr());
+          }
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: context.theme.colorScheme.primaryContainer,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: CachedNetworkImage(
+          imageUrl: iconUrl,
+          height: 24,
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
   }
 }

@@ -24,10 +24,12 @@ class ScheduleIconText extends StatelessWidget {
           color: context.theme.colorScheme.onSurfaceVariant,
         ),
         const HSpacer(width: 5),
-        Text(
-          text,
-          style: context.textTheme.bodySmall?.copyWith(
-            color: context.theme.colorScheme.onSurfaceVariant,
+        Expanded(
+          child: Text(
+            text,
+            style: context.textTheme.bodySmall?.copyWith(
+              color: context.theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       ],

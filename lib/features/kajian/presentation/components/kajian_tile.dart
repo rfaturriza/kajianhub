@@ -103,11 +103,13 @@ class KajianTile extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          LabelTag(
-                            title: prayerName.capitalize(),
-                            backgroundColor: prayerColor.first,
-                            foregroundColor: prayerColor.second,
-                          ),
+                          if (prayerName.isNotEmpty) ...[
+                            LabelTag(
+                              title: prayerName.capitalize(),
+                              backgroundColor: prayerColor.first,
+                              foregroundColor: prayerColor.second,
+                            ),
+                          ],
                           Text(
                             title,
                             style: context.textTheme.bodyMedium?.copyWith(

@@ -85,7 +85,7 @@ class _ListItemMenu extends StatelessWidget {
           ),
         ),
         ButtonDrawer(
-          icon: Icons.language,
+          icon: Symbols.language,
           title: LocaleKeys.language.tr(),
           onTap: () {
             context.pushNamed(RootRouter.languageSettingRoute.name);
@@ -93,7 +93,7 @@ class _ListItemMenu extends StatelessWidget {
           withDecoration: false,
         ),
         ButtonDrawer(
-          icon: Icons.format_size,
+          icon: Symbols.format_color_text_rounded,
           title: LocaleKeys.stylingView.tr(),
           onTap: () {
             context.pushNamed(RootRouter.styleSettingRoute.name);
@@ -101,7 +101,15 @@ class _ListItemMenu extends StatelessWidget {
           withDecoration: false,
         ),
         ButtonDrawer(
-          icon: Icons.mosque,
+          icon: Symbols.menu_book_rounded,
+          title: LocaleKeys.mosque.tr(),
+          onTap: () {
+            context.pushNamed(RootRouter.studyLocationRoute.name);
+          },
+          withDecoration: false,
+        ),
+        ButtonDrawer(
+          icon: Symbols.mosque,
           title: LocaleKeys.mosque.tr(),
           onTap: () {
             context.pushNamed(RootRouter.studyLocationRoute.name);
@@ -145,7 +153,7 @@ class _Footer extends StatelessWidget {
                     inAppReview.requestReview();
                   }
                 },
-                icon: Icons.rate_review_rounded,
+                icon: Symbols.rate_review_rounded,
                 title: LocaleKeys.rateUs.tr(),
               ),
             ),
@@ -179,7 +187,7 @@ class _Footer extends StatelessWidget {
                     ),
                   );
                 },
-                icon: Icons.share_rounded,
+                icon: Symbols.share_rounded,
                 title: '',
               ),
             ),
@@ -191,7 +199,7 @@ class _Footer extends StatelessWidget {
             onTap: () {
               context.pushNamed(RootRouter.donationRoute.name);
             },
-            icon: Icons.volunteer_activism,
+            icon: Symbols.volunteer_activism,
             title: LocaleKeys.supportUs.tr(),
           ),
           const VSpacer(),
@@ -208,7 +216,7 @@ class _Footer extends StatelessWidget {
               debugPrint(e.toString());
             }
           },
-          icon: Icons.sentiment_satisfied_alt_rounded,
+          icon: Symbols.sentiment_satisfied_alt_rounded,
           title: LocaleKeys.muslimBookIsOpenSource.tr(
             args: [LocaleKeys.appName.tr()],
           ),
@@ -268,8 +276,8 @@ class _AppInfoState extends State<_AppInfo> {
         ),
         trailing: IconButton(
           icon: context.isDarkMode
-              ? const Icon(Icons.dark_mode_rounded)
-              : const Icon(Icons.light_mode_rounded),
+              ? const Icon(Symbols.dark_mode_rounded)
+              : const Icon(Symbols.light_mode_rounded),
           onPressed: () {
             showModalBottomSheet(
               useSafeArea: true,
@@ -319,7 +327,7 @@ class _ThemePickerBottomSheet extends StatelessWidget {
                 title: Text(LocaleKeys.systemMode.tr()),
                 selected: themeProvider.themeMode == ThemeMode.system,
                 trailing: themeProvider.themeMode == ThemeMode.system
-                    ? const Icon(Icons.check)
+                    ? const Icon(Symbols.check)
                     : null,
                 onTap: () {
                   themeProvider.setThemeMode(ThemeMode.system);
@@ -330,7 +338,7 @@ class _ThemePickerBottomSheet extends StatelessWidget {
                 title: Text(LocaleKeys.lightMode.tr()),
                 selected: themeProvider.themeMode == ThemeMode.light,
                 trailing: themeProvider.themeMode == ThemeMode.light
-                    ? const Icon(Icons.check)
+                    ? const Icon(Symbols.check)
                     : null,
                 onTap: () {
                   themeProvider.setThemeMode(ThemeMode.light);
@@ -341,7 +349,7 @@ class _ThemePickerBottomSheet extends StatelessWidget {
                 title: Text(LocaleKeys.darkMode.tr()),
                 selected: themeProvider.themeMode == ThemeMode.dark,
                 trailing: themeProvider.themeMode == ThemeMode.dark
-                    ? const Icon(Icons.check)
+                    ? const Icon(Symbols.check)
                     : null,
                 onTap: () {
                   themeProvider.setThemeMode(ThemeMode.dark);

@@ -1,7 +1,9 @@
 import 'package:dartz/dartz.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:injectable/injectable.dart';
 import 'package:quranku/core/error/exceptions.dart';
 import 'package:quranku/core/utils/extension/dartz_ext.dart';
+import 'package:quranku/generated/locale_keys.g.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../../kajian/domain/entities/study_location_entity.dart';
@@ -26,10 +28,10 @@ class StudyLocationRepositoryImpl implements StudyLocationRepository {
       }
       final mosqueEntities = models.asRight();
       return Right(mosqueEntities.toEntity());
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message));
     } catch (e) {
-      // Handle any unexpected errors
-      final exception = ServerException(e as Exception);
-      return Left(ServerFailure(message: exception.message));
+      return Left(ServerFailure(message: LocaleKeys.defaultErrorMessage.tr()));
     }
   }
 }

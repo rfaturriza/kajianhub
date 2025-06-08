@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/generated/locale_keys.g.dart';
 import '../../../../core/components/search_box.dart';
@@ -152,13 +153,13 @@ class _StudyLocationListScaffoldState
                 if (state.status.isFailure &&
                     (state.studyLocations == null ||
                         state.studyLocations?.isEmpty == true)) {
-                  return Center(
-                    child: Text(
+                  return ListTile(
+                    title: Text(
                       state.errorMessage.isNotEmpty
                           ? state.errorMessage
                           : LocaleKeys.defaultErrorMessage.tr(),
-                      style: context.textTheme.bodyMedium,
                     ),
+                    leading: const Icon(Symbols.warning_amber_rounded),
                   );
                 }
                 final studyLocations = state.studyLocations ?? [];

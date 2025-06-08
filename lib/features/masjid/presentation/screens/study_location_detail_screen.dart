@@ -130,7 +130,10 @@ class _StudySchedulesListState extends State<_StudySchedulesList> {
         }
         final schedules = state.kajianResult;
         if (schedules.isEmpty) {
-          return Text(LocaleKeys.searchKajianEmpty.tr());
+          return ListTile(
+            title: Text(LocaleKeys.searchKajianEmpty.tr()),
+            leading: const Icon(Symbols.warning_amber_rounded),
+          );
         }
         return ListView.builder(
           controller: _scrollController,

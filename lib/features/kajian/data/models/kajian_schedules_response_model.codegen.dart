@@ -94,6 +94,9 @@ abstract class DataKajianScheduleModel with _$DataKajianScheduleModel {
           .map((e) => HistoryKajianModel.fromEntity(e))
           .toList(),
       customSchedules: entity.customSchedules,
+      distanceInKm: entity.distanceInKm != null
+          ? double.tryParse(entity.distanceInKm!)
+          : null,
     );
   }
 

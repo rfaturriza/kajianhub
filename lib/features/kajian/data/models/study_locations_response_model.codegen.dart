@@ -48,7 +48,7 @@ abstract class DataStudyLocationModel with _$DataStudyLocationModel {
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
     String? description,
-    @JsonKey(name: 'distance_in_km') String? distanceInKm,
+    @JsonKey(name: 'distance_in_km') double? distanceInKm,
     @JsonKey(name: 'youtube_channel_link') String? youtubeChannelLink,
     @JsonKey(name: 'instagram_link') String? instagramLink,
     @JsonKey(name: 'kajian_count') String? kajianCount,
@@ -79,7 +79,7 @@ abstract class DataStudyLocationModel with _$DataStudyLocationModel {
       createdAt: createdAt,
       updatedAt: updatedAt,
       description: description,
-      distanceInKm: distanceInKm,
+      distanceInKm: distanceInKm.toString(),
       youtubeChannelLink: youtubeChannelLink,
       instagramLink: instagramLink,
       kajianCount: kajianCount,
@@ -108,7 +108,9 @@ abstract class DataStudyLocationModel with _$DataStudyLocationModel {
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
       description: entity.description,
-      distanceInKm: entity.distanceInKm,
+      distanceInKm: entity.distanceInKm != null
+          ? double.tryParse(entity.distanceInKm!)
+          : null,
       youtubeChannelLink: entity.youtubeChannelLink,
       instagramLink: entity.instagramLink,
       kajianCount: entity.kajianCount,

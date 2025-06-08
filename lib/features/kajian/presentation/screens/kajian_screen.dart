@@ -74,7 +74,8 @@ class KajianScreen extends StatelessWidget {
               final isLoading = state.status.isInProgress;
               if (state.status.isFailure && state.kajianResult.isEmpty) {
                 return ErrorScreen(
-                  message: LocaleKeys.errorGetKajian.tr(),
+                  message: state.kajianErrorMessage ??
+                      LocaleKeys.errorGetKajian.tr(),
                   onRefresh: () {
                     context.read<KajianBloc>().add(
                           KajianEvent.fetchKajian(

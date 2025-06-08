@@ -11,6 +11,7 @@ import 'package:quranku/features/kajian/data/models/provinces_response_model.cod
 import 'package:quranku/features/kajian/data/models/prayer_kajian_schedules_response_model.codegen.dart';
 import 'package:quranku/features/kajian/data/models/ustadz_response_model.codegen.dart';
 
+import '../../../../../core/error/exceptions.dart';
 import '../../models/kajian_schedule_response_model.codegen.dart';
 import '../../models/prayer_kajian_schedule_request_model.codegen.dart';
 import 'kajianhub_remote_data_source.dart';
@@ -38,6 +39,8 @@ class KajianHubRemoteDataSourceImpl implements KajianHubRemoteDataSource {
 
       final data = response.data;
       return right(KajianSchedulesResponseModel.fromJson(data));
+    } on Exception catch (e) {
+      throw left(ServerException(e));
     } catch (e) {
       throw left(e);
     }
@@ -60,6 +63,8 @@ class KajianHubRemoteDataSourceImpl implements KajianHubRemoteDataSource {
 
       final data = response.data;
       return right(KajianScheduleResponseModel.fromJson(data));
+    } on Exception catch (e) {
+      throw left(ServerException(e));
     } catch (e) {
       throw left(e);
     }
@@ -86,6 +91,8 @@ class KajianHubRemoteDataSourceImpl implements KajianHubRemoteDataSource {
 
       final data = response.data;
       return right(CitiesResponseModel.fromJson(data));
+    } on Exception catch (e) {
+      throw left(ServerException(e));
     } catch (e) {
       throw left(e);
     }
@@ -110,6 +117,8 @@ class KajianHubRemoteDataSourceImpl implements KajianHubRemoteDataSource {
 
       final data = response.data;
       return right(KajianThemesResponseModel.fromJson(data));
+    } on Exception catch (e) {
+      throw left(ServerException(e));
     } catch (e) {
       throw left(e);
     }
@@ -136,6 +145,8 @@ class KajianHubRemoteDataSourceImpl implements KajianHubRemoteDataSource {
 
       final data = response.data;
       return right(StudyLocationResponseModel.fromJson(data));
+    } on Exception catch (e) {
+      throw left(ServerException(e));
     } catch (e) {
       throw left(e);
     }
@@ -162,6 +173,8 @@ class KajianHubRemoteDataSourceImpl implements KajianHubRemoteDataSource {
 
       final data = response.data;
       return right(ProvincesResponseModel.fromJson(data));
+    } on Exception catch (e) {
+      throw left(ServerException(e));
     } catch (e) {
       throw left(e);
     }
@@ -181,6 +194,8 @@ class KajianHubRemoteDataSourceImpl implements KajianHubRemoteDataSource {
 
       final data = response.data;
       return right(PrayerKajianSchedulesByMosqueResponseModel.fromJson(data));
+    } on Exception catch (e) {
+      throw left(ServerException(e));
     } catch (e) {
       throw left(e);
     }
@@ -205,6 +220,8 @@ class KajianHubRemoteDataSourceImpl implements KajianHubRemoteDataSource {
 
       final data = response.data;
       return right(UstadzResponseModel.fromJson(data));
+    } on Exception catch (e) {
+      throw left(ServerException(e));
     } catch (e) {
       throw left(e);
     }
@@ -227,6 +244,8 @@ class KajianHubRemoteDataSourceImpl implements KajianHubRemoteDataSource {
 
       final data = response.data;
       return right(PrayerKajianSchedulesResponseModel.fromJson(data));
+    } on Exception catch (e) {
+      throw left(ServerException(e));
     } catch (e) {
       throw left(e);
     }

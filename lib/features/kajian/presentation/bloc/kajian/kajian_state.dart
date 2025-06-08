@@ -7,6 +7,7 @@ abstract class KajianState with _$KajianState {
     FormzSubmissionStatus statusRecommended,
     DataKajianSchedule? recommendedKajian,
     @Default(FormzSubmissionStatus.initial) FormzSubmissionStatus status,
+    String? kajianErrorMessage,
     @Default([]) List<DataKajianSchedule> kajianResult,
     @Default(FormzSubmissionStatus.initial)
     FormzSubmissionStatus provincesStatus,

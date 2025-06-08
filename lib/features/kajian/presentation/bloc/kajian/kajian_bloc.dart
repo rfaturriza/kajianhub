@@ -184,7 +184,10 @@ class KajianBloc extends Bloc<KajianEvent, KajianState> {
       final result = await _getKajianListUseCase(request);
       result.fold(
         (failure) => emit(
-          state.copyWith(status: FormzSubmissionStatus.failure),
+          state.copyWith(
+            status: FormzSubmissionStatus.failure,
+            kajianErrorMessage: failure.errorMessage,
+          ),
         ),
         (data) {
           final currentData = state.kajianResult;

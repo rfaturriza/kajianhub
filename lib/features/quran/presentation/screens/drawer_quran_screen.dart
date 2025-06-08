@@ -100,6 +100,19 @@ class _ListItemMenu extends StatelessWidget {
           },
           withDecoration: false,
         ),
+        VSpacer(),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+          ),
+          child: Text(
+            LocaleKeys.menu.tr(),
+            style: context.textTheme.titleSmall?.copyWith(
+              color: context.theme.colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
         ButtonDrawer(
           icon: Symbols.menu_book_rounded,
           title: LocaleKeys.kajian.tr(),

@@ -1,10 +1,8 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:quranku/features/kajian/domain/usecases/get_kajian_list_usecase.dart';
-import 'package:quranku/generated/locale_keys.g.dart';
 
 import '../../../../kajian/data/models/kajian_schedule_request_model.codegen.dart';
 import '../../../../kajian/domain/entities/kajian_schedule.codegen.dart';
@@ -52,8 +50,6 @@ class StudyLocationDetailBloc
             kajianList.meta.currentPage == state.currentPage) {
           emit(state.copyWith(
             hasReachedMax: true,
-            statusKajian: FormzSubmissionStatus.failure,
-            errorMessage: LocaleKeys.searchKajianEmpty.tr(),
           ));
           return;
         }

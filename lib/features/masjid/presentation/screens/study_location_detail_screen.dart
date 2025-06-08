@@ -205,39 +205,41 @@ class _ImageSection extends StatelessWidget {
             ),
           ),
         ),
-        Positioned(
-          bottom: 4,
-          right: 4,
-          child: GestureDetector(
-            onTap: () {
-              final youtubeUrl =
-                  this.youtubeUrl.isNotEmpty ? this.youtubeUrl : '';
-              if (youtubeUrl.isNotEmpty) {
-                final uri = Uri.parse(youtubeUrl);
-                launchUrl(uri, mode: LaunchMode.externalApplication);
-              } else {
-                context.showErrorToast(LocaleKeys.defaultErrorMessage.tr());
-              }
-            },
-            child: Chip(
-              backgroundColor: context.theme.colorScheme.primary,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              side: BorderSide.none,
-              avatar: const Icon(
-                Symbols.youtube_activity_rounded,
-                color: Colors.white,
-                size: 18,
-              ),
-              label: Text(
-                label,
-                style: context.textTheme.titleSmall?.copyWith(
+        if (youtubeUrl.isNotEmpty) ...[
+          Positioned(
+            bottom: 4,
+            right: 4,
+            child: GestureDetector(
+              onTap: () {
+                final youtubeUrl =
+                    this.youtubeUrl.isNotEmpty ? this.youtubeUrl : '';
+                if (youtubeUrl.isNotEmpty) {
+                  final uri = Uri.parse(youtubeUrl);
+                  launchUrl(uri, mode: LaunchMode.externalApplication);
+                } else {
+                  context.showErrorToast(LocaleKeys.defaultErrorMessage.tr());
+                }
+              },
+              child: Chip(
+                backgroundColor: context.theme.colorScheme.primary,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                side: BorderSide.none,
+                avatar: const Icon(
+                  Symbols.youtube_activity_rounded,
                   color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                  size: 18,
+                ),
+                label: Text(
+                  label,
+                  style: context.textTheme.titleSmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -328,8 +330,7 @@ class _InfoSection extends StatelessWidget {
         ),
         const VSpacer(height: 12),
         Material(
-          color:
-              context.theme.colorScheme.surfaceContainerHighest.withAlpha(100),
+          color: context.theme.colorScheme.primaryContainer.withAlpha(100),
           borderRadius: BorderRadius.circular(8),
           child: InkWell(
             borderRadius: BorderRadius.circular(8),

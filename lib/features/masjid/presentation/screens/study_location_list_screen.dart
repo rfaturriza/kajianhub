@@ -10,7 +10,7 @@ import '../../../../core/components/error_screen.dart';
 import '../../../../core/components/search_box.dart';
 import '../../../../core/route/root_router.dart';
 import '../blocs/study_location_list/study_location_list_bloc.dart';
-import '../components/mosque_tile.dart';
+import '../components/study_location_tile.dart';
 
 class StudyLocationListScreen extends StatefulWidget {
   const StudyLocationListScreen({super.key});
@@ -202,7 +202,7 @@ class _StudyLocationListScaffoldState
                         );
                       }
                       final mosque = studyLocations[index];
-                      return MosqueTile(
+                      return StudyLocationTile(
                         location: mosque,
                         onTap: (mosque) {
                           context.pushNamed(

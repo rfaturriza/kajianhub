@@ -8,11 +8,11 @@ import '../../../../core/components/spacer.dart';
 import '../../../kajian/presentation/components/mosque_image_container.dart';
 import '../../../kajian/presentation/components/schedule_icon_text.dart';
 
-class MosqueTile extends StatelessWidget {
+class StudyLocationTile extends StatelessWidget {
   final StudyLocationEntity location;
   final Function(StudyLocationEntity mosque)? onTap;
 
-  const MosqueTile({
+  const StudyLocationTile({
     super.key,
     required this.location,
     this.onTap,
@@ -31,7 +31,7 @@ class MosqueTile extends StatelessWidget {
     final title = location.name ?? '';
     final provinceCity = "${location.city?.name}, ${location.province?.name}";
     final address = location.address ?? '';
-    final totalStudy = location.kajianCount ?? 0;
+    final totalStudy = location.kajianCount ?? '';
     final googleMapUrl = location.googleMaps ?? '';
 
     return GestureDetector(
@@ -88,7 +88,7 @@ class MosqueTile extends StatelessWidget {
                               Expanded(
                                 flex: 1,
                                 child: ScheduleIconText(
-                                  icon: Icons.book,
+                                  icon: Icons.menu_book_rounded,
                                   text: totalStudy.toString(),
                                 ),
                               ),

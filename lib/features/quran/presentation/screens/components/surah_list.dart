@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quranku/core/components/error_screen.dart';
 import 'package:quranku/core/components/search_box.dart';
-import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/features/quran/presentation/bloc/surah/surah_bloc.dart';
 
 import '../../../../../core/route/root_router.dart';
@@ -73,11 +72,8 @@ class SurahList extends StatelessWidget {
                   );
                 }
                 if (listSurah == null || listSurah.isEmpty) {
-                  return Center(
-                    child: Text(
-                      LocaleKeys.noData.tr(),
-                      style: context.textTheme.headlineMedium,
-                    ),
+                  return ErrorScreen(
+                    message: LocaleKeys.noData.tr(),
                   );
                 }
 

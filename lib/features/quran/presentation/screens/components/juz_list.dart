@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:quranku/core/utils/extension/context_ext.dart';
+import 'package:quranku/core/components/error_screen.dart';
 import 'package:quranku/core/utils/extension/string_ext.dart';
 import 'package:quranku/features/quran/presentation/bloc/juz/juz_cubit.dart';
 import 'package:quranku/features/quran/presentation/screens/components/list_tile_juz.dart';
@@ -61,11 +61,8 @@ class JuzList extends StatelessWidget {
                   return const LinearProgressIndicator();
                 }
                 if (state.listJuz == null || state.listJuz?.isEmpty == true) {
-                  return Center(
-                    child: Text(
-                      LocaleKeys.noData.tr(),
-                      style: context.textTheme.headlineMedium,
-                    ),
+                  return ErrorScreen(
+                    message: LocaleKeys.noData.tr(),
                   );
                 }
 

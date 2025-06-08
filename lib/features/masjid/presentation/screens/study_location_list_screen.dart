@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/core/utils/extension/string_ext.dart';
 import 'package:quranku/generated/locale_keys.g.dart';
+import '../../../../core/components/error_screen.dart';
 import '../../../../core/components/search_box.dart';
 import '../../../../core/route/root_router.dart';
 import '../blocs/study_location_list/study_location_list_bloc.dart';
@@ -160,20 +160,23 @@ class _StudyLocationListScaffoldState
                 if (state.status.isFailure &&
                     (state.studyLocations == null ||
                         state.studyLocations?.isEmpty == true)) {
-                  return ListTile(
-                    title: Text(
-                      state.errorMessage.isNotEmpty
-                          ? state.errorMessage
-                          : LocaleKeys.defaultErrorMessage.tr(),
-                    ),
-                    leading: const Icon(Symbols.priority_high_rounded),
+                  return ErrorScreen(
+                    message: state.errorMessage,
+                    onRefresh: () {
+                      context.read<StudyLocationListBloc>().add(
+                            LoadMasjidList(
+                              querySearch: state.querySearch,
+                              locale: Localizations.localeOf(context),
+                            ),
+                          );
+                    },
                   );
                 }
                 if (state.studyLocations == null ||
                     state.studyLocations!.isEmpty) {
-                  return ListTile(
-                    title: Text(LocaleKeys.searchMosqueEmpty.tr()),
-                    leading: const Icon(Symbols.info_rounded),
+                  return ErrorScreen(
+                    message: LocaleKeys.noData.tr(),
+                    iconType: IconType.warning,
                   );
                 }
                 final studyLocations = state.studyLocations ?? [];

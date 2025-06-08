@@ -10,6 +10,7 @@ import 'package:quranku/features/kajian/domain/entities/study_location_entity.da
 import 'package:quranku/generated/locale_keys.g.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/components/error_screen.dart';
 import '../../../../core/constants/asset_constants.dart';
 import '../../../kajian/presentation/components/kajian_tile.dart';
 import '../blocs/study_location_detail/study_location_detail_bloc.dart';
@@ -128,11 +129,24 @@ class _StudySchedulesListState extends State<_StudySchedulesList> {
             state.kajianResult.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
+        if (state.statusKajian == FormzSubmissionStatus.failure) {
+          return ErrorScreen(
+            message: state.errorMessage,
+            onRefresh: () {
+              context.read<StudyLocationDetailBloc>().add(
+                    StudyLocationDetailEvent.loadStudies(
+                      studyLocationId: widget.studyLocationId,
+                      page: 1,
+                    ),
+                  );
+            },
+          );
+        }
         final schedules = state.kajianResult;
         if (schedules.isEmpty) {
-          return ListTile(
-            title: Text(LocaleKeys.searchKajianEmpty.tr()),
-            leading: const Icon(Symbols.info_rounded),
+          return ErrorScreen(
+            iconType: IconType.info,
+            message: LocaleKeys.searchKajianEmpty.tr(),
           );
         }
         return ListView.builder(

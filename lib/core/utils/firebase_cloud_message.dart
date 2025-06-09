@@ -10,7 +10,7 @@ import '../../injection.dart';
 Future<void> initializeFCM() async {
   final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
   if (Platform.isIOS && apnsToken == null) {
-      debugPrint('APNS Token is null');
+    debugPrint('APNS Token is null');
     return;
   }
   await FirebaseMessaging.instance.setAutoInitEnabled(true);
@@ -20,6 +20,8 @@ Future<void> initializeFCM() async {
     print('FCM Token: $fcmToken');
     print('APNS Token: $apnsToken');
   }
+  await FirebaseMessaging.instance.subscribeToTopic("daily-general");
+  await FirebaseMessaging.instance.subscribeToTopic("fasting-reminder");
   configureFCMListeners();
 }
 

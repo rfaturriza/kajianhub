@@ -10,7 +10,7 @@ import '../../injection.dart';
 Future<void> initializeFCM() async {
   final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
   if (Platform.isIOS && apnsToken == null) {
-    debugPrint('APNS Token is null');
+      debugPrint('APNS Token is null');
     return;
   }
   await FirebaseMessaging.instance.setAutoInitEnabled(true);
@@ -27,7 +27,9 @@ void configureFCMListeners() {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     // Handle incoming data message when the app is in the foreground
     if (kDebugMode) {
-      print("Data message received: ${message.notification?.title} ${message.notification?.body}");
+      print(
+        "Data message received: ${message.notification?.title} ${message.notification?.body}",
+      );
     }
     sl<LocalNotification>().show(
       title: message.notification?.title ?? emptyString,
@@ -38,6 +40,7 @@ void configureFCMListeners() {
   FirebaseMessaging.onBackgroundMessage(_backgroundHandler);
 }
 
+@pragma('vm:entry-point')
 Future<void> _backgroundHandler(RemoteMessage message) async {
   if (kDebugMode) {
     print("Handling background message: ${message.data}");

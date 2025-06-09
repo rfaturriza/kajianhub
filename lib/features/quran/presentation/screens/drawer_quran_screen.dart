@@ -8,7 +8,6 @@ import 'package:in_app_review/in_app_review.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:quranku/core/constants/url_constants.dart';
 import 'package:quranku/core/route/root_router.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:share_plus/share_plus.dart';
@@ -222,7 +221,7 @@ class _Footer extends StatelessWidget {
           onTap: () async {
             try {
               await launchUrl(
-                Uri.parse(UrlConst.urlGithub),
+                Uri.parse(sl<RemoteConfigService>().githubUrl),
                 mode: LaunchMode.externalApplication,
               );
             } catch (e) {
@@ -233,7 +232,7 @@ class _Footer extends StatelessWidget {
           title: LocaleKeys.muslimBookIsOpenSource.tr(
             args: [LocaleKeys.appName.tr()],
           ),
-          subtitle: UrlConst.urlGithub,
+          subtitle: sl<RemoteConfigService>().githubUrl,
         ),
         const VSpacer(),
       ],

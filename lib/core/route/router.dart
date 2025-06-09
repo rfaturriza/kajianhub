@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,7 +31,26 @@ import '../../injection.dart';
 import '../components/error_screen.dart';
 import 'root_router.dart';
 
+// Custom extra Codec to retain complex objects passed via 'extra'
+class AppExtraCodec extends Codec<Object?, Object?> {
+  @override
+  Converter<Object?, Object?> get encoder => const _AppExtraConverter();
+
+  @override
+  Converter<Object?, Object?> get decoder => const _AppExtraConverter();
+}
+
+// Converter that returns the object unchanged
+class _AppExtraConverter extends Converter<Object?, Object?> {
+  const _AppExtraConverter();
+
+  @override
+  Object? convert(Object? input) => input;
+}
+
 final router = GoRouter(
+  // provide custom codec so complex 'extra' values are not dropped
+  extraCodec: AppExtraCodec(),
   navigatorKey: App.navigatorKey,
   initialLocation: RootRouter.rootRoute.path,
   debugLogDiagnostics: kDebugMode,

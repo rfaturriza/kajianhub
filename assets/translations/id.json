@@ -233,5 +233,10 @@
   "totalStudies": "Total Kajian",
   "subscribe": "Berlangganan",
   "subscribers": "Pengikut",
-  "menu": "Menu"
+  "menu": "Menu",
+  "camera": "Kamera",
+  "gallery": "Galeri",
+  "takePicture": "Ambil gambar",
+  "selectPicture": "Pilih gambar",
+  "removePicture": "Hapus gambar"
 }

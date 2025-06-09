@@ -233,5 +233,10 @@
   "totalStudies": "Total Studies",
   "subscribe": "Subscribe",
   "subscribers": "Subscribers",
-  "menu": "Menu"
+  "menu": "Menu",
+  "camera": "Camera",
+  "gallery": "Gallery",
+  "takePicture": "Take picture",
+  "selectPicture": "Select picture",
+  "removePicture": "Remove picture"
 }

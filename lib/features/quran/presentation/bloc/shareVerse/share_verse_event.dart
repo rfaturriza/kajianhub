@@ -34,4 +34,7 @@ abstract class ShareVerseEvent with _$ShareVerseEvent {
 
   const factory ShareVerseEvent.onSharePressed(
       RenderRepaintBoundary? boundary) = _OnSharePressed;
+
+  const factory ShareVerseEvent.onPickBackgroundImage(String? path) =
+      _OnPickBackgroundImage;
 }

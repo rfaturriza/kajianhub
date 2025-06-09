@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/generated/locale_keys.g.dart';
 
+import 'spacer.dart';
+
 enum IconType {
   warning(Symbols.warning_rounded),
   error(Symbols.priority_high_rounded),
@@ -36,13 +38,14 @@ class ErrorScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ListTile(
-                leading: Icon(
-                  iconType.icon,
-                ),
-                title: Text(
-                  message ?? LocaleKeys.defaultErrorMessage.tr(),
-                ),
+              Icon(
+                iconType.icon,
+              ),
+              const VSpacer(),
+              Text(
+                message ?? LocaleKeys.defaultErrorMessage.tr(),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               // icon Refresh
               if (onRefresh != null) ...[

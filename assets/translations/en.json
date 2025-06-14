@@ -1,8 +1,8 @@
 {
   "appName": "KajianHub",
-  "defaultErrorMessage": "I'm sorry, an error occurred, please try again",
+  "defaultErrorMessage": "Sorry, something went wrong. Please try again later.",
   "loading": "Loading",
-  "noData": "No data",
+  "noData": "No data available",
   "noInternetConnection": "No internet connection, please check your connection",
   "pleaseWait": "Please wait...",
   "juzOneDescription": "Starting from Al-Fatihah verse 1 to Al-Baqarah verse 141",
@@ -155,9 +155,11 @@
   "kajianDateSchedule": "Study Date Schedule",
   "selectDate": "Select Date",
   "searchImamHint": "Search Imam...",
-  "searchImamEmpty": "No imam found",
+  "searchImamEmpty": "No imam found, please try another search",
   "searchKhatibHint": "Search Khatib...",
-  "searchKhatibEmpty": "No khatib found",
+  "searchKhatibEmpty": "No khatib found, please try another search",
+  "searchMosqueHint": "Search Mosque...",
+  "searchMosqueEmpty": "No mosque found, please try another search",
   "filter": "Filter",
   "play": "Play",
   "requestAccessLocation": "Request Location Permission",
@@ -227,5 +229,14 @@
     "description": "Ask questions about Islam to Ustadz AI",
     "labelTextField": "Ask anything about Islam",
     "generating": "Please wait, your question is being processed"
-  }
+  },
+  "totalStudies": "Total Studies",
+  "subscribe": "Subscribe",
+  "subscribers": "Subscribers",
+  "menu": "Menu",
+  "camera": "Camera",
+  "gallery": "Gallery",
+  "takePicture": "Take picture",
+  "selectPicture": "Select picture",
+  "removePicture": "Remove picture"
 }

@@ -5,17 +5,6 @@ import 'package:easy_localization/easy_localization.dart';
 
 import '../../domain/entities/schedule.codegen.dart';
 
-enum PrayerInApp {
-  imsak,
-  subuh,
-  syuruq,
-  dhuha,
-  dzuhur,
-  ashar,
-  maghrib,
-  isya,
-}
-
 class HelperTimeShalat {
   static List<String> prayerNameByLocale(Locale? locale) {
     switch (locale?.languageCode) {

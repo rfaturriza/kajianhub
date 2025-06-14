@@ -3,14 +3,9 @@ default_platform(:ios)
 platform :ios do
   before_all do
     # Ensure required environment variables are set
-    %w[
-      APP_STORE_CONNECT_KEY_ID
-      APP_STORE_CONNECT_ISSUER_ID
-      APP_STORE_CONNECT_API_KEY_CONTENT
-    ].each do |var|
+    %w[APP_STORE_CONNECT_KEY_ID APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_API_KEY_CONTENT].each do |var|
       UI.user_error!("Missing environment variable: #{var}") if ENV[var].to_s.empty?
     end
-
     setup_ci
 
     app_store_connect_api_key(
@@ -32,47 +27,42 @@ platform :ios do
 
     case type
     when "major"
-      version_parts[0] += 1
-      version_parts[1] = 0
-      version_parts[2] = 0
+      version_parts[0] += 1; version_parts[1] = 0; version_parts[2] = 0
     when "minor"
-      version_parts[1] += 1
-      version_parts[2] = 0
+      version_parts[1] += 1; version_parts[2] = 0
     when "patch"
       version_parts[2] += 1
     else
       UI.user_error!("Invalid update type: #{type}")
     end
-
-    updated_version = version_parts.join(".")
+    updated_version = version_parts.join('.')
     updated_build_number = current_build_number + 1
-
     increment_version_number(version_number: updated_version, xcodeproj: "Runner.xcodeproj")
     increment_build_number(build_number: updated_build_number, xcodeproj: "Runner.xcodeproj")
   end
 
   private_lane :build_ios do
-    build_ios_app(
-      workspace: "Runner.xcworkspace",
+     build_ios_app(
+       workspace: "Runner.xcworkspace",
       scheme: "Runner",
-      output_directory: "./fastlane/build",
-      output_name: "app.ipa",
-      configuration: "Release",
-      silent: true,
-      clean: true,
-      export_method: "app-store"
-    )
-  end
+       output_directory: "./fastlane/build",
+       output_name: "app.ipa",
+       configuration: "Release",
+       silent: true,
+       clean: true,
+       export_method: "app-store"
+     )
+   end
 
-  private_lane :upload_internal do
-    upload_to_testflight(
+   private_lane :upload_internal do
+     upload_to_testflight(
       ipa: "./fastlane/build/app.ipa",
       skip_submission: true,
       skip_waiting_for_build_processing: true
-    )
-  end
+     )
+   end
 
-  private_lane :upload_production do
+   private_lane :upload_production do
     upload_to_app_store(
       ipa: "./fastlane/build/app.ipa",
       skip_screenshots: true,

@@ -9,19 +9,15 @@ import 'package:quranku/core/utils/extension/extension.dart';
 import 'package:quranku/core/utils/extension/string_ext.dart';
 import 'package:quranku/features/kajian/domain/entities/day_kajian.codegen.dart';
 import 'package:quranku/features/kajian/domain/entities/prayer_kajian.codegen.dart';
-import 'package:quranku/features/kajian/presentation/components/label_tag.dart';
 import 'package:quranku/generated/locale_keys.g.dart';
 
 import '../../../../core/components/error_screen.dart';
 import '../../../../core/components/spacer.dart';
-import '../../../../core/route/root_router.dart';
 import '../../../../core/utils/pair.dart';
-import '../../domain/entities/kajian_schedule.codegen.dart';
 import '../../domain/entities/week_kajian.codegen.dart';
 import '../bloc/kajian/kajian_bloc.dart';
 import '../components/item_bottom_sheet.dart';
-import '../components/mosque_image_container.dart';
-import '../components/schedule_icon_text.dart';
+import '../components/kajian_tile.dart';
 
 class KajianScreen extends StatelessWidget {
   const KajianScreen({super.key});
@@ -35,7 +31,6 @@ class KajianScreen extends StatelessWidget {
           buildWhen: (previous, current) => previous.search != current.search,
           builder: (context, state) {
             return SearchBox(
-              isDense: true,
               initialValue: state.search ?? emptyString,
               hintText: LocaleKeys.searchKajianHint.tr(),
               onClear: () {
@@ -79,7 +74,8 @@ class KajianScreen extends StatelessWidget {
               final isLoading = state.status.isInProgress;
               if (state.status.isFailure && state.kajianResult.isEmpty) {
                 return ErrorScreen(
-                  message: LocaleKeys.errorGetKajian.tr(),
+                  message: state.kajianErrorMessage ??
+                      LocaleKeys.errorGetKajian.tr(),
                   onRefresh: () {
                     context.read<KajianBloc>().add(
                           KajianEvent.fetchKajian(
@@ -120,7 +116,8 @@ class KajianScreen extends StatelessWidget {
                         child: LinearProgressIndicator(),
                       );
                     }
-                    return _KajianTile(
+                    return KajianTile(
+                      key: Key(index.toString()),
                       kajian: state.kajianResult.elementAt(index),
                     );
                   },
@@ -401,153 +398,6 @@ class _FilterRowSection extends StatelessWidget {
                 ),
               );
         },
-      ),
-    );
-  }
-}
-
-class _KajianTile extends StatelessWidget {
-  final DataKajianSchedule kajian;
-
-  const _KajianTile({
-    required this.kajian,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final imageUrl = kajian.studyLocation.pictureUrl;
-    final prayerName = kajian.prayerSchedule;
-    final title = kajian.title;
-    final ustadz =
-        kajian.ustadz.isNotEmpty ? kajian.ustadz.first.name : emptyString;
-    final time = '${kajian.timeStart} - ${kajian.timeEnd}';
-    final place = kajian.studyLocation.name;
-    final schedule = kajian.dailySchedules.isNotEmpty
-        ? kajian.dailySchedules.first.dayLabel
-        : emptyString;
-    final Pair<Color, Color> prayerColor = () {
-      switch (prayerName.toLowerCase()) {
-        case 'subuh':
-          return Pair(
-            context.theme.colorScheme.tertiaryContainer,
-            context.theme.colorScheme.onTertiaryContainer,
-          );
-        case 'dzuhur':
-          return Pair(
-            context.theme.colorScheme.tertiary,
-            context.theme.colorScheme.onTertiary,
-          );
-        case 'ashar':
-          return Pair(
-            context.theme.colorScheme.error,
-            context.theme.colorScheme.onError,
-          );
-        case 'maghrib':
-          return Pair(
-            context.theme.colorScheme.primaryContainer,
-            context.theme.colorScheme.onPrimaryContainer,
-          );
-        case 'isya':
-          return Pair(
-            context.theme.colorScheme.secondaryContainer,
-            context.theme.colorScheme.onSecondaryContainer,
-          );
-        default:
-          return Pair(
-            context.theme.colorScheme.tertiaryContainer,
-            context.theme.colorScheme.onTertiaryContainer,
-          );
-      }
-    }();
-    return GestureDetector(
-      onTap: () {
-        context.pushNamed(
-          RootRouter.kajianDetailRoute.name,
-          pathParameters: {
-            'id': kajian.id.toString(),
-          },
-          extra: kajian,
-        );
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: ShapeDecoration(
-          color: context.theme.colorScheme.surfaceContainer,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5),
-          ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            MosqueImageContainer(
-              imageUrl: imageUrl,
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          LabelTag(
-                            title: prayerName.capitalize(),
-                            backgroundColor: prayerColor.first,
-                            foregroundColor: prayerColor.second,
-                          ),
-                          Text(
-                            title,
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const VSpacer(height: 2),
-                          Text(
-                            ustadz,
-                            style: context.textTheme.bodySmall,
-                          ),
-                          const VSpacer(height: 2),
-                          Row(
-                            children: [
-                              Expanded(
-                                flex: 1,
-                                child: ScheduleIconText(
-                                  icon: Icons.date_range_outlined,
-                                  text: schedule,
-                                ),
-                              ),
-                              const HSpacer(width: 5),
-                              Expanded(
-                                flex: 2,
-                                child: ScheduleIconText(
-                                  icon: Icons.access_time,
-                                  text: time,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const VSpacer(height: 2),
-                          ScheduleIconText(
-                            icon: Icons.place_outlined,
-                            text: place,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(
-                      Icons.navigate_next,
-                      size: 20,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

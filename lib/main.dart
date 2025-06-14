@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -23,22 +21,23 @@ import 'injection.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await EasyLocalization.ensureInitialized();
+  EasyLocalization.ensureInitialized();
+  MobileAds.instance.initialize();
+
   await Hive.initFlutter();
   await registerHiveAdapter();
   await configureDependencies();
   await dotenv.load(fileName: ".env");
-  unawaited(MobileAds.instance.initialize());
-  MobileAds.instance.updateRequestConfiguration(
-    RequestConfiguration(
-      testDeviceIds: kDebugMode ? AdMobConst.testDevice : [],
-    ),
-  );
   if (kReleaseMode) {
     await Firebase.initializeApp(
       options: firebase_release.DefaultFirebaseOptions.currentPlatform,
     );
   } else {
+    MobileAds.instance.updateRequestConfiguration(
+      RequestConfiguration(
+        testDeviceIds: kDebugMode ? AdMobConst.testDevice : [],
+      ),
+    );
     await Firebase.initializeApp(
       options: firebase_debug.DefaultFirebaseOptions.currentPlatform,
     );

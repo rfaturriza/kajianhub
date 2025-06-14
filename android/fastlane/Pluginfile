@@ -4,3 +4,4 @@
 
 gem 'fastlane-plugin-increment_version_code'
 gem 'fastlane-plugin-flutter_dart_version_manager'
+gem 'fastlane-plugin-firebase_app_distribution'

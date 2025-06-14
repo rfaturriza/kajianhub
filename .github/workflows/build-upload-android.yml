@@ -18,6 +18,14 @@ on:
           - production_patch
           - production_minor
           - production_major
+          - firebase_dist_patch
+          - firebase_dist_minor
+          - firebase_dist_major
+      firebase_groups:
+        description: "Firebase Distribution groups (comma-separated)"
+        required: false
+        default: "testers"
+        type: string
 
 jobs:
   release-android:
@@ -25,6 +33,7 @@ jobs:
     with:
       platform: android
       lane: ${{ github.event.inputs.lane }}
+      firebase_groups: ${{ github.event.inputs.firebase_groups }}
     secrets: inherit
 
   bump-version:

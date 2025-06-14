@@ -16,6 +16,7 @@ import 'package:quranku/features/shalat/domain/entities/schedule.codegen.dart';
 import 'package:quranku/features/shalat/presentation/helper/helper_time_shalat.dart';
 
 import '../../../setting/presentation/bloc/language_setting/language_setting_bloc.dart';
+import '../../domain/entities/prayer_in_app.dart';
 import '../bloc/shalat/shalat_bloc.dart';
 
 class PrayerScheduleScreen extends StatelessWidget {
@@ -37,7 +38,7 @@ class PrayerScheduleScreen extends StatelessWidget {
 
           context
               .read<ShalatBloc>()
-              .add(ShalatEvent.schedulePrayerAlarmEvent());
+              .add(const ShalatEvent.checkAndUpdateNotificationsEvent());
           context.pop(false);
         },
         child: Scaffold(

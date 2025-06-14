@@ -15,5 +15,7 @@ abstract class ShareVerseState with _$ShareVerseState {
     @Default(true) bool isArabicVisible,
     @Default(true) bool isLatinVisible,
     @Default(true) bool isTranslationVisible,
+    // custom background image path
+    String? backgroundImagePath,
   }) = _ShareVerseState;
 }

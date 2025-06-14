@@ -39,6 +39,11 @@ class ServerException implements Exception {
         return LocaleKeys.unknownErrorException.tr();
     }
   }
+
+  @override
+  String toString() {
+    return message;
+  }
 }
 
 class CacheException implements Exception {}

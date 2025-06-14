@@ -20,6 +20,11 @@ class AssetConst {
   static const String prayerTimeBackground =
       'assets/images/prayer-time-background.jpeg';
 
+  static const String youtubeIconUrl =
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/YouTube_full-color_icon_%282017%29.svg/2560px-YouTube_full-color_icon_%282017%29.svg.png';
+  static const String instagramIconUrl =
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/2048px-Instagram_icon.png';
+
   static const String imsakIcon = 'assets/svg/imsak_ic.svg';
   static const String subuhIcon = 'assets/svg/subuh_ic.svg';
   static const String syuruqIcon = 'assets/svg/syuruq_ic.svg';

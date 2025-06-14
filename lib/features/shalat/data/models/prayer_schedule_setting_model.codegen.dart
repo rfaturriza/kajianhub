@@ -1,9 +1,9 @@
 import 'package:adhan/adhan.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hive_ce/hive.dart';
-import 'package:quranku/features/shalat/presentation/helper/helper_time_shalat.dart';
 
 import '../../../../core/constants/hive_constants.dart';
+import '../../domain/entities/prayer_in_app.dart';
 import '../../domain/entities/prayer_schedule_setting.codegen.dart';
 
 part 'prayer_schedule_setting_model.codegen.freezed.dart';

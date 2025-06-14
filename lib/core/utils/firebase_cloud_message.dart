@@ -20,6 +20,8 @@ Future<void> initializeFCM() async {
     print('FCM Token: $fcmToken');
     print('APNS Token: $apnsToken');
   }
+  await FirebaseMessaging.instance.subscribeToTopic("daily-general");
+  await FirebaseMessaging.instance.subscribeToTopic("fasting-reminder");
   configureFCMListeners();
 }
 
@@ -27,7 +29,9 @@ void configureFCMListeners() {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     // Handle incoming data message when the app is in the foreground
     if (kDebugMode) {
-      print("Data message received: ${message.notification?.title} ${message.notification?.body}");
+      print(
+        "Data message received: ${message.notification?.title} ${message.notification?.body}",
+      );
     }
     sl<LocalNotification>().show(
       title: message.notification?.title ?? emptyString,
@@ -38,6 +42,7 @@ void configureFCMListeners() {
   FirebaseMessaging.onBackgroundMessage(_backgroundHandler);
 }
 
+@pragma('vm:entry-point')
 Future<void> _backgroundHandler(RemoteMessage message) async {
   if (kDebugMode) {
     print("Handling background message: ${message.data}");

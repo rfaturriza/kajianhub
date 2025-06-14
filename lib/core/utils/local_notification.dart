@@ -11,6 +11,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 @Singleton()
 class LocalNotification {
   final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  static const _defaultIcon = 'ic_notification';
 
   Future<void> init() async {
     // Get device timezone
@@ -30,7 +31,7 @@ class LocalNotification {
     }
 
     const initSettingsAndroid = AndroidInitializationSettings(
-      'ic_notification',
+      _defaultIcon,
     );
     final initSettingsDarwin = DarwinInitializationSettings();
 
@@ -56,6 +57,7 @@ class LocalNotification {
       channel?.second ?? 'High Importance Notifications',
       importance: Importance.max,
       priority: Priority.high,
+      icon: _defaultIcon,
       showWhen: false,
     );
     const iosPlatformChannelSpecifics = DarwinNotificationDetails(
@@ -87,6 +89,7 @@ class LocalNotification {
     final androidPlatformChannelSpecifics = AndroidNotificationDetails(
       channel?.first ?? 'reminder_channel',
       channel?.second ?? 'Reminder Channel',
+      icon: _defaultIcon,
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -129,6 +132,7 @@ class LocalNotification {
       channel?.second ?? 'Periodic Notifications',
       importance: Importance.max,
       priority: Priority.high,
+      icon: _defaultIcon,
     );
     const iosPlatformChannelSpecifics = DarwinNotificationDetails(
       presentAlert: true,

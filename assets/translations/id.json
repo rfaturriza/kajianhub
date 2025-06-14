@@ -1,8 +1,8 @@
 {
   "appName": "KajianHub",
-  "defaultErrorMessage": "Mohon maaf, Terjadi kesalahan silahkan coba lagi",
+  "defaultErrorMessage": "Mohon maaf, Terjadi kesalahan silahkan. Coba lagi nanti.",
   "loading": "Memuat",
-  "noData": "Tidak ada data",
+  "noData": "Tidak ada data yang tersedia",
   "noInternetConnection": "Tidak ada koneksi internet, periksa koneksi Anda dan coba lagi",
   "pleaseWait": "Mohon tunggu...",
   "juzOneDescription": "Mulai dari Al-Fatihah ayat 1 sampai Al-Baqarah ayat 141",
@@ -158,6 +158,8 @@
   "searchImamEmpty": "Maaf, tidak ada imam yang tersedia.",
   "searchKhatibHint": "Cari Khatib...",
   "searchKhatibEmpty": "Maaf, tidak ada khatib yang tersedia.",
+  "searchMosqueHint": "Cari Masjid...",
+  "searchMosqueEmpty": "Maaf, tidak ada masjid yang tersedia.",
   "filter": "Filter",
   "play": "Putar",
   "requestAccessLocation": "Izinkan akses lokasi",
@@ -227,5 +229,14 @@
     "description": "Tanyakan pertanyaan seputar Islam kepada Ustadz AI",
     "labelTextField": "Tanya apa saja tentang Islam",
     "generating": "Ditunggu ya, pertanyaan kamu sedang diproses"
-  }
+  },
+  "totalStudies": "Total Kajian",
+  "subscribe": "Berlangganan",
+  "subscribers": "Pengikut",
+  "menu": "Menu",
+  "camera": "Kamera",
+  "gallery": "Galeri",
+  "takePicture": "Ambil gambar",
+  "selectPicture": "Pilih gambar",
+  "removePicture": "Hapus gambar"
 }

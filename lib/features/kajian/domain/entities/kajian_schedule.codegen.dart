@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'study_location_entity.dart';
+
 part 'kajian_schedule.codegen.freezed.dart';
 
 @freezed
@@ -23,18 +25,19 @@ abstract class DataKajianSchedule with _$DataKajianSchedule {
     required String timeEnd,
     required String prayerSchedule,
     required String locationId,
-    required StudyLocation studyLocation,
+    required StudyLocationEntity studyLocation,
     required List<Ustadz> ustadz,
     required List<KajianTheme> themes,
     required List<DailySchedule> dailySchedules,
     required List<HistoryKajian> histories,
     required List<dynamic> customSchedules,
+    String? distanceInKm,
   }) = _DataKajianSchedule;
 
   const DataKajianSchedule._();
 
   static DataKajianSchedule empty() {
-    return const DataKajianSchedule(
+    return DataKajianSchedule(
       id: 0,
       title: '',
       type: '',
@@ -44,22 +47,7 @@ abstract class DataKajianSchedule with _$DataKajianSchedule {
       timeEnd: '',
       prayerSchedule: '',
       locationId: '',
-      studyLocation: StudyLocation(
-        id: 0,
-        name: '',
-        village: '',
-        address: '',
-        provinceId: '',
-        cityId: '',
-        googleMaps: '',
-        longitude: '',
-        latitude: '',
-        contactPerson: '',
-        picture: '',
-        pictureUrl: '',
-        province: Province(id: 0, name: ''),
-        city: City(id: 0, name: '', provinceId: ''),
-      ),
+      studyLocation: StudyLocationEntity(),
       ustadz: [],
       themes: [],
       dailySchedules: [],
@@ -78,26 +66,6 @@ abstract class HistoryKajian with _$HistoryKajian {
     required String title,
     required String publishedAt,
   }) = _HistoryKajian;
-}
-
-@freezed
-abstract class StudyLocation with _$StudyLocation {
-  const factory StudyLocation({
-    required int id,
-    required String name,
-    required String village,
-    required String address,
-    required String provinceId,
-    required String cityId,
-    required String googleMaps,
-    required String longitude,
-    required String latitude,
-    required String contactPerson,
-    required String picture,
-    required String pictureUrl,
-    required Province province,
-    required City city,
-  }) = _StudyLocation;
 }
 
 @freezed

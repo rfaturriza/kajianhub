@@ -15,14 +15,48 @@ import 'package:quranku/features/shalat/presentation/bloc/shalat/shalat_bloc.dar
 import 'package:quranku/generated/locale_keys.g.dart';
 import 'package:quranku/injection.dart';
 import 'package:quranku/theme_provider.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 import 'core/route/router.dart';
 import 'features/quran/presentation/bloc/surah/surah_bloc.dart';
 import 'features/setting/presentation/bloc/language_setting/language_setting_bloc.dart';
 import 'features/setting/presentation/bloc/styling_setting/styling_setting_bloc.dart';
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key});
+
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // When app is resumed, check for location changes and update notifications
+      final context = App.navigatorKey.currentContext;
+      if (context != null) {
+        context
+            .read<ShalatBloc>()
+            .add(const ShalatEvent.checkAndUpdateNotificationsEvent());
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,26 +103,28 @@ class App extends StatelessWidget {
               final isDynamicColor = themeProvider.dynamicColor;
               return DynamicColorBuilder(
                 builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-                  return MaterialApp.router(
-                    routerConfig: router,
-                    title: LocaleKeys.appName.tr(),
-                    debugShowCheckedModeBanner: false,
-                    theme: themeData(
-                      isDarkMode: false,
-                      colorScheme: isDynamicColor ? lightDynamic : null,
+                  return OverlaySupport(
+                    child: MaterialApp.router(
+                      routerConfig: router,
+                      title: LocaleKeys.appName.tr(),
+                      debugShowCheckedModeBanner: false,
+                      theme: themeData(
+                        isDarkMode: false,
+                        colorScheme: isDynamicColor ? lightDynamic : null,
+                      ),
+                      darkTheme: themeData(
+                        isDarkMode: true,
+                        colorScheme: isDynamicColor ? darkDynamic : null,
+                      ),
+                      themeMode: themeProvider.themeMode,
+                      localizationsDelegates: [
+                        for (var delegate in context.localizationDelegates)
+                          delegate,
+                        const LocaleNamesLocalizationsDelegate(),
+                      ],
+                      supportedLocales: context.supportedLocales,
+                      locale: context.locale,
                     ),
-                    darkTheme: themeData(
-                      isDarkMode: true,
-                      colorScheme: isDynamicColor ? darkDynamic : null,
-                    ),
-                    themeMode: themeProvider.themeMode,
-                    localizationsDelegates: [
-                      for (var delegate in context.localizationDelegates)
-                        delegate,
-                      const LocaleNamesLocalizationsDelegate(),
-                    ],
-                    supportedLocales: context.supportedLocales,
-                    locale: context.locale,
                   );
                 },
               );

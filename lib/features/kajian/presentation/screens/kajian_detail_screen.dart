@@ -41,7 +41,7 @@ class KajianDetailScreen extends StatelessWidget {
       body: ListView(
         children: [
           _ImageSection(
-            imageUrl: kajian.studyLocation.pictureUrl,
+            imageUrl: kajian.studyLocation.pictureUrl ?? '',
             label: kajianTheme,
           ),
           const VSpacer(height: 12),
@@ -118,13 +118,13 @@ class _InfoSection extends StatelessWidget {
         children: [
           Text(
             kajian.title,
-            style: context.textTheme.titleLarge?.copyWith(
+            style: context.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             ustadzName,
-            style: context.textTheme.titleMedium?.copyWith(
+            style: context.textTheme.bodyLarge?.copyWith(
               color: context.theme.colorScheme.onSurfaceVariant,
             ),
           ),
@@ -165,7 +165,8 @@ class _InfoSection extends StatelessWidget {
                 flex: 7,
                 child: GestureDetector(
                   onTap: () async {
-                    final uri = Uri.parse(kajian.studyLocation.googleMaps);
+                    final uri =
+                        Uri.parse(kajian.studyLocation.googleMaps ?? '');
                     if (await canLaunchUrl(uri)) {
                       await launchUrl(uri);
                     }
@@ -191,7 +192,7 @@ class _InfoSection extends StatelessWidget {
                         ],
                       ),
                       Text(
-                        kajian.studyLocation.address,
+                        kajian.studyLocation.address ?? emptyString,
                         style: context.textTheme.bodyMedium,
                       ),
                     ],

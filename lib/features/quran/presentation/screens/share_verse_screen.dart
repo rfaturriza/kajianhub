@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/components/spacer.dart';
 import 'package:quranku/core/constants/admob_constants.dart';
 import 'package:quranku/core/constants/asset_constants.dart';
@@ -49,57 +53,71 @@ class ShareVerseScreen extends StatelessWidget {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        forceMaterialTransparency: true,
-        leading: BackButton(
-          onPressed: () {
+    return BlocListener<ShareVerseBloc, ShareVerseState>(
+      listenWhen: (previous, current) {
+        return previous.isLoading != current.isLoading;
+      },
+      listener: (context, state) {
+        if (state.isLoading) {
+          context.showLoadingDialog();
+        } else {
+          if (context.canPop()) {
             context.pop();
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: showSettingBottomSheet,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: IconButton(
-              icon: const Icon(Icons.ios_share),
-              onPressed: () {
-                context.showLoadingDialog();
-                final boundary = canvasGlobalKey.currentContext
-                    ?.findRenderObject() as RenderRepaintBoundary?;
-                AdMobConst.showRewardedInterstitialAd(
-                  adUnitId: AdMobConst.rewardedInterstitialShareID,
-                  onEarnedReward: (_) {
-                    context.read<ShareVerseBloc>().add(
-                          ShareVerseEvent.onSharePressed(boundary),
-                        );
-                  },
-                  onFailedToLoad: (error) {
-                    context.pop();
-                    context.showErrorToast(error);
-                  },
-                  onLoaded: () {
-                    context.pop();
-                  },
-                );
-              },
-            ),
-          )
-        ],
-      ),
-      body: GestureDetector(
-        onVerticalDragUpdate: (details) {
-          if (details.delta.dy < -10) {
-            showSettingBottomSheet();
           }
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 50.0),
-          child: _CanvasPreview(
-            canvasGlobalKey: canvasGlobalKey,
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          forceMaterialTransparency: true,
+          leading: BackButton(
+            onPressed: () {
+              context.pop();
+            },
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Symbols.edit),
+              onPressed: showSettingBottomSheet,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: IconButton(
+                icon: const Icon(Symbols.ios_share),
+                onPressed: () {
+                  context.showLoadingDialog();
+                  final boundary = canvasGlobalKey.currentContext
+                      ?.findRenderObject() as RenderRepaintBoundary?;
+                  AdMobConst.showRewardedInterstitialAd(
+                    adUnitId: AdMobConst.rewardedInterstitialShareID,
+                    onEarnedReward: (_) {
+                      context.read<ShareVerseBloc>().add(
+                            ShareVerseEvent.onSharePressed(boundary),
+                          );
+                    },
+                    onFailedToLoad: (error) {
+                      context.pop();
+                      context.showErrorToast(error);
+                    },
+                    onLoaded: () {
+                      context.pop();
+                    },
+                  );
+                },
+              ),
+            )
+          ],
+        ),
+        body: GestureDetector(
+          onVerticalDragUpdate: (details) {
+            if (details.delta.dy < -10) {
+              showSettingBottomSheet();
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 50.0),
+            child: _CanvasPreview(
+              canvasGlobalKey: canvasGlobalKey,
+            ),
           ),
         ),
       ),
@@ -124,19 +142,24 @@ class _CanvasPreview extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: state.backgroundColor,
-                image: state.backgroundColor == null
+                image: state.backgroundImagePath != null
                     ? DecorationImage(
-                        image: CachedNetworkImageProvider(
-                          sl<RemoteConfigService>().imageRandomUrl,
-                          cacheKey: state.randomImageUrl,
-                        ),
-                        colorFilter: ColorFilter.mode(
-                          Colors.black.withValues(alpha: 0.5),
-                          BlendMode.darken,
-                        ),
+                        image: FileImage(File(state.backgroundImagePath!)),
                         fit: BoxFit.cover,
                       )
-                    : null,
+                    : state.backgroundColor == null
+                        ? DecorationImage(
+                            image: CachedNetworkImageProvider(
+                              sl<RemoteConfigService>().imageRandomUrl,
+                              cacheKey: state.randomImageUrl,
+                            ),
+                            colorFilter: ColorFilter.mode(
+                              Colors.black.withValues(alpha: 0.5),
+                              BlendMode.darken,
+                            ),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: AspectRatio(
@@ -313,6 +336,70 @@ class _RowListColorSetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final shareBloc = context.read<ShareVerseBloc>();
+    void onTapReplaceImage() async {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) {
+          return SafeArea(
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: 20.0,
+                right: 20.0,
+                bottom: 20.0,
+              ),
+              child: Wrap(
+                children: [
+                  ListTile(
+                    leading: Icon(Symbols.image),
+                    title: Text(LocaleKeys.selectPicture.tr()),
+                    onTap: () async {
+                      final file = await ImagePicker()
+                          .pickImage(source: ImageSource.gallery);
+                      if (file != null && context.mounted) {
+                        shareBloc.add(
+                          ShareVerseEvent.onPickBackgroundImage(
+                            file.path,
+                          ),
+                        );
+                        context.pop();
+                      }
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Symbols.camera_alt),
+                    title: Text(LocaleKeys.takePicture.tr()),
+                    onTap: () async {
+                      final file = await ImagePicker()
+                          .pickImage(source: ImageSource.camera);
+                      if (file != null && context.mounted) {
+                        shareBloc.add(
+                          ShareVerseEvent.onPickBackgroundImage(
+                            file.path,
+                          ),
+                        );
+                        context.pop();
+                      }
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Symbols.delete),
+                    title: Text(LocaleKeys.removePicture.tr()),
+                    onTap: () {
+                      shareBloc.add(
+                        const ShareVerseEvent.onPickBackgroundImage(null),
+                      );
+                      context.pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: BlocBuilder<ShareVerseBloc, ShareVerseState>(
@@ -324,6 +411,18 @@ class _RowListColorSetting extends StatelessWidget {
         builder: (context, state) {
           return Row(
             children: [
+              GestureDetector(
+                onTap: onTapReplaceImage,
+                child: CircleAvatar(
+                  backgroundColor: context.theme.colorScheme.primary,
+                  radius: 16,
+                  child: Icon(
+                    Symbols.add_photo_alternate_rounded,
+                    color: context.theme.colorScheme.onPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
               CachedNetworkImage(
                 cacheKey: state.randomImageUrl,
                 imageUrl: sl<RemoteConfigService>().imageRandomUrl,
@@ -338,7 +437,7 @@ class _RowListColorSetting extends StatelessWidget {
                       backgroundColor: Colors.transparent,
                       radius: 16,
                       child: Icon(
-                        Icons.refresh,
+                        Symbols.refresh,
                         color: Colors.white,
                       ),
                     ),
@@ -357,7 +456,7 @@ class _RowListColorSetting extends StatelessWidget {
                       backgroundImage: imageProvider,
                       child: state.backgroundColor == null
                           ? const Icon(
-                              Icons.refresh,
+                              Symbols.refresh,
                               color: Colors.white,
                             )
                           : null,
@@ -379,10 +478,16 @@ class _RowListColorSetting extends StatelessWidget {
                   );
                 },
               ),
+              Divider(
+                color: context.theme.colorScheme.primaryContainer,
+                height: 32,
+                endIndent: 8,
+                thickness: 2,
+              ),
               ...List.generate(
                 Colors.primaries.length,
                 (index) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
                   child: GestureDetector(
                     onTap: () {
                       shareBloc.add(
@@ -396,7 +501,7 @@ class _RowListColorSetting extends StatelessWidget {
                       radius: 16,
                       child: state.backgroundColor == Colors.primaries[index]
                           ? const Icon(
-                              Icons.check,
+                              Symbols.check,
                               color: Colors.white,
                             )
                           : null,

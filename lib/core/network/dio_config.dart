@@ -1,8 +1,17 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_alice/alice.dart';
 import 'package:injectable/injectable.dart';
+import 'package:quranku/app.dart';
 
 @injectable
 class NetworkConfig {
+  static final alice = Alice(
+    navigatorKey: App.navigatorKey,
+    showNotification: true,
+    showInspectorOnShake: true,
+  );
+
   static const baseUrlQuran = 'https://rizz-quran-api.vercel.app/';
   static const baseUrlShalat = 'https://api.myquran.com/';
   static const baseUrlKajianHub = 'https://kajianhub.com/api/';
@@ -19,13 +28,16 @@ class NetworkConfig {
 
   static Dio getDio() {
     final dio = Dio(_baseOptions);
-    dio.interceptors.add(LogInterceptor(
-      request: true,
-      responseBody: true,
-      requestBody: true,
-      requestHeader: true,
-      responseHeader: true,
-    ));
+    if (kDebugMode) {
+      dio.interceptors.add(LogInterceptor(
+        request: true,
+        responseBody: true,
+        requestBody: true,
+        requestHeader: true,
+        responseHeader: true,
+      ));
+      dio.interceptors.add(alice.getDioInterceptor());
+    }
     return dio;
   }
 
@@ -38,13 +50,16 @@ class NetworkConfig {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
-    dio.interceptors.add(LogInterceptor(
-      request: true,
-      responseBody: true,
-      requestBody: true,
-      requestHeader: true,
-      responseHeader: true,
-    ));
+    if (kDebugMode) {
+      dio.interceptors.add(LogInterceptor(
+        request: true,
+        responseBody: true,
+        requestBody: true,
+        requestHeader: true,
+        responseHeader: true,
+      ));
+      dio.interceptors.add(alice.getDioInterceptor());
+    }
     return dio;
   }
 }

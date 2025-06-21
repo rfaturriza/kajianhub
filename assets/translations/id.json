@@ -215,7 +215,7 @@
   "accuracy": "Akurasi",
   "calibrationCompass": "Kalibrasi kompas sebelum digunakan dengan menggerakkan ponsel Anda dalam gerakan angka 8",
   "islamicStudiesInformationLabel": "Info Kajian",
-  "islamicStudiesNearbyInformationLabel": "Info Kajian Terdekat",
+  "islamicStudiesNearbyInformationLabel": "Kami belum bisa mendeteksi lokasimu. Aktifkan lokasi untuk menampilkan jadwal shalat yang akurat",
   "doneAction": "Sudah",
   "kajian": "Kajian",
   "errorOpenMap": "Mohon maaf, tidak dapat membuka peta",
@@ -227,5 +227,6 @@
     "description": "Tanyakan pertanyaan seputar Islam kepada Ustadz AI",
     "labelTextField": "Tanya apa saja tentang Islam",
     "generating": "Ditunggu ya, pertanyaan kamu sedang diproses"
-  }
+  },
+  "needAccessLocationForPrayingTime": "Kami butuh akses lokasi untuk menampilkan waktu shalat. Klik di sini untuk mengaktifkannya."
 }

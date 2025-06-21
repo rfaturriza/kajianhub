@@ -31,7 +31,10 @@ class LabelTag extends StatelessWidget {
           color:
               foregroundColor ?? context.theme.colorScheme.onPrimaryContainer,
         ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis
       ),
+
     );
   }
 }

@@ -215,7 +215,7 @@
   "accuracy": "Accuracy",
   "calibrationCompass": "Please calibrate your compass before use by moving your phone in a figure 8 motion",
   "islamicStudiesInformationLabel": "Islamic Studies Info",
-  "islamicStudiesNearbyInformationLabel": "Studies Nearby Info",
+  "islamicStudiesNearbyInformationLabel": "We couldn’t detect your location. Enable it to see accurate prayer times.",
   "doneAction": "Done",
   "kajian": "Kajian",
   "errorOpenMap": "Sorry, unable to open the map",
@@ -227,5 +227,6 @@
     "description": "Ask questions about Islam to Ustadz AI",
     "labelTextField": "Ask anything about Islam",
     "generating": "Please wait, your question is being processed"
-  }
+  },
+  "needAccessLocationForPrayingTime": "We need your location to show prayer times. Tap here to enable it."
 }

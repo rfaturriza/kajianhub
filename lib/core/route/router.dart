@@ -25,6 +25,11 @@ import '../../features/quran/presentation/screens/share_verse_screen.dart';
 import '../../features/setting/presentation/screens/language_setting_screen.dart';
 import '../../features/setting/presentation/screens/styling_setting_screen.dart';
 import '../../features/shalat/presentation/screens/prayer_schedule_screen.dart';
+import '../../features/ustadz/domain/entities/ustadz_entity.codegen.dart';
+import '../../features/ustadz/presentation/blocs/ustadz_detail/ustadz_detail_bloc.dart';
+import '../../features/ustadz/presentation/blocs/ustadz_list/ustadz_list_bloc.dart';
+import '../../features/ustadz/presentation/screens/ustadz_detail_screen.dart';
+import '../../features/ustadz/presentation/screens/ustadz_list_screen.dart';
 import '../../features/ustad_ai/presentation/blocs/ustad_ai/ustad_ai_bloc.dart';
 import '../../features/ustad_ai/presentation/screens/ustad_ai_screen.dart';
 import '../../injection.dart';
@@ -223,6 +228,26 @@ final router = GoRouter(
                   ),
                 child: StudyLocationDetailScreen(
                   masjid: state.extra as StudyLocationEntity,
+                ),
+              ),
+            ),
+          ],
+        ),
+        GoRoute(
+          name: RootRouter.ustadzRoute.name,
+          path: RootRouter.ustadzRoute.path,
+          builder: (_, __) => BlocProvider(
+            create: (context) => sl<UstadzListBloc>(),
+            child: UstadzListScreen(),
+          ),
+          routes: [
+            GoRoute(
+              name: RootRouter.ustadzDetailRoute.name,
+              path: RootRouter.ustadzDetailRoute.path,
+              builder: (_, state) => BlocProvider(
+                create: (_) => sl<UstadzDetailBloc>(),
+                child: UstadzDetailScreen(
+                  ustadz: state.extra as UstadzEntity,
                 ),
               ),
             ),

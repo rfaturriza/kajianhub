@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:quranku/core/utils/extension/string_ext.dart';
-import 'package:quranku/features/kajian/domain/entities/kajian_schedule.codegen.dart';
+import 'package:quranku/features/kajian/data/models/kajian_schedules_response_model.codegen.dart';
+import 'package:quranku/features/ustadz/domain/entities/ustadz_entity.codegen.dart';
 
 part 'ustadz_response_model.codegen.freezed.dart';
 part 'ustadz_response_model.codegen.g.dart';
@@ -9,10 +10,21 @@ part 'ustadz_response_model.codegen.g.dart';
 abstract class UstadzResponseModel with _$UstadzResponseModel {
   const factory UstadzResponseModel({
     List<DataUstadzModel>? data,
+    LinksKajianHubModel? links,
+    MetaKajianHubModel? meta,
   }) = _UstadzResponseModel;
 
   factory UstadzResponseModel.fromJson(Map<String, dynamic> json) =>
       _$UstadzResponseModelFromJson(json);
+
+  const UstadzResponseModel._();
+
+  UstadzListEntity toUstadzListEntity() {
+    return UstadzListEntity(
+      data: data?.map((e) => e.toEntity()).toList() ?? [],
+      meta: meta?.toEntity(),
+    );
+  }
 }
 
 @freezed
@@ -48,10 +60,9 @@ abstract class DataUstadzModel with _$DataUstadzModel {
   factory DataUstadzModel.fromJson(Map<String, dynamic> json) =>
       _$DataUstadzModelFromJson(json);
 
-  Ustadz toEntity() {
-    return Ustadz(
+  UstadzEntity toEntity() {
+    return UstadzEntity(
       id: id ?? 0,
-      ustadzId: id.toString(),
       name: name ?? emptyString,
       email: email ?? emptyString,
       placeOfBirth: placeOfBirth ?? emptyString,

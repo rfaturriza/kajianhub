@@ -122,7 +122,7 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
 
       // Update alarm times based on the new prayer times
       final updatedAlarms = currentSettings.alarms.map((alarm) {
-        if (!alarm.isAlarmActive || alarm.prayer == null) {
+        if (alarm.alarmType == 3 || alarm.prayer == null) {
           return alarm;
         }
 
@@ -182,7 +182,7 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
 
       // Schedule notifications with the updated times
       for (final element in updatedSettings.alarms) {
-        if (element.time == null || !element.isAlarmActive) continue;
+        if (element.time == null || element.alarmType == 3) continue;
 
         final hour = TimeOfDay.fromDateTime(element.time!).hour;
         final minute = TimeOfDay.fromDateTime(element.time!).minute;

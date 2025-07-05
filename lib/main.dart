@@ -20,14 +20,28 @@ import 'hive_adapter_register.dart';
 import 'injection.dart';
 
 void main() async {
+  debugPrint('🔹 Before ensureInitialized');
   WidgetsFlutterBinding.ensureInitialized();
+  debugPrint('🔹 After WidgetsFlutterBinding.ensureInitialized');
+
   EasyLocalization.ensureInitialized();
+  debugPrint('🔹 After EasyLocalization.ensureInitialized');
+
   MobileAds.instance.initialize();
+  debugPrint('🔹 MobileAds ensureInitialized');
 
   await Hive.initFlutter();
+  debugPrint('🔹 After Hive.ensureInitialized');
+
   await registerHiveAdapter();
+  debugPrint('🔹 After registerHiveAdapter.ensureInitialized');
+
   await configureDependencies();
+  debugPrint('🔹 After configureDependencies.ensureInitialized');
+
   await dotenv.load(fileName: ".env");
+  debugPrint('🔹 After dotenv.load.ensureInitialized');
+
   if (kReleaseMode) {
     await Firebase.initializeApp(
       options: firebase_release.DefaultFirebaseOptions.currentPlatform,
@@ -38,16 +52,21 @@ void main() async {
         testDeviceIds: kDebugMode ? AdMobConst.testDevice : [],
       ),
     );
+    debugPrint('🔹 After  MobileAds.instance.ensureInitialized');
+
     await Firebase.initializeApp(
       options: firebase_debug.DefaultFirebaseOptions.currentPlatform,
     );
+    debugPrint('🔹 After  Firebase.initializeApp.ensureInitialized');
   }
   await sl<RemoteConfigService>().initialize();
+  debugPrint('🔹 After EasyLocalization.ensureInitialized');
 
   /// iOS skip this step because it's need Account in Apple Developer
   /// iOS also need to upload key to firebase
   await initializeFCM();
   await sl<LocalNotification>().init();
+  debugPrint('🔹 After EasyLocalization.ensureInitialized');
 
   timeago.setLocaleMessages('id', timeago.IdMessages());
   timeago.setLocaleMessages('en', timeago.EnMessages());
@@ -66,4 +85,5 @@ void main() async {
       child: const App(),
     ),
   );
+  debugPrint('🔹 runApp() called');
 }

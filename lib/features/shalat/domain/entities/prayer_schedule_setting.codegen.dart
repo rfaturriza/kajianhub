@@ -20,6 +20,6 @@ abstract class PrayerAlarm with _$PrayerAlarm {
   const factory PrayerAlarm({
     DateTime? time,
     PrayerInApp? prayer,
-    @Default(false) bool isAlarmActive,
+    @Default(3) dynamic alarmType,
   }) = _PrayerAlarm;
 }

@@ -238,5 +238,13 @@
   "gallery": "Galeri",
   "takePicture": "Ambil gambar",
   "selectPicture": "Pilih gambar",
-  "removePicture": "Hapus gambar"
+  "removePicture": "Hapus gambar",
+  "player_schedule_modal_text1": "Kamu dapat mengatur notifikasi di setiap waktu sholat",
+  "player_schedule_modal_text2": "Pengingat Sebelum",
+  "player_schedule_modal_text3": "Menit",
+  "player_schedule_modal_text4": "Simpan",
+  "player_schedule_modal_option1": "Adzan",
+  "player_schedule_modal_option2": "notifikasi",
+  "player_schedule_modal_option3": "Hening",
+  "player_schedule_modal_option4": "Tidak Aktif"
 }

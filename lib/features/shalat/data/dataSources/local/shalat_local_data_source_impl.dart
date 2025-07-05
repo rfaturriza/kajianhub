@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter/rendering.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:injectable/injectable.dart';
 import 'package:quranku/core/constants/hive_constants.dart';
@@ -20,6 +21,7 @@ class ShalatLocalDataSourceImpl implements ShalatLocalDataSource {
   @override
   Future<Either<Failure, PrayerScheduleSettingModel?>>
       getPrayerScheduleSetting() async {
+    debugPrint('getPrayerScheduleSetting called');
     try {
       var box = await hive.openBox(HiveConst.settingBox);
       final model = box.get(HiveConst.prayerAlarmScheduleKey);
@@ -27,7 +29,7 @@ class ShalatLocalDataSourceImpl implements ShalatLocalDataSource {
         final alarm = PrayerInApp.values
             .map((e) => PrayerAlarmModel(
                   prayer: e.name,
-                  isAlarmActive: false,
+                  alarmType: 3,
                 ))
             .toList();
         await setPrayerScheduleSetting(
@@ -35,8 +37,10 @@ class ShalatLocalDataSourceImpl implements ShalatLocalDataSource {
         );
         return right(PrayerScheduleSettingModel(alarms: alarm));
       }
+      debugPrint('getPrayerScheduleSetting: $model');
       return right(model);
     } catch (e) {
+      debugPrint('Error in getPrayerScheduleSetting: $e');
       return left(
         CacheFailure(
           message: e.toString(),
@@ -50,6 +54,7 @@ class ShalatLocalDataSourceImpl implements ShalatLocalDataSource {
     PrayerScheduleSettingModel? model,
   ) async {
     try {
+      debugPrint('setPrayerScheduleSetting: $model');
       var box = await hive.openBox(HiveConst.settingBox);
       await box.put(
         HiveConst.prayerAlarmScheduleKey,
@@ -57,6 +62,7 @@ class ShalatLocalDataSourceImpl implements ShalatLocalDataSource {
       );
       return right(unit);
     } catch (e) {
+      debugPrint('Error in setPrayerScheduleSetting: $e');
       return left(
         CacheFailure(
           message: e.toString(),

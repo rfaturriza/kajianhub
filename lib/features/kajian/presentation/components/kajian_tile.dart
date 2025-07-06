@@ -88,8 +88,7 @@ class KajianTile extends StatelessWidget {
           children: [
             MosqueImageContainer(
               distanceInKm: kajian.distanceInKm ??
-                  kajian.studyLocation.distanceInKm ??
-                  emptyString,
+                  kajian.studyLocation.distanceInKm,
               imageUrl: imageUrl,
             ),
             Expanded(

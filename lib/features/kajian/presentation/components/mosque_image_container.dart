@@ -20,6 +20,7 @@ class MosqueImageContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var imageUrl = this.imageUrl;
+    final validDistance = double.tryParse(distanceInKm ?? '');
     if (imageUrl.isEmpty) {
       imageUrl = AssetConst.mosqueDummyImageUrl;
     }
@@ -38,7 +39,10 @@ class MosqueImageContainer extends StatelessWidget {
               ),
             ),
           ),
-          if (distanceInKm != null && distanceInKm!.isNotEmpty) ...[
+          if (distanceInKm != null &&
+              distanceInKm!.isNotEmpty &&
+              validDistance != null &&
+              validDistance > 0) ...[
             Positioned(
               top: 0,
               right: 0,

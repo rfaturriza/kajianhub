@@ -186,91 +186,169 @@ class _ImageSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 200,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: context.theme.colorScheme.surfaceContainerHighest,
-      ),
-      child: Stack(
-        children: [
-          if (imageUrl.isNotEmpty)
-            CachedNetworkImage(
-              imageUrl: imageUrl,
-              height: 200,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => Container(
+    return GestureDetector(
+      onTap: () {
+        if (imageUrl.isNotEmpty) {
+          _showFullScreenImage(context);
+        }
+      },
+      child: Container(
+        height: 200,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: context.theme.colorScheme.surfaceContainerHighest,
+        ),
+        child: Stack(
+          children: [
+            if (imageUrl.isNotEmpty) ...[
+              CachedNetworkImage(
+                imageUrl: imageUrl,
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: context.theme.colorScheme.surfaceContainerHighest,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  color: context.theme.colorScheme.surfaceContainerHighest,
+                  child: const Icon(
+                    Icons.person,
+                    size: 80,
+                  ),
+                ),
+              ),
+              // a indicator that the image is clickable
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: context.theme.colorScheme.surface
+                        .withValues(alpha: 0.8),
+                    border: Border.all(
+                      color: context.theme.colorScheme.outline
+                          .withValues(alpha: 0.3),
+                    ),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Icon(
+                    Icons.fullscreen,
+                    color: context.theme.colorScheme.onSurface,
+                    size: 16,
+                  ),
+                ),
+              ),
+            ] else ...[
+              Container(
                 color: context.theme.colorScheme.surfaceContainerHighest,
                 child: const Center(
-                  child: CircularProgressIndicator(),
+                  child: Icon(
+                    Icons.person,
+                    size: 80,
+                  ),
                 ),
               ),
-              errorWidget: (context, url, error) => Container(
-                color: context.theme.colorScheme.surfaceContainerHighest,
-                child: const Icon(
-                  Icons.person,
-                  size: 80,
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showFullScreenImage(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierColor: context.theme.colorScheme.surface.withValues(alpha: 0.9),
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.zero,
+          child: Stack(
+            children: [
+              // Full screen image
+              Center(
+                child: InteractiveViewer(
+                  panEnabled: true,
+                  boundaryMargin: const EdgeInsets.all(20),
+                  minScale: 0.5,
+                  maxScale: 3.0,
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    fit: BoxFit.contain,
+                    placeholder: (context, url) => Center(
+                      child: CircularProgressIndicator(
+                        color: context.theme.colorScheme.primary,
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => Center(
+                      child: Icon(
+                        Icons.error,
+                        color: context.theme.colorScheme.error,
+                        size: 64,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            )
-          else
-            Container(
-              color: context.theme.colorScheme.surfaceContainerHighest,
-              child: const Center(
-                child: Icon(
-                  Icons.person,
-                  size: 80,
+              // Close button
+              Positioned(
+                top: MediaQuery.of(context).padding.top + 10,
+                right: 20,
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: context.theme.colorScheme.surface
+                          .withValues(alpha: 0.8),
+                      border: Border.all(
+                        color: context.theme.colorScheme.outline
+                            .withValues(alpha: 0.3),
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Icon(
+                      Icons.close,
+                      color: context.theme.colorScheme.onSurface,
+                      size: 24,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          Positioned(
-            bottom: 16,
-            left: 16,
-            right: 16,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: context.theme.colorScheme.surface.withValues(alpha: 0.9),
-                border: Border.all(
-                  color:
-                      context.theme.colorScheme.outline.withValues(alpha: 0.2),
-                ),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
+              // Ustadz name overlay
+              Positioned(
+                bottom: MediaQuery.of(context).padding.bottom + 20,
+                left: 20,
+                right: 20,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: context.theme.colorScheme.surface
+                        .withValues(alpha: 0.9),
+                    border: Border.all(
+                      color: context.theme.colorScheme.outline
+                          .withValues(alpha: 0.2),
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
                     ustadz.name,
                     style: context.textTheme.titleMedium?.copyWith(
                       color: context.theme.colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                     ),
+                    textAlign: TextAlign.center,
                   ),
-                  if (ustadz.email.isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      ustadz.email,
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: context.theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    if (ustadz.email.isNotEmpty) ...[
-                      Text(
-                        ustadz.contactPerson ?? '',
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          color: context.theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ],
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -285,31 +363,6 @@ class _InfoSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            if (ustadz.placeOfBirth?.isNotEmpty == true) ...[
-              Expanded(
-                child: _InfoRow(
-                  icon: Symbols.location_on,
-                  label: LocaleKeys.birthPlace.tr(),
-                  value: ustadz.placeOfBirth!,
-                ),
-              ),
-              const VSpacer(height: 8),
-            ],
-            if (ustadz.dateOfBirth?.isNotEmpty == true) ...[
-              Expanded(
-                child: _InfoRow(
-                  icon: Symbols.calendar_today,
-                  label: LocaleKeys.dateOfBirth.tr(),
-                  value: ustadz.dateOfBirth!,
-                ),
-              ),
-              const VSpacer(height: 8),
-            ],
-          ],
-        ),
-        SizedBox(height: 8),
         Row(
           children: [
             Expanded(
@@ -330,50 +383,6 @@ class _InfoSection extends StatelessWidget {
           ],
         ),
         const VSpacer(height: 16),
-      ],
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-
-  const _InfoRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(
-          icon,
-          size: 20,
-          color: context.theme.colorScheme.primary,
-        ),
-        const HSpacer(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: context.theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              Text(
-                value,
-                style: context.textTheme.bodyMedium,
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }

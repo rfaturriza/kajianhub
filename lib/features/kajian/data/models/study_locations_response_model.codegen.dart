@@ -10,8 +10,8 @@ part 'study_locations_response_model.codegen.g.dart';
 abstract class StudyLocationResponseModel with _$StudyLocationResponseModel {
   const factory StudyLocationResponseModel({
     List<DataStudyLocationModel>? data,
-    LinksKajianScheduleModel? links,
-    MetaKajianScheduleModel? meta,
+    LinksKajianHubModel? links,
+    MetaKajianHubModel? meta,
   }) = _StudyLocationResponseModel;
 
   factory StudyLocationResponseModel.fromJson(Map<String, dynamic> json) =>

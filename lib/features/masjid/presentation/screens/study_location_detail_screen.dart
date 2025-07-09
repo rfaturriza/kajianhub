@@ -158,9 +158,10 @@ class _StudySchedulesListState extends State<_StudySchedulesList> {
         return ListView.builder(
           controller: _scrollController,
           shrinkWrap: true,
-          physics: const BouncingScrollPhysics(),
-          itemCount:
-              state.hasReachedMax ? schedules.length : schedules.length + 1,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: state.statusKajian == FormzSubmissionStatus.inProgress
+              ? state.kajianResult.length + 1
+              : state.kajianResult.length,
           itemBuilder: (context, index) {
             if (index >= schedules.length) {
               return const Center(
@@ -423,6 +424,7 @@ class _SocialButton extends StatelessWidget {
           if (await canLaunchUrl(uri)) {
             await launchUrl(uri, mode: LaunchMode.externalApplication);
           } else {
+            if (!context.mounted) return;
             context.showErrorToast(LocaleKeys.defaultErrorMessage.tr());
           }
         }

@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:quranku/features/ustadz/domain/entities/ustadz_entity.codegen.dart';
 
 import 'study_location_entity.dart';
 
@@ -9,7 +10,7 @@ abstract class KajianSchedules with _$KajianSchedules {
   const factory KajianSchedules({
     required List<DataKajianSchedule> data,
     required LinksKajianSchedule links,
-    required MetaKajianSchedule meta,
+    required MetaKajianHub meta,
   }) = _KajianSchedules;
 }
 
@@ -26,11 +27,11 @@ abstract class DataKajianSchedule with _$DataKajianSchedule {
     required String prayerSchedule,
     required String locationId,
     required StudyLocationEntity studyLocation,
-    required List<Ustadz> ustadz,
+    required List<UstadzEntity> ustadz,
     required List<KajianTheme> themes,
     required List<DailySchedule> dailySchedules,
     required List<HistoryKajian> histories,
-    required List<dynamic> customSchedules,
+    required List<CustomSchedule> customSchedules,
     String? distanceInKm,
   }) = _DataKajianSchedule;
 
@@ -69,6 +70,25 @@ abstract class HistoryKajian with _$HistoryKajian {
 }
 
 @freezed
+abstract class CustomSchedule with _$CustomSchedule {
+  const factory CustomSchedule({
+    int? id,
+    String? kajianId,
+    String? themeId,
+    String? book,
+    String? prayTime,
+    String? link,
+    KajianTheme? theme,
+    List<UstadzEntity>? ustadz,
+    String? timeStart,
+    DateTime? date,
+    String? title,
+    String? createdAt,
+    String? updatedAt,
+  }) = _CustomSchedule;
+}
+
+@freezed
 abstract class Province with _$Province {
   const factory Province({
     required int id,
@@ -86,25 +106,22 @@ abstract class City with _$City {
 }
 
 @freezed
-abstract class Ustadz with _$Ustadz {
-  const factory Ustadz({
-    required int id,
-    required String ustadzId,
-    required String name,
-    required String email,
-    required String placeOfBirth,
-    required String dateOfBirth,
-    required String contactPerson,
-  }) = _Ustadz;
-}
-
-@freezed
 abstract class KajianTheme with _$KajianTheme {
   const factory KajianTheme({
     required int id,
     required String themeId,
     required String theme,
   }) = _KajianTheme;
+
+  const KajianTheme._();
+
+  static KajianTheme empty() {
+    return const KajianTheme(
+      id: 0,
+      themeId: '',
+      theme: '',
+    );
+  }
 }
 
 @freezed
@@ -127,8 +144,8 @@ abstract class LinksKajianSchedule with _$LinksKajianSchedule {
 }
 
 @freezed
-abstract class MetaKajianSchedule with _$MetaKajianSchedule {
-  const factory MetaKajianSchedule({
+abstract class MetaKajianHub with _$MetaKajianHub {
+  const factory MetaKajianHub({
     int? currentPage,
     int? from,
     int? lastPage,
@@ -137,7 +154,7 @@ abstract class MetaKajianSchedule with _$MetaKajianSchedule {
     int? perPage,
     int? to,
     int? total,
-  }) = _MetaKajianSchedule;
+  }) = _MetaKajianHub;
 }
 
 @freezed

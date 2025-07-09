@@ -128,6 +128,14 @@ class _ListItemMenu extends StatelessWidget {
           },
           withDecoration: false,
         ),
+        ButtonDrawer(
+          icon: Symbols.person,
+          title: 'Ustadz',
+          onTap: () {
+            context.pushNamed(RootRouter.ustadzRoute.name);
+          },
+          withDecoration: false,
+        ),
         if (ustadAiConfig.show) ...[
           ButtonDrawer(
             icon: Symbols.star_shine,

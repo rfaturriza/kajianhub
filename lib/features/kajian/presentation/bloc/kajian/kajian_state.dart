@@ -20,7 +20,7 @@ abstract class KajianState with _$KajianState {
     FormzSubmissionStatus kajianThemesStatus,
     @Default([]) List<KajianTheme> kajianThemes,
     @Default(FormzSubmissionStatus.initial) FormzSubmissionStatus ustadzStatus,
-    @Default([]) List<Ustadz> ustadz,
+    @Default([]) List<UstadzEntity> ustadz,
     @Default(1) int currentPage,
     int? lastPage,
     int? totalData,

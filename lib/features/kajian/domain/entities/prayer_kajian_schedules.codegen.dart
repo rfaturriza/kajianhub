@@ -10,7 +10,7 @@ abstract class PrayerkajianSchedules with _$PrayerkajianSchedules {
   const factory PrayerkajianSchedules({
     required List<PrayerKajianSchedule> data,
     required LinksKajianSchedule links,
-    required MetaKajianSchedule meta,
+    required MetaKajianHub meta,
   }) = _PrayerkajianSchedules;
 }
 

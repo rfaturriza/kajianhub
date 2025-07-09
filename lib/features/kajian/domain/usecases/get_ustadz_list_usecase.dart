@@ -2,20 +2,20 @@ import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
 import 'package:quranku/features/kajian/data/repositories/kajianhub_repository.dart';
+import 'package:quranku/features/ustadz/domain/entities/ustadz_entity.codegen.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
-import '../entities/kajian_schedule.codegen.dart';
 
 @injectable
 class GetUstadzListUseCase
-    implements UseCase<List<Ustadz>, GetUstadzListParams> {
+    implements UseCase<List<UstadzEntity>, GetUstadzListParams> {
   final KajianHubRepository repository;
 
   GetUstadzListUseCase(this.repository);
 
   @override
-  Future<Either<Failure, List<Ustadz>>> call(
+  Future<Either<Failure, List<UstadzEntity>>> call(
     GetUstadzListParams params,
   ) async {
     final result = await repository.getUstadzList(

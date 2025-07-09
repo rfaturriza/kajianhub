@@ -21,10 +21,8 @@ class UstadzTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final imageUrl = ustadz.pictureUrl ?? '';
     final name = ustadz.name;
-    final email = ustadz.email;
     final subscribersCount = ustadz.subscribersCount ?? '0';
     final kajianCount = ustadz.kajianCount ?? '0';
-    final placeOfBirth = ustadz.placeOfBirth ?? '';
 
     return GestureDetector(
       onTap: onTap != null
@@ -87,18 +85,6 @@ class UstadzTile extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const VSpacer(height: 2),
-                          Text(
-                            email,
-                            style: context.textTheme.bodySmall,
-                          ),
-                          if (placeOfBirth.isNotEmpty) ...[
-                            const VSpacer(height: 2),
-                            Text(
-                              placeOfBirth,
-                              style: context.textTheme.bodySmall,
-                            ),
-                          ],
                           const VSpacer(height: 4),
                           Row(
                             children: [

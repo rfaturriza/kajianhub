@@ -31,7 +31,7 @@ abstract class DataKajianSchedule with _$DataKajianSchedule {
     required List<KajianTheme> themes,
     required List<DailySchedule> dailySchedules,
     required List<HistoryKajian> histories,
-    required List<dynamic> customSchedules,
+    required List<CustomSchedule> customSchedules,
     String? distanceInKm,
   }) = _DataKajianSchedule;
 
@@ -70,6 +70,25 @@ abstract class HistoryKajian with _$HistoryKajian {
 }
 
 @freezed
+abstract class CustomSchedule with _$CustomSchedule {
+  const factory CustomSchedule({
+    int? id,
+    String? kajianId,
+    String? themeId,
+    String? book,
+    String? prayTime,
+    String? link,
+    KajianTheme? theme,
+    List<UstadzEntity>? ustadz,
+    String? timeStart,
+    DateTime? date,
+    String? title,
+    String? createdAt,
+    String? updatedAt,
+  }) = _CustomSchedule;
+}
+
+@freezed
 abstract class Province with _$Province {
   const factory Province({
     required int id,
@@ -93,6 +112,16 @@ abstract class KajianTheme with _$KajianTheme {
     required String themeId,
     required String theme,
   }) = _KajianTheme;
+
+  const KajianTheme._();
+
+  static KajianTheme empty() {
+    return const KajianTheme(
+      id: 0,
+      themeId: '',
+      theme: '',
+    );
+  }
 }
 
 @freezed

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
@@ -26,11 +27,23 @@ class KajianTile extends StatelessWidget {
     final title = kajian.title;
     final ustadz =
         kajian.ustadz.isNotEmpty ? kajian.ustadz.first.name : emptyString;
-    final time = '${kajian.timeStart} - ${kajian.timeEnd}';
+    final time = kajian.timeEnd.isNotEmpty == true
+        ? '${kajian.timeStart} - ${kajian.timeEnd}'
+        : kajian.timeStart;
     final place = kajian.studyLocation.name;
-    final schedule = kajian.dailySchedules.isNotEmpty
-        ? kajian.dailySchedules.first.dayLabel
-        : emptyString;
+    final schedule = () {
+      if (kajian.dailySchedules.isEmpty && kajian.customSchedules.isNotEmpty) {
+        if (kajian.customSchedules.first.date != null) {
+          return DateFormat('dd MMMM yyyy', context.locale.toString())
+              .format(kajian.customSchedules.first.date!.toLocal());
+        }
+        return emptyString;
+      }
+      if (kajian.dailySchedules.isNotEmpty && kajian.customSchedules.isEmpty) {
+        return kajian.dailySchedules.first.dayLabel;
+      }
+      return emptyString;
+    }();
     final Pair<Color, Color> prayerColor = () {
       switch (prayerName.toLowerCase()) {
         case 'subuh':
@@ -87,8 +100,8 @@ class KajianTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             MosqueImageContainer(
-              distanceInKm: kajian.distanceInKm ??
-                  kajian.studyLocation.distanceInKm,
+              distanceInKm:
+                  kajian.distanceInKm ?? kajian.studyLocation.distanceInKm,
               imageUrl: imageUrl,
             ),
             Expanded(
@@ -132,7 +145,7 @@ class KajianTile extends StatelessWidget {
                               ),
                               const HSpacer(width: 5),
                               Expanded(
-                                flex: 2,
+                                flex: 1,
                                 child: ScheduleIconText(
                                   icon: Icons.access_time,
                                   text: time,

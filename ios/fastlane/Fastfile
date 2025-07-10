@@ -10,7 +10,11 @@ platform :ios do
     # Skip before_all setup for this test lane
     release_notes = generate_release_notes_with_gemini
     UI.success("Generated Release Notes:")
-    UI.message(release_notes)
+    UI.message("English (en-US):")
+    UI.message(release_notes["en-US"])
+    UI.message("")
+    UI.message("Indonesian (id):")
+    UI.message(release_notes["id"])
   end
 
   before_all do
@@ -40,41 +44,86 @@ platform :ios do
     commits = sh("git log #{last_tag}..HEAD --oneline --no-merges", log: false).strip
     
     if commits.empty?
-      fallback_notes = "Minor bug fixes and improvements"
-      next fallback_notes
+      fallback_notes_en = "Minor bug fixes and improvements"
+      fallback_notes_id = "Perbaikan bug kecil dan peningkatan performa"
+      return {
+        "en-US" => fallback_notes_en,
+        "id" => fallback_notes_id
+      }
     end
-
-    # Prepare prompt for Gemini AI
-    prompt = <<~PROMPT
-      Generate concise release notes for a mobile app based on these git commits. 
-      Focus on user-facing features and improvements. Keep it under 4000 characters.
-      Format as plain text with simple bullet points using asterisks (*).
-      Use categories like "New:", "Improved:", and "Fixed:" when appropriate.
-      Write in clear, user-friendly language that customers will understand.
-      
-      Example format:
-      * New: Feature description here
-      * Improved: Enhancement description here  
-      * Fixed: Bug fix description here
-      
-      Commits:
-      #{commits}
-      
-      Generate professional release notes:
-    PROMPT
 
     # Call Gemini API
     gemini_api_key = ENV["GEMINI_API_KEY"]&.strip
     if gemini_api_key.nil? || gemini_api_key.empty?
       UI.important("GEMINI_API_KEY not set. Using default release notes.")
-      fallback_notes = "* Bug fixes and performance improvements\n* Enhanced user experience\n* General stability improvements"
-      next fallback_notes
+      fallback_notes_en = "* Bug fixes and performance improvements\n* Enhanced user experience\n* General stability improvements"
+      fallback_notes_id = "* Perbaikan bug dan peningkatan performa\n* Pengalaman pengguna yang lebih baik\n* Peningkatan stabilitas umum"
+      return {
+        "en-US" => fallback_notes_en,
+        "id" => fallback_notes_id
+      }
     end
 
-    UI.message("API Key present, making request to Gemini...")
+    UI.message("API Key present, generating release notes in English and Indonesian...")
+
+    # Generate English release notes
+    english_notes = generate_notes_for_language(commits: commits, language: "English", api_key: gemini_api_key)
+    
+    # Generate Indonesian release notes
+    indonesian_notes = generate_notes_for_language(commits: commits, language: "Indonesian", api_key: gemini_api_key)
+
+    {
+      "en-US" => english_notes,
+      "id" => indonesian_notes
+    }
+  end
+
+  private_lane :generate_notes_for_language do |options|
+    commits = options[:commits]
+    language = options[:language]
+    api_key = options[:api_key]
+    
+    # Prepare prompt for specific language
+    if language == "Indonesian"
+      prompt = <<~PROMPT
+        Generate catatan rilis yang ringkas untuk aplikasi mobile berdasarkan git commits ini. 
+        Fokus pada fitur dan peningkatan yang dapat dilihat pengguna. Maksimal 4000 karakter.
+        Format sebagai teks biasa dengan bullet points menggunakan asterisk (*).
+        Gunakan kategori seperti "Baru:", "Ditingkatkan:", dan "Diperbaiki:" bila sesuai.
+        Tulis dalam bahasa Indonesia yang jelas dan mudah dipahami pengguna.
+        
+        Format contoh:
+        * Baru: Deskripsi fitur baru di sini
+        * Ditingkatkan: Deskripsi peningkatan di sini
+        * Diperbaiki: Deskripsi perbaikan bug di sini
+        
+        Commits:
+        #{commits}
+        
+        Buat catatan rilis profesional:
+      PROMPT
+    else
+      prompt = <<~PROMPT
+        Generate concise release notes for a mobile app based on these git commits. 
+        Focus on user-facing features and improvements. Keep it under 4000 characters.
+        Format as plain text with simple bullet points using asterisks (*).
+        Use categories like "New:", "Improved:", and "Fixed:" when appropriate.
+        Write in clear, user-friendly language that customers will understand.
+        
+        Example format:
+        * New: Feature description here
+        * Improved: Enhancement description here  
+        * Fixed: Bug fix description here
+        
+        Commits:
+        #{commits}
+        
+        Generate professional release notes:
+      PROMPT
+    end
 
     begin
-      uri = URI("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=#{gemini_api_key}")
+      uri = URI("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=#{api_key}")
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
 
@@ -105,19 +154,22 @@ platform :ios do
         release_notes = result.dig('candidates', 0, 'content', 'parts', 0, 'text')&.strip
         
         if release_notes && !release_notes.empty?
-          UI.success("Generated release notes with Gemini AI")
+          UI.success("Generated #{language} release notes with Gemini AI")
           next release_notes
         end
       else
-        UI.error("Gemini API error: #{response.code} - #{response.body}")
+        UI.error("Gemini API error for #{language}: #{response.code} - #{response.body}")
       end
     rescue => e
-      UI.error("Error calling Gemini API: #{e.message}")
+      UI.error("Error calling Gemini API for #{language}: #{e.message}")
     end
 
-    # Fallback release notes
-    fallback_notes = "* Bug fixes and performance improvements\n* Enhanced user experience\n* General stability improvements"
-    fallback_notes
+    # Fallback release notes based on language
+    if language == "Indonesian"
+      "* Perbaikan bug dan peningkatan performa\n* Pengalaman pengguna yang lebih baik\n* Peningkatan stabilitas umum"
+    else
+      "* Bug fixes and performance improvements\n* Enhanced user experience\n* General stability improvements"
+    end
   end
 
   private_lane :update_ios_version do |options|

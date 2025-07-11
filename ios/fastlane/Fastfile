@@ -90,7 +90,7 @@ platform :ios do
         Fokus pada fitur dan peningkatan yang dapat dilihat pengguna. Maksimal 4000 karakter.
         Format sebagai teks biasa dengan bullet points menggunakan asterisk (*).
         Gunakan kategori seperti "Baru:", "Ditingkatkan:", dan "Diperbaiki:" bila sesuai.
-        Tulis dalam bahasa Indonesia yang jelas dan mudah dipahami pengguna bukan teknis.
+        Tulis dalam bahasa Indonesia yang jelas dan mudah dipahami pengguna. jangan gunakan jargon teknis secara detail. hanya cantumkan informasi fiturnya jangan detail teknis seperti kode, algoritma, components, atau lainnya.
         
         Format contoh:
         * Baru: Deskripsi fitur baru di sini
@@ -108,7 +108,7 @@ platform :ios do
         Focus on user-facing features and improvements. Keep it under 4000 characters.
         Format as plain text with simple bullet points using asterisks (*).
         Use categories like "New:", "Improved:", and "Fixed:" when appropriate.
-        Write in clear, user-friendly language that customers will understand, not technical jargon.
+        Write in clear, user-friendly language that customers will understand, don't use technical jargon with details like code, algorithms, components ui, or others.
         
         Example format:
         * New: Feature description here

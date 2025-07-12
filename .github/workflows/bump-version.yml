@@ -76,6 +76,6 @@ jobs:
             --repo rfaturriza/muslim_book)
 
           # Enable auto-merge and merge the PR
-          gh pr merge $PR_URL --auto --squash --delete-branch
+          gh pr merge $PR_URL --squash --delete-branch --auto "1"
 
           echo "PR created and auto-merged: $PR_URL"

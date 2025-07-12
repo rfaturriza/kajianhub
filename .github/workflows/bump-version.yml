@@ -56,4 +56,18 @@ jobs:
       - name: Push changes
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.KAJIANHUB_GITHUB_PAT }}@github.com/rfaturriza/muslim_book.git
-          git push origin ${{ github.ref_name }} --force-with-lease
+
+          # Try direct force push first
+          if ! git push origin ${{ github.ref_name }} --force; then
+            echo "Direct push failed, trying API approach..."
+            
+            # Get the commit SHA
+            COMMIT_SHA=$(git rev-parse HEAD)
+            
+            # Use GitHub API to update the branch reference directly
+            curl -X PATCH \
+              -H "Authorization: token ${{ secrets.KAJIANHUB_GITHUB_PAT }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              -d "{\"sha\":\"$COMMIT_SHA\",\"force\":true}" \
+              "https://api.github.com/repos/rfaturriza/muslim_book/git/refs/heads/${{ github.ref_name }}"
+          fi

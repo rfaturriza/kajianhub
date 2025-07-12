@@ -46,9 +46,16 @@ jobs:
             *) echo "Skipping bump: not a version lane" ;;
           esac
 
-      - name: Commit and Push
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Commit
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add pubspec.yaml
+          git commit -m "chore[GITHUB-ACTION]: bump version to ${{ github.event.inputs.lane }}"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
         with:
-          commit_message: "chore: bump version (BOT)"
-          file_pattern: pubspec.yaml
-          branch: ${{ steps.branch-name.outputs.name }}
+          github_token: ${{ secrets.KAJIANHUB_GITHUB_PAT }}
+          branch: ${{ github.ref }}
+          force_with_lease: true

@@ -146,18 +146,13 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
             newTime = sunriseTime.add(const Duration(minutes: 15));
             break;
           case PrayerInApp.dzuhur:
-            newTime = /* prayerTimes.dhuhr; */
-                DateTime.now().add(const Duration(minutes: 1));
+            newTime = prayerTimes.dhuhr;
             break;
           case PrayerInApp.ashar:
-            newTime = /* prayerTimes.asr; */ DateTime.now().add(
-              const Duration(minutes: 2),
-            ); // Placeholder for Asr time
+            newTime = prayerTimes.asr;
             break;
           case PrayerInApp.maghrib:
-            newTime = /* prayerTimes.maghrib; */ DateTime.now().add(
-              const Duration(minutes: 3),
-            ); // Placeholder for Asr time
+            newTime = prayerTimes.maghrib;
             break;
           case PrayerInApp.isya:
             newTime = prayerTimes.isha;

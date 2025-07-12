@@ -195,6 +195,9 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
         // Cancel existing notification before scheduling a new one
         await localNotification.cancel(element.prayer?.index ?? 0);
 
+        String androidSound = 'adzan_general';
+        String iosSound = 'adzan_general.wav';
+
         if (element.reminderEnabled) {
           // Schedule reminder notification
           await localNotification.scheduleDaily(
@@ -210,6 +213,9 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
               },
             ),
             timeOfDay: TimeOfDay.fromDateTime(element.time!),
+            mute: element.alarmType == 2, // silent,
+            androidSound: element.alarmType == 0 ? androidSound : null,
+            iosSound: element.alarmType == 0 ? iosSound : null,
           );
         } else {
           await localNotification.scheduleDaily(
@@ -224,6 +230,9 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
               },
             ),
             timeOfDay: TimeOfDay.fromDateTime(element.time!),
+            mute: element.alarmType == 2, // silent,
+            androidSound: element.alarmType == 0 ? androidSound : null,
+            iosSound: element.alarmType == 0 ? iosSound : null,
           );
         }
       }

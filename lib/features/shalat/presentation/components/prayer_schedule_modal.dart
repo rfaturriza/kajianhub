@@ -24,10 +24,10 @@ class SholatNotificationBottomSheet extends StatefulWidget {
 
 class _SholatNotificationBottomSheetState
     extends State<SholatNotificationBottomSheet> {
-  final _controllerSwitch = ValueNotifier<bool>(false);
+  late ValueNotifier<bool> _controllerSwitch;
   int _selectedNotificationType = 2;
   bool _reminderEnabled = false;
-  int _selectedReminder = 0;
+  int _selectedReminderTime = 0;
 
   final List<Map<String, dynamic>> _notificationOptions = [
     {
@@ -55,15 +55,18 @@ class _SholatNotificationBottomSheetState
   }
 
   init() {
-    _selectedReminder = widget.prayerAlarm?.reminderTime ?? 0;
+    _selectedReminderTime = widget.prayerAlarm?.reminderTime ?? 0;
     _selectedNotificationType = widget.prayerAlarm?.alarmType ?? 2;
     _reminderEnabled = widget.prayerAlarm?.reminderEnabled ?? false;
+    _controllerSwitch = ValueNotifier<bool>(_reminderEnabled);
     _controllerSwitch.addListener(() {
       setState(() {
         if (_controllerSwitch.value) {
           _reminderEnabled = true;
+          _selectedReminderTime = 5;
         } else {
           _reminderEnabled = false;
+          _selectedReminderTime = 0;
         }
       });
     });
@@ -149,6 +152,7 @@ class _SholatNotificationBottomSheetState
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   AdvancedSwitch(
                     controller: _controllerSwitch,
+                    initialValue: _reminderEnabled,
                     inactiveColor: Color(0xffE9E8EB),
                     enabled: _selectedNotificationType == 3 ? false : true,
                   ),
@@ -164,16 +168,17 @@ class _SholatNotificationBottomSheetState
                       label: Text(
                         '$min ${LocaleKeys.player_schedule_modal_text3.tr()}',
                         style: context.textTheme.bodySmall?.copyWith(
-                            fontWeight: _selectedReminder == min
+                            fontWeight: _selectedReminderTime == min
                                 ? FontWeight.bold
                                 : FontWeight.w600),
                       ),
-                      selected:
-                          _reminderEnabled ? _selectedReminder == min : false,
+                      selected: _reminderEnabled
+                          ? _selectedReminderTime == min
+                          : false,
                       onSelected: _reminderEnabled
                           ? (_) {
                               setState(() {
-                                _selectedReminder = min;
+                                _selectedReminderTime = min;
                               });
                             }
                           : null,
@@ -184,7 +189,7 @@ class _SholatNotificationBottomSheetState
                             20.0), // Change this value to adjust radius
                       ),
                       side: BorderSide(
-                        color: _selectedReminder == min
+                        color: _selectedReminderTime == min
                             ? Color(0xff57C7BD)
                             : Color(0xffE5F1F2),
                       ),
@@ -213,7 +218,7 @@ class _SholatNotificationBottomSheetState
                     widget.onSave?.call({
                       'notificationType': _selectedNotificationType,
                       'reminderEnabled': _reminderEnabled,
-                      'reminderTime': _selectedReminder,
+                      'reminderTime': _selectedReminderTime,
                     });
                     Navigator.of(context).pop();
                   },

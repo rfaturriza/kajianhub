@@ -87,6 +87,7 @@ flutter:
     - assets/svg/
     - assets/images/
     - assets/gif/
+    - assets/sounds/
   fonts:
     - family: Lato
       fonts:

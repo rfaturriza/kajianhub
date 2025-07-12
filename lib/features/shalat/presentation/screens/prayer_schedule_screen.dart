@@ -518,12 +518,12 @@ class _PrayerScheduleSectionState extends State<_PrayerScheduleSection> {
                               return IconButton(
                                 icon: Icon(
                                   () {
-                                    return alarm.alarmType == 1
+                                    return alarm.alarmType != 3
                                         ? Icons.notifications_active
                                         : Icons.notifications_off;
                                   }(),
                                   color: () {
-                                    return alarm.alarmType == 1
+                                    return alarm.alarmType != 3
                                         ? context.theme.colorScheme.primary
                                         : context.theme.colorScheme.onSurface;
                                   }(),

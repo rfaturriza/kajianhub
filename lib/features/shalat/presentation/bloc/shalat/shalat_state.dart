@@ -13,5 +13,6 @@ abstract class ShalatState with _$ShalatState {
     Either<Failure, GeoLocation?>? manualLocation,
     @Default(false) bool isLoading,
     bool? hasShownPermissionDialog,
+    bool? hasAnyChanges,
   }) = _ShalatState;
 }

@@ -2,14 +2,20 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
+import 'package:quranku/features/shalat/domain/entities/prayer_schedule_setting.codegen.dart';
 import 'package:quranku/generated/locale_keys.g.dart';
 
 class SholatNotificationBottomSheet extends StatefulWidget {
   final String playerName;
   final String time;
   final Function(Map)? onSave;
+  final PrayerAlarm? prayerAlarm;
   const SholatNotificationBottomSheet(
-      {super.key, this.playerName = '', this.time = '', this.onSave});
+      {super.key,
+      this.playerName = '',
+      this.time = '',
+      this.onSave,
+      this.prayerAlarm});
 
   @override
   State<SholatNotificationBottomSheet> createState() =>
@@ -49,6 +55,9 @@ class _SholatNotificationBottomSheetState
   }
 
   init() {
+    _selectedReminder = widget.prayerAlarm?.reminderTime ?? 0;
+    _selectedNotificationType = widget.prayerAlarm?.alarmType ?? 2;
+    _reminderEnabled = widget.prayerAlarm?.reminderEnabled ?? false;
     _controllerSwitch.addListener(() {
       setState(() {
         if (_controllerSwitch.value) {

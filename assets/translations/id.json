@@ -222,6 +222,7 @@
   "kajian": "Kajian",
   "errorOpenMap": "Mohon maaf, tidak dapat membuka peta",
   "notificationPrayerTitle": "Waktunya {prayer} Pukul {time}",
+  "notificationReminderPrayerTitle": "{ReminderTime} menit tersisa untuk {prayer} pada pukul {time}",
   "notificationPrayerDescription": "Lihat informasi waktu shalat di {location}",
   "ustadzAiButtonLabel": "Ustadz AI",
   "ustadzAiScreen": {

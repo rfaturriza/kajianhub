@@ -14,7 +14,7 @@ import 'package:quranku/core/utils/extension/string_ext.dart';
 import 'package:quranku/features/shalat/domain/entities/prayer_schedule_setting.codegen.dart';
 import 'package:quranku/features/shalat/domain/entities/schedule.codegen.dart';
 import 'package:quranku/features/shalat/presentation/helper/helper_time_shalat.dart';
-import 'package:quranku/features/shalat/presentation/screens/prayer_schedule_widget.dart';
+import 'package:quranku/features/shalat/presentation/components/prayer_schedule_modal.dart';
 
 import '../../../setting/presentation/bloc/language_setting/language_setting_bloc.dart';
 import '../../domain/entities/prayer_in_app.dart';
@@ -532,60 +532,39 @@ class _PrayerScheduleSectionState extends State<_PrayerScheduleSection> {
                                   _openBottomSheet(
                                       context,
                                       prayer.capitalizeEveryWord(),
-                                      timePrayerText, (Map data) {
-                                    if (data['reminderEnabled'] == true) {
-                                      final reminderTime = int.tryParse(
-                                              data['reminderTime'] ?? '0') ??
-                                          0;
-                                      context.read<ShalatBloc>().add(
-                                            ShalatEvent
-                                                .setPrayerScheduleSettingEvent(
-                                              model: schedule?.copyWith(
-                                                alarms: alarms.map((e) {
-                                                  if (e.prayer?.index ==
-                                                      index) {
-                                                    return e.copyWith(
-                                                        time: DateTime.now()
-                                                            .add(Duration(
-                                                          minutes:
-                                                              -reminderTime,
-                                                        )),
-                                                        alarmType: data[
-                                                            'notificationType']);
-                                                  }
-                                                  return e;
-                                                }).toList(),
-                                              ),
+                                      timePrayerText,
+                                      alarm, (Map data) {
+                                    final reminderTime =
+                                        data['reminderTime'] ?? 0;
+                                    context.read<ShalatBloc>().add(
+                                          ShalatEvent
+                                              .setPrayerScheduleSettingEvent(
+                                            model: schedule?.copyWith(
+                                              alarms: alarms.map((e) {
+                                                if (e.prayer?.index == index) {
+                                                  return e.copyWith(
+                                                    time:
+                                                        DateTime.now().copyWith(
+                                                      hour:
+                                                          int.tryParse(hour) ??
+                                                              0,
+                                                      minute: int.tryParse(
+                                                              minute) ??
+                                                          0,
+                                                    ),
+                                                    alarmType: data[
+                                                        'notificationType'],
+                                                    reminderTime: reminderTime,
+                                                    reminderEnabled: data[
+                                                            'reminderEnabled'] ??
+                                                        false,
+                                                  );
+                                                }
+                                                return e;
+                                              }).toList(),
                                             ),
-                                          );
-                                    } else {
-                                      context.read<ShalatBloc>().add(
-                                            ShalatEvent
-                                                .setPrayerScheduleSettingEvent(
-                                              model: schedule?.copyWith(
-                                                alarms: alarms.map((e) {
-                                                  if (e.prayer?.index ==
-                                                      index) {
-                                                    return e.copyWith(
-                                                      time: DateTime.now()
-                                                          .copyWith(
-                                                        hour: int.tryParse(
-                                                                hour) ??
-                                                            0,
-                                                        minute: int.tryParse(
-                                                                minute) ??
-                                                            0,
-                                                      ),
-                                                      alarmType: data[
-                                                          'notificationType'],
-                                                    );
-                                                  }
-                                                  return e;
-                                                }).toList(),
-                                              ),
-                                            ),
-                                          );
-                                    }
+                                          ),
+                                        );
                                   });
                                 },
                               );
@@ -604,8 +583,13 @@ class _PrayerScheduleSectionState extends State<_PrayerScheduleSection> {
     );
   }
 
-  void _openBottomSheet(BuildContext context, String playerName, String time,
-      Function(Map) onSave) {
+  void _openBottomSheet(
+    BuildContext context,
+    String playerName,
+    String time,
+    PrayerAlarm? prayerAlarm,
+    Function(Map) onSave,
+  ) {
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
@@ -617,6 +601,7 @@ class _PrayerScheduleSectionState extends State<_PrayerScheduleSection> {
           playerName: playerName,
           time: time,
           onSave: onSave,
+          prayerAlarm: prayerAlarm,
         );
       },
     );

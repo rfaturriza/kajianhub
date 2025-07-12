@@ -337,6 +337,7 @@ class ShalatBloc extends Bloc<ShalatEvent, ShalatState> {
     );
     emit(
       state.copyWith(
+        hasAnyChanges: true,
         prayerScheduleSetting: result.fold(
           (failure) => left(
             GeneralFailure(
@@ -366,6 +367,11 @@ class ShalatBloc extends Bloc<ShalatEvent, ShalatState> {
         forceUpdate: event.forceUpdate,
       ),
     );
+    emit(
+      state.copyWith(
+        hasAnyChanges: false,
+      ),
+    );
   }
 
   void _onCheckAndUpdateNotificationsEvent(
@@ -390,7 +396,8 @@ class ShalatBloc extends Bloc<ShalatEvent, ShalatState> {
     }
 
     // Schedule prayer alarms with the current location
-    add(_SchedulePrayerAlarmWithLocationEvent(location: geoLocation));
+    add(_SchedulePrayerAlarmWithLocationEvent(
+        location: geoLocation, forceUpdate: state.hasAnyChanges ?? false));
   }
 
   @override

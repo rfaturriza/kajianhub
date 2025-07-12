@@ -222,6 +222,7 @@
   "kajian": "Kajian",
   "errorOpenMap": "Sorry, unable to open the map",
   "notificationPrayerTitle": "Time for {prayer} at {time}",
+  "notificationReminderPrayerTitle": "{ReminderTime} minutes are left in {prayer} at {time}",
   "notificationPrayerDescription": "View prayer times information in {location}",
   "ustadzAiButtonLabel": "Ustadz AI",
   "ustadzAiScreen": {

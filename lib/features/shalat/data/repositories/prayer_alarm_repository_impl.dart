@@ -161,6 +161,11 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
             newTime = alarm.time;
         }
 
+        if (alarm.reminderEnabled && newTime != null) {
+          // Adjust the time for reminders if enabled
+          newTime = newTime.subtract(Duration(minutes: alarm.reminderTime));
+        }
+
         // Return updated alarm with new time
         return alarm.copyWith(time: newTime);
       }).toList();
@@ -190,19 +195,37 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
         // Cancel existing notification before scheduling a new one
         await localNotification.cancel(element.prayer?.index ?? 0);
 
-        await localNotification.scheduleDaily(
-          id: element.prayer?.index ?? 0,
-          title: LocaleKeys.notificationPrayerTitle.tr(namedArgs: {
-            'prayer': element.prayer?.name.capitalizeEveryWord() ?? '',
-            'time': '$hour:$minute',
-          }),
-          body: LocaleKeys.notificationPrayerDescription.tr(
-            namedArgs: {
-              'location': updatedSettings.location,
-            },
-          ),
-          timeOfDay: TimeOfDay.fromDateTime(element.time!),
-        );
+        if (element.reminderEnabled) {
+          // Schedule reminder notification
+          await localNotification.scheduleDaily(
+            id: element.prayer?.index ?? 0,
+            title: LocaleKeys.notificationReminderPrayerTitle.tr(namedArgs: {
+              'ReminderTime': element.reminderTime.toString(),
+              'prayer': element.prayer?.name.capitalizeEveryWord() ?? '',
+              'time': '$hour:$minute',
+            }),
+            body: LocaleKeys.notificationPrayerDescription.tr(
+              namedArgs: {
+                'location': updatedSettings.location,
+              },
+            ),
+            timeOfDay: TimeOfDay.fromDateTime(element.time!),
+          );
+        } else {
+          await localNotification.scheduleDaily(
+            id: element.prayer?.index ?? 0,
+            title: LocaleKeys.notificationPrayerTitle.tr(namedArgs: {
+              'prayer': element.prayer?.name.capitalizeEveryWord() ?? '',
+              'time': '$hour:$minute',
+            }),
+            body: LocaleKeys.notificationPrayerDescription.tr(
+              namedArgs: {
+                'location': updatedSettings.location,
+              },
+            ),
+            timeOfDay: TimeOfDay.fromDateTime(element.time!),
+          );
+        }
       }
 
       return right(unit);

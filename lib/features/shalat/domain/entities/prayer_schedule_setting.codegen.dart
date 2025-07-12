@@ -21,5 +21,7 @@ abstract class PrayerAlarm with _$PrayerAlarm {
     DateTime? time,
     PrayerInApp? prayer,
     @Default(3) dynamic alarmType,
+    @Default(0) int reminderTime,
+    @Default(false) bool reminderEnabled,
   }) = _PrayerAlarm;
 }

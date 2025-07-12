@@ -58,4 +58,4 @@ jobs:
         with:
           github_token: ${{ secrets.KAJIANHUB_GITHUB_PAT }}
           branch: ${{ github.ref }}
-          force_with_lease: true
+          force: true

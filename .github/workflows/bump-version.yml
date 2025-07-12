@@ -53,7 +53,29 @@ jobs:
           git add pubspec.yaml
           git commit -m "chore[GITHUB-ACTION]: bump version to ${{ github.event.inputs.lane }}"
 
-      - name: Push changes
+      - name: Create PR and Auto-merge
         run: |
+          # Set up git remote with token
           git remote set-url origin https://x-access-token:${{ secrets.KAJIANHUB_GITHUB_PAT }}@github.com/rfaturriza/muslim_book.git
-          git push origin HEAD:${{ github.ref_name }} --force
+
+          # Create a temporary branch for the version bump
+          TEMP_BRANCH="version-bump-${{ github.event.inputs.lane }}-$(date +%s)"
+          git checkout -b $TEMP_BRANCH
+
+          # Push the temporary branch
+          git push origin $TEMP_BRANCH
+
+          # Create pull request using GitHub CLI
+          gh auth login --with-token <<< "${{ secrets.KAJIANHUB_GITHUB_PAT }}"
+
+          PR_URL=$(gh pr create \
+            --title "chore: bump version to ${{ github.event.inputs.lane }}" \
+            --body "Automated version bump from GitHub Actions" \
+            --base ${{ github.ref_name }} \
+            --head $TEMP_BRANCH \
+            --repo rfaturriza/muslim_book)
+
+          # Enable auto-merge and merge the PR
+          gh pr merge $PR_URL --auto --squash --delete-branch
+
+          echo "PR created and auto-merged: $PR_URL"

@@ -146,13 +146,18 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
             newTime = sunriseTime.add(const Duration(minutes: 15));
             break;
           case PrayerInApp.dzuhur:
-            newTime = prayerTimes.dhuhr;
+            newTime = /* prayerTimes.dhuhr; */
+                DateTime.now().add(const Duration(minutes: 1));
             break;
           case PrayerInApp.ashar:
-            newTime = prayerTimes.asr;
+            newTime = /* prayerTimes.asr; */ DateTime.now().add(
+              const Duration(minutes: 2),
+            ); // Placeholder for Asr time
             break;
           case PrayerInApp.maghrib:
-            newTime = prayerTimes.maghrib;
+            newTime = /* prayerTimes.maghrib; */ DateTime.now().add(
+              const Duration(minutes: 3),
+            ); // Placeholder for Asr time
             break;
           case PrayerInApp.isya:
             newTime = prayerTimes.isha;
@@ -187,7 +192,11 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
 
       // Schedule notifications with the updated times
       for (final element in updatedSettings.alarms) {
-        if (element.time == null || element.alarmType == 3) continue;
+        if (element.time == null) continue;
+        if (element.alarmType == 3) {
+          await localNotification.cancel(element.prayer?.index ?? 0);
+          continue;
+        }
 
         final hour = TimeOfDay.fromDateTime(element.time!).hour;
         final minute = TimeOfDay.fromDateTime(element.time!).minute;

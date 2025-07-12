@@ -54,8 +54,6 @@ jobs:
           git commit -m "chore[GITHUB-ACTION]: bump version to ${{ github.event.inputs.lane }}"
 
       - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.KAJIANHUB_GITHUB_PAT }}
-          branch: ${{ github.ref }}
-          force: true
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.KAJIANHUB_GITHUB_PAT }}@github.com/rfaturriza/muslim_book.git
+          git push origin HEAD:${{ github.ref_name }} --force

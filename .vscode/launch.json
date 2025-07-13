@@ -7,8 +7,7 @@
         {
             "name": "quranku",
             "request": "launch",
-            "type": "dart",
-            "program": "lib/main.dart"
+            "type": "dart"
         },
         {
             "name": "quranku (profile mode)",

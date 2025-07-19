@@ -100,6 +100,18 @@ class RootRouter {
     parent: studyLocationRoute,
   );
 
+  static const RouteModel ustadzRoute = RouteModel(
+    name: 'ustadz',
+    path: '/ustadz',
+    parent: rootRoute,
+  );
+
+  static const RouteModel ustadzDetailRoute = RouteModel(
+    name: 'ustadzDetail',
+    path: '/:id',
+    parent: ustadzRoute,
+  );
+
   static const RouteModel ustadAiRoute = RouteModel(
     name: 'ustadAi',
     path: '/ustad-ai',

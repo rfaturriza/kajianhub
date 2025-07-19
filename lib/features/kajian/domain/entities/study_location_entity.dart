@@ -4,7 +4,7 @@ import 'package:quranku/features/kajian/domain/entities/kajian_schedule.codegen.
 class StudyLocationsEntity extends Equatable {
   final List<StudyLocationEntity>? data;
   final LinksKajianSchedule? links;
-  final MetaKajianSchedule? meta;
+  final MetaKajianHub? meta;
 
   const StudyLocationsEntity({
     this.data,

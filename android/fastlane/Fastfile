@@ -104,6 +104,7 @@ def release_lane(update_type: nil, target:, firebase_groups: nil)
   
   case target
   when "firebase_distribution"
+    ENV['APK_BUILD_MODE'] = 'debug'
     build_flutter_app("apk")
     release_notes = generate_release_notes
     distribute_to_firebase(firebase_groups, release_notes)

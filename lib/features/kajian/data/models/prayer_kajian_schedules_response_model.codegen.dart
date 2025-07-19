@@ -25,8 +25,8 @@ abstract class PrayerKajianSchedulesResponseModel
     with _$PrayerKajianSchedulesResponseModel {
   const factory PrayerKajianSchedulesResponseModel({
     List<PrayerKajianScheduleModel>? data,
-    LinksKajianScheduleModel? links,
-    MetaKajianScheduleModel? meta,
+    LinksKajianHubModel? links,
+    MetaKajianHubModel? meta,
   }) = _PrayerKajianSchedulesResponseModel;
 
   const PrayerKajianSchedulesResponseModel._();
@@ -38,8 +38,8 @@ abstract class PrayerKajianSchedulesResponseModel
   PrayerkajianSchedules toEntity() {
     return PrayerkajianSchedules(
       data: data?.map((e) => e.toEntity()).toList() ?? [],
-      links: links?.toEntity() ?? LinksKajianScheduleModel.empty().toEntity(),
-      meta: meta?.toEntity() ?? MetaKajianScheduleModel.empty().toEntity(),
+      links: links?.toEntity() ?? LinksKajianHubModel.empty().toEntity(),
+      meta: meta?.toEntity() ?? MetaKajianHubModel.empty().toEntity(),
     );
   }
 }

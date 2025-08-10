@@ -59,7 +59,7 @@ abstract class PrayerAlarmModel with _$PrayerAlarmModel {
   const factory PrayerAlarmModel({
     @HiveField(0) DateTime? time,
     @HiveField(1) String? prayer,
-    @HiveField(3) @Default(3) dynamic alarmType,
+    @HiveField(3) @Default(3) int alarmType,
     @HiveField(4) @Default(0) int reminderTime,
     @HiveField(5) @Default(false) bool reminderEnabled,
   }) = _PrayerAlarmModel;

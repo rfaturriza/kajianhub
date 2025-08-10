@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/features/shalat/domain/entities/prayer_schedule_setting.codegen.dart';
 import 'package:quranku/generated/locale_keys.g.dart';
@@ -31,20 +32,20 @@ class _SholatNotificationBottomSheetState
 
   final List<Map<String, dynamic>> _notificationOptions = [
     {
-      'icon': Icons.volume_up,
-      'label': LocaleKeys.player_schedule_modal_option1.tr(),
+      'icon': Symbols.volume_up,
+      'label': LocaleKeys.notificationTypeAdhan.tr(),
     },
     {
-      'icon': Icons.notifications_none_outlined,
-      'label': LocaleKeys.player_schedule_modal_option2.tr(),
+      'icon': Symbols.notifications_active,
+      'label': LocaleKeys.notificationTypeStandard.tr(),
     },
     {
-      'icon': Icons.volume_off,
-      'label': LocaleKeys.player_schedule_modal_option3.tr(),
+      'icon': Symbols.notifications_none,
+      'label': LocaleKeys.notificationTypeSilent.tr(),
     },
     {
-      'icon': Icons.block,
-      'label': LocaleKeys.player_schedule_modal_option4.tr(),
+      'icon': Symbols.notifications_off_rounded,
+      'label': LocaleKeys.notificationTypeDisabled.tr(),
     },
   ];
 
@@ -88,29 +89,34 @@ class _SholatNotificationBottomSheetState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('${widget.playerName} ${widget.time}',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      style: context.textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: context.theme.colorScheme.onSurface)),
                   IconButton(
                     icon: Icon(Icons.close),
+                    color: context.theme.colorScheme.onSurface,
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
               SizedBox(height: 5),
-              Text(LocaleKeys.player_schedule_modal_text1.tr(),
-                  style: TextStyle(color: Colors.grey[600])),
+              Text(LocaleKeys.prayerNotificationDescription.tr(),
+                  style: context.textTheme.labelLarge?.copyWith(
+                      fontSize: 12,
+                      color: context.theme.colorScheme.onSurface
+                          .withAlpha((0.5 * 255).toInt()))),
               SizedBox(height: 20),
-
               // Notification Type Options
               ...List.generate(_notificationOptions.length, (index) {
                 final option = _notificationOptions[index];
                 return ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: Icon(option['icon'], color: Color(0xff7E7E7E)),
+                  leading: Icon(option['icon'],
+                      color: context.theme.colorScheme.onSurface),
                   title: Text(
                     option['label'],
                     style: context.textTheme.bodyMedium?.copyWith(
-                      color: Color(0xff7E7E7E),
+                      color: context.theme.colorScheme.onSurface,
                     ),
                   ),
                   trailing: Theme(
@@ -119,7 +125,8 @@ class _SholatNotificationBottomSheetState
                         fillColor:
                             WidgetStateProperty.resolveWith<Color>((states) {
                           if (states.contains(WidgetState.selected)) {
-                            return Color(0xffF1B340); // active color
+                            return context
+                                .theme.colorScheme.primary; // active color
                           }
                           return Colors.grey.shade300; // inactive color
                         }),
@@ -148,54 +155,77 @@ class _SholatNotificationBottomSheetState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                      '${LocaleKeys.player_schedule_modal_text2.tr()} ${widget.playerName}',
+                      '${LocaleKeys.reminderLeadTimeLabel.tr()} ${widget.playerName}',
                       style: TextStyle(fontWeight: FontWeight.bold)),
                   AdvancedSwitch(
                     controller: _controllerSwitch,
                     initialValue: _reminderEnabled,
-                    inactiveColor: Color(0xffE9E8EB),
+                    inactiveColor:
+                        context.theme.colorScheme.surfaceContainerHighest,
+                    activeColor: context.theme.colorScheme.primary,
                     enabled: _selectedNotificationType == 3 ? false : true,
                   ),
                 ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [5, 15, 30].map((min) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: ChoiceChip(
-                      showCheckmark: false,
-                      label: Text(
-                        '$min ${LocaleKeys.player_schedule_modal_text3.tr()}',
-                        style: context.textTheme.bodySmall?.copyWith(
-                            fontWeight: _selectedReminderTime == min
-                                ? FontWeight.bold
-                                : FontWeight.w600),
-                      ),
-                      selected: _reminderEnabled
-                          ? _selectedReminderTime == min
-                          : false,
-                      onSelected: _reminderEnabled
-                          ? (_) {
-                              setState(() {
-                                _selectedReminderTime = min;
-                              });
-                            }
-                          : null,
-                      selectedColor: Color(0xffE2F0F1),
-                      backgroundColor: Color(0xffFAFAFA),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            20.0), // Change this value to adjust radius
-                      ),
-                      side: BorderSide(
-                        color: _selectedReminderTime == min
-                            ? Color(0xff57C7BD)
-                            : Color(0xffE5F1F2),
-                      ),
-                    ),
-                  );
-                }).toList(),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [5, 15, 30].map((min) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: FilterChip(
+                        label: Text(
+                          '$min ${LocaleKeys.reminderLeadTimeUnit.tr()}',
+                          style: context.textTheme.bodySmall?.copyWith(
+                              fontWeight: _selectedReminderTime == min
+                                  ? FontWeight.bold
+                                  : FontWeight.w600),
+                        ),
+                        selected: _reminderEnabled
+                            ? _selectedReminderTime == min
+                            : false,
+                        onSelected: _reminderEnabled
+                            ? (_) {
+                                setState(() {
+                                  _selectedReminderTime = min;
+                                });
+                              }
+                            : null,
+                      ), /* ChoiceChip(
+                        showCheckmark: false,
+                        label: Text(
+                          '$min ${LocaleKeys.reminderLeadTimeUnit.tr()}',
+                          style: context.textTheme.bodySmall?.copyWith(
+                              fontWeight: _selectedReminderTime == min
+                                  ? FontWeight.bold
+                                  : FontWeight.w600),
+                        ),
+                        selected: _reminderEnabled
+                            ? _selectedReminderTime == min
+                            : false,
+                        onSelected: _reminderEnabled
+                            ? (_) {
+                                setState(() {
+                                  _selectedReminderTime = min;
+                                });
+                              }
+                            : null,
+                        selectedColor: Color(0xffE2F0F1),
+                        backgroundColor: Color(0xffFAFAFA),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                              20.0), // Change this value to adjust radius
+                        ),
+                        side: BorderSide(
+                          color: _selectedReminderTime == min
+                              ? Color(0xff57C7BD)
+                              : Color(0xffE5F1F2),
+                        ),
+                      ), */
+                    );
+                  }).toList(),
+                ),
               ),
 
               SizedBox(height: 20),
@@ -211,8 +241,12 @@ class _SholatNotificationBottomSheetState
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  child: Text(LocaleKeys.player_schedule_modal_text4.tr(),
-                      style: TextStyle(fontSize: 16)),
+                  child: Text(
+                    LocaleKeys.saveButtonLabel.tr(),
+                    style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.theme.colorScheme.onPrimary,
+                        fontSize: 16),
+                  ),
                   onPressed: () {
                     // handle save logic here
                     widget.onSave?.call({

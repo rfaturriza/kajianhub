@@ -67,8 +67,12 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
 
     alarms?.forEach((element) async {
       if (element.time == null) return;
-      final hour = TimeOfDay.fromDateTime(element.time!).hour;
-      final minute = TimeOfDay.fromDateTime(element.time!).minute;
+      final hour =
+          TimeOfDay.fromDateTime(element.time!).hour.toString().padLeft(2, '0');
+      final minute = TimeOfDay.fromDateTime(element.time!)
+          .minute
+          .toString()
+          .padLeft(2, '0');
       await localNotification.scheduleDaily(
         id: element.prayer?.index ?? 0,
         title: LocaleKeys.notificationPrayerTitle.tr(namedArgs: {
@@ -193,8 +197,14 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
           continue;
         }
 
-        final hour = TimeOfDay.fromDateTime(element.time!).hour;
-        final minute = TimeOfDay.fromDateTime(element.time!).minute;
+        final hour = TimeOfDay.fromDateTime(element.time!)
+            .hour
+            .toString()
+            .padLeft(2, '0');
+        final minute = TimeOfDay.fromDateTime(element.time!)
+            .minute
+            .toString()
+            .padLeft(2, '0');
 
         // Cancel existing notification before scheduling a new one
         await localNotification.cancel(element.prayer?.index ?? 0);

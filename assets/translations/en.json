@@ -244,12 +244,12 @@
   "takePicture": "Take picture",
   "selectPicture": "Select picture",
   "removePicture": "Remove picture",
-  "player_schedule_modal_text1": "You can set notifications for each prayer time",
-  "player_schedule_modal_text2": "Reminder Before",
-  "player_schedule_modal_text3": "Minutes",
-  "player_schedule_modal_text4": "Save",
-  "player_schedule_modal_option1": "Adhan",
-  "player_schedule_modal_option2": "Notification",
-  "player_schedule_modal_option3": "Silent",
-  "player_schedule_modal_option4": "Inactive"
+  "prayerNotificationDescription": "You can set notifications for each prayer time",
+  "reminderLeadTimeLabel": "Reminder Before",
+  "reminderLeadTimeUnit": "Minutes",
+  "saveButtonLabel": "Save",
+  "notificationTypeAdhan": "Adhan",
+  "notificationTypeStandard": "Notification",
+  "notificationTypeSilent": "Silent",
+  "notificationTypeDisabled": "Inactive"
 }

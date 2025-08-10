@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:jhijri/_src/_jHijri.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/constants/asset_constants.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/core/utils/extension/dartz_ext.dart';
@@ -374,6 +375,21 @@ class _PrayerScheduleSection extends StatefulWidget {
 class _PrayerScheduleSectionState extends State<_PrayerScheduleSection> {
   DateTime dateSelected = DateTime.now();
 
+  final List<Map<String, dynamic>> _notificationOptions = [
+    {
+      'icon': Symbols.volume_up,
+    },
+    {
+      'icon': Symbols.notifications_active,
+    },
+    {
+      'icon': Symbols.notifications_none,
+    },
+    {
+      'icon': Symbols.notifications_off_rounded,
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -518,9 +534,9 @@ class _PrayerScheduleSectionState extends State<_PrayerScheduleSection> {
                               return IconButton(
                                 icon: Icon(
                                   () {
-                                    return alarm.alarmType != 3
-                                        ? Icons.notifications_active
-                                        : Icons.notifications_off;
+                                    return _notificationOptions[alarm.alarmType]
+                                            ['icon'] ??
+                                        Icons.notifications_off;
                                   }(),
                                   color: () {
                                     return alarm.alarmType != 3
@@ -596,6 +612,7 @@ class _PrayerScheduleSectionState extends State<_PrayerScheduleSection> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
       ),
       isScrollControlled: true,
+      backgroundColor: context.theme.colorScheme.surfaceContainer,
       builder: (context) {
         return SholatNotificationBottomSheet(
           playerName: playerName,

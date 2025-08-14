@@ -64,7 +64,6 @@ dependencies:
   flutter_alice: ^2.0.1
   overlay_support: ^2.1.0
   image_picker: ^0.8.6
-  flutter_advanced_switch: ^3.1.0
 
 dev_dependencies:
   flutter_test:

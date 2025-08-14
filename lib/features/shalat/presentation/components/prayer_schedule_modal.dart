@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/features/shalat/domain/entities/prayer_schedule_setting.codegen.dart';
@@ -88,65 +87,65 @@ class _SholatNotificationBottomSheetState
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('${widget.playerName} ${widget.time}',
-                      style: context.textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: context.theme.colorScheme.onSurface)),
+                  Text(
+                    '${widget.playerName} ${widget.time}',
+                    style: context.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: context.theme.colorScheme.onSurface,
+                    ),
+                  ),
                   IconButton(
-                    icon: Icon(Icons.close),
+                    icon: Icon(Symbols.close),
                     color: context.theme.colorScheme.onSurface,
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ],
               ),
               SizedBox(height: 5),
-              Text(LocaleKeys.prayerNotificationDescription.tr(),
-                  style: context.textTheme.labelLarge?.copyWith(
-                      fontSize: 12,
-                      color: context.theme.colorScheme.onSurface
-                          .withAlpha((0.5 * 255).toInt()))),
+              Text(
+                LocaleKeys.prayerNotificationDescription.tr(),
+                style: context.textTheme.labelLarge?.copyWith(
+                  fontSize: 12,
+                  color: context.theme.colorScheme.onSurface.withAlpha(
+                    (0.5 * 255).toInt(),
+                  ),
+                ),
+              ),
               SizedBox(height: 20),
               // Notification Type Options
-              ...List.generate(_notificationOptions.length, (index) {
-                final option = _notificationOptions[index];
-                return ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Icon(option['icon'],
-                      color: context.theme.colorScheme.onSurface),
-                  title: Text(
-                    option['label'],
-                    style: context.textTheme.bodyMedium?.copyWith(
+              ...List.generate(
+                _notificationOptions.length,
+                (index) {
+                  final option = _notificationOptions[index];
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      option['icon'],
                       color: context.theme.colorScheme.onSurface,
                     ),
-                  ),
-                  trailing: Theme(
-                    data: Theme.of(context).copyWith(
-                      radioTheme: RadioThemeData(
-                        fillColor:
-                            WidgetStateProperty.resolveWith<Color>((states) {
-                          if (states.contains(WidgetState.selected)) {
-                            return context
-                                .theme.colorScheme.primary; // active color
-                          }
-                          return Colors.grey.shade300; // inactive color
-                        }),
+                    title: Text(
+                      option['label'],
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.theme.colorScheme.onSurface,
                       ),
                     ),
-                    child: Transform.scale(
-                      scale: 1.2,
-                      child: Radio<int>(
-                        value: index,
-                        groupValue: _selectedNotificationType,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedNotificationType = value!;
-                          });
-                        },
-                      ),
+                    onTap: () {
+                      setState(() {
+                        _selectedNotificationType = index;
+                      });
+                    },
+                    trailing: Radio<int>(
+                      value: index,
+                      groupValue: _selectedNotificationType,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedNotificationType = value!;
+                        });
+                      },
                     ),
-                  ),
-                );
-              }),
+                  );
+                },
+              ),
 
               SizedBox(height: 10),
 
@@ -155,15 +154,15 @@ class _SholatNotificationBottomSheetState
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                      '${LocaleKeys.reminderLeadTimeLabel.tr()} ${widget.playerName}',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  AdvancedSwitch(
-                    controller: _controllerSwitch,
-                    initialValue: _reminderEnabled,
-                    inactiveColor:
-                        context.theme.colorScheme.surfaceContainerHighest,
-                    activeColor: context.theme.colorScheme.primary,
-                    enabled: _selectedNotificationType == 3 ? false : true,
+                    '${LocaleKeys.reminderLeadTimeLabel.tr()} ${widget.playerName}',
+                  ),
+                  Switch(
+                    value: _reminderEnabled,
+                    onChanged: _selectedNotificationType == 3
+                        ? null
+                        : (value) {
+                            _controllerSwitch.value = value;
+                          },
                   ),
                 ],
               ),
@@ -192,37 +191,7 @@ class _SholatNotificationBottomSheetState
                                 });
                               }
                             : null,
-                      ), /* ChoiceChip(
-                        showCheckmark: false,
-                        label: Text(
-                          '$min ${LocaleKeys.reminderLeadTimeUnit.tr()}',
-                          style: context.textTheme.bodySmall?.copyWith(
-                              fontWeight: _selectedReminderTime == min
-                                  ? FontWeight.bold
-                                  : FontWeight.w600),
-                        ),
-                        selected: _reminderEnabled
-                            ? _selectedReminderTime == min
-                            : false,
-                        onSelected: _reminderEnabled
-                            ? (_) {
-                                setState(() {
-                                  _selectedReminderTime = min;
-                                });
-                              }
-                            : null,
-                        selectedColor: Color(0xffE2F0F1),
-                        backgroundColor: Color(0xffFAFAFA),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              20.0), // Change this value to adjust radius
-                        ),
-                        side: BorderSide(
-                          color: _selectedReminderTime == min
-                              ? Color(0xff57C7BD)
-                              : Color(0xffE5F1F2),
-                        ),
-                      ), */
+                      ),
                     );
                   }).toList(),
                 ),

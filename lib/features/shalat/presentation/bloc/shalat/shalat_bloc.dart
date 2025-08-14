@@ -397,7 +397,9 @@ class ShalatBloc extends Bloc<ShalatEvent, ShalatState> {
 
     // Schedule prayer alarms with the current location
     add(_SchedulePrayerAlarmWithLocationEvent(
-        location: geoLocation, forceUpdate: state.hasAnyChanges ?? false));
+      location: geoLocation,
+      forceUpdate: true,
+    ));
   }
 
   @override

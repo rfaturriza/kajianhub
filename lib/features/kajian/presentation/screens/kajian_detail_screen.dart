@@ -219,35 +219,42 @@ class _InfoSection extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      LocaleKeys.day.tr(),
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      dayLabel,
-                      style: context.textTheme.bodyMedium,
-                    ),
-                    const VSpacer(height: 8),
-                    Text(
-                      LocaleKeys.time.tr(),
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '${kajian.timeStart} - ${kajian.timeEnd}',
-                      style: context.textTheme.bodyMedium,
-                    ),
-                  ],
+              if ((kajian.customSchedules.isEmpty) == true) ...[
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (dayLabel.isNotEmpty) ...[
+                        Text(
+                          LocaleKeys.day.tr(),
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          dayLabel,
+                          style: context.textTheme.bodyMedium,
+                        ),
+                        const VSpacer(height: 8),
+                      ],
+                      if (kajian.timeStart.isNotEmpty == true ||
+                          kajian.timeEnd.isNotEmpty == true) ...[
+                        Text(
+                          LocaleKeys.time.tr(),
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '${kajian.timeStart} ${kajian.timeEnd.isNotEmpty ? '- ${kajian.timeEnd}' : ''}',
+                          style: context.textTheme.bodyMedium,
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-              ),
+              ],
               Expanded(
                 flex: 7,
                 child: GestureDetector(

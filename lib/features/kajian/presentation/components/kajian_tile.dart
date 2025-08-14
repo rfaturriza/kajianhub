@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/features/kajian/presentation/components/label_tag.dart';
 
@@ -34,7 +35,7 @@ class KajianTile extends StatelessWidget {
     final schedule = () {
       if (kajian.dailySchedules.isEmpty && kajian.customSchedules.isNotEmpty) {
         if (kajian.customSchedules.first.date != null) {
-          return DateFormat('dd MMMM yyyy', context.locale.toString())
+          return DateFormat('EEEE, dd MMMM yyyy', context.locale.toString())
               .format(kajian.customSchedules.first.date!.toLocal());
         }
         return emptyString;
@@ -135,22 +136,27 @@ class KajianTile extends StatelessWidget {
                           ),
                           const VSpacer(height: 2),
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                flex: 1,
-                                child: ScheduleIconText(
-                                  icon: Icons.date_range_outlined,
-                                  text: schedule,
+                              if (schedule.isNotEmpty) ...[
+                                Expanded(
+                                  flex: 1,
+                                  child: ScheduleIconText(
+                                    icon: Symbols.date_range_rounded,
+                                    text: schedule,
+                                  ),
                                 ),
-                              ),
-                              const HSpacer(width: 5),
-                              Expanded(
-                                flex: 1,
-                                child: ScheduleIconText(
-                                  icon: Icons.access_time,
-                                  text: time,
+                              ],
+                              if (time.isNotEmpty) ...[
+                                const HSpacer(width: 5),
+                                Expanded(
+                                  flex: 1,
+                                  child: ScheduleIconText(
+                                    icon: Icons.access_time,
+                                    text: time,
+                                  ),
                                 ),
-                              ),
+                              ]
                             ],
                           ),
                           const VSpacer(height: 2),

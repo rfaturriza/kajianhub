@@ -38,7 +38,7 @@ dependencies:
   adhan: ^2.0.0+1
   flutter_dotenv: ^5.1.0
   formz: ^0.8.0
-  in_app_purchase: ^3.2.0
+  in_app_purchase: ^3.2.3
   package_info_plus: ^8.2.0
   url_launcher: ^6.2.5
   firebase_core: ^3.8.1

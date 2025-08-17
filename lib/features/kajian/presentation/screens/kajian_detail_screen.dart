@@ -195,6 +195,8 @@ class _InfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ustadzName = kajian.ustadz.isNotEmpty ? kajian.ustadz.first.name : '';
+    final ustadzPictureUrl =
+        kajian.ustadz.isNotEmpty ? kajian.ustadz.first.pictureUrl : null;
     final dayLabel = kajian.dailySchedules.isNotEmpty
         ? kajian.dailySchedules.first.dayLabel
         : '';
@@ -203,17 +205,46 @@ class _InfoSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            kajian.title,
-            style: context.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            ustadzName,
-            style: context.textTheme.bodyLarge?.copyWith(
-              color: context.theme.colorScheme.onSurfaceVariant,
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (ustadzPictureUrl != null && ustadzPictureUrl.isNotEmpty) ...[
+                CircleAvatar(
+                  radius: 30,
+                  backgroundImage: CachedNetworkImageProvider(ustadzPictureUrl),
+                  onBackgroundImageError: (_, __) {},
+                  child: CachedNetworkImage(
+                    imageUrl: ustadzPictureUrl,
+                    imageBuilder: (context, imageProvider) => Container(),
+                    errorWidget: (context, url, error) => Icon(
+                      Symbols.person_rounded,
+                      color: context.theme.colorScheme.onSurfaceVariant,
+                      size: 30,
+                    ),
+                  ),
+                ),
+                const HSpacer(width: 12),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      kajian.title,
+                      style: context.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      ustadzName,
+                      style: context.textTheme.bodyLarge?.copyWith(
+                        color: context.theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const VSpacer(height: 12),
           Row(

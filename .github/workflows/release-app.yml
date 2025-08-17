@@ -17,7 +17,7 @@ on:
 jobs:
   build:
     name: Release ${{ inputs.platform }}
-    runs-on: ${{ inputs.platform == 'ios' && 'macos-15' || 'ubuntu-latest' }}
+    runs-on: ${{ inputs.platform == 'ios' && vars.MACOSVERSIONRUN || 'ubuntu-latest' }}
 
     steps:
       - name: Checkout code

@@ -10,6 +10,7 @@ import 'package:quranku/features/ustadz/domain/entities/ustadz_entity.codegen.da
 import 'package:quranku/generated/locale_keys.g.dart';
 
 import '../../../../core/components/error_screen.dart';
+import '../../../../core/components/fullscreen_image_dialog.dart';
 import '../../../kajian/presentation/components/kajian_tile.dart';
 import '../blocs/ustadz_detail/ustadz_detail_bloc.dart';
 
@@ -189,7 +190,10 @@ class _ImageSection extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (imageUrl.isNotEmpty) {
-          _showFullScreenImage(context);
+          context.showFullscreenImageDialog(
+            imageUrl: imageUrl,
+            overlayText: ustadz.name,
+          );
         }
       },
       child: Container(
@@ -256,99 +260,6 @@ class _ImageSection extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  void _showFullScreenImage(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierColor: context.theme.colorScheme.surface.withValues(alpha: 0.9),
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: EdgeInsets.zero,
-          child: Stack(
-            children: [
-              // Full screen image
-              Center(
-                child: InteractiveViewer(
-                  panEnabled: true,
-                  boundaryMargin: const EdgeInsets.all(20),
-                  minScale: 0.5,
-                  maxScale: 3.0,
-                  child: CachedNetworkImage(
-                    imageUrl: imageUrl,
-                    fit: BoxFit.contain,
-                    placeholder: (context, url) => Center(
-                      child: CircularProgressIndicator(
-                        color: context.theme.colorScheme.primary,
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => Center(
-                      child: Icon(
-                        Icons.error,
-                        color: context.theme.colorScheme.error,
-                        size: 64,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              // Close button
-              Positioned(
-                top: MediaQuery.of(context).padding.top + 10,
-                right: 20,
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: context.theme.colorScheme.surface
-                          .withValues(alpha: 0.8),
-                      border: Border.all(
-                        color: context.theme.colorScheme.outline
-                            .withValues(alpha: 0.3),
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Icon(
-                      Icons.close,
-                      color: context.theme.colorScheme.onSurface,
-                      size: 24,
-                    ),
-                  ),
-                ),
-              ),
-              // Ustadz name overlay
-              Positioned(
-                bottom: MediaQuery.of(context).padding.bottom + 20,
-                left: 20,
-                right: 20,
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: context.theme.colorScheme.surface
-                        .withValues(alpha: 0.9),
-                    border: Border.all(
-                      color: context.theme.colorScheme.outline
-                          .withValues(alpha: 0.2),
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    ustadz.name,
-                    style: context.textTheme.titleMedium?.copyWith(
-                      color: context.theme.colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }

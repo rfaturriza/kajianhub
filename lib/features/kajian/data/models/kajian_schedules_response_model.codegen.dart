@@ -1,10 +1,10 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:quranku/features/kajian/data/models/study_locations_response_model.codegen.dart';
-import 'package:quranku/features/ustadz/domain/entities/ustadz_entity.codegen.dart';
 
 import '../../../../core/utils/extension/string_ext.dart';
 import '../../domain/entities/kajian_schedule.codegen.dart';
 import '../../domain/entities/study_location_entity.dart';
+import 'ustadz_response_model.codegen.dart';
 
 part 'kajian_schedules_response_model.codegen.freezed.dart';
 part 'kajian_schedules_response_model.codegen.g.dart';
@@ -55,7 +55,7 @@ abstract class DataKajianScheduleModel with _$DataKajianScheduleModel {
     @JsonKey(name: 'jadwal_shalat') String? prayerSchedule,
     @JsonKey(name: 'location_id') String? locationId,
     DataStudyLocationModel? studyLocation,
-    List<UstadzModel>? ustadz,
+    List<DataUstadzModel>? ustadz,
     List<KajianThemeModel>? themes,
     List<DailyScheduleModel>? dailySchedules,
     List<HistoryKajianModel>? histories,
@@ -86,7 +86,7 @@ abstract class DataKajianScheduleModel with _$DataKajianScheduleModel {
       prayerSchedule: entity.prayerSchedule,
       locationId: entity.locationId,
       studyLocation: DataStudyLocationModel.fromEntity(entity.studyLocation),
-      ustadz: entity.ustadz.map((e) => UstadzModel.fromEntity(e)).toList(),
+      ustadz: entity.ustadz.map((e) => DataUstadzModel.fromEntity(e)).toList(),
       themes: entity.themes.map((e) => KajianThemeModel.fromEntity(e)).toList(),
       dailySchedules: entity.dailySchedules
           .map((e) => DailyScheduleModel.fromEntity(e))
@@ -111,13 +111,13 @@ abstract class DataKajianScheduleModel with _$DataKajianScheduleModel {
       typeLabel: typeLabel ?? emptyString,
       book: book ?? emptyString,
       timeStart: () {
-        if (timeStart == null) {
+        if (timeStart == null || timeStart!.isEmpty) {
           return emptyString;
         }
         return timeStart!.substring(0, 5);
       }(),
       timeEnd: () {
-        if (timeEnd == null) {
+        if (timeEnd == null || timeEnd!.isEmpty) {
           return emptyString;
         }
         return timeEnd!.substring(0, 5);
@@ -146,7 +146,7 @@ abstract class CustomScheduleModel with _$CustomScheduleModel {
     String? link,
     String? date,
     KajianThemeModel? theme,
-    List<UstadzModel>? ustadz,
+    List<DataUstadzModel>? ustadz,
     @JsonKey(name: 'time_start') String? timeStart,
     String? title,
     @JsonKey(name: 'created_at') String? createdAt,
@@ -166,9 +166,12 @@ abstract class CustomScheduleModel with _$CustomScheduleModel {
       book: entity.book,
       prayTime: entity.prayTime,
       link: entity.link,
-      ustadz: entity.ustadz?.map((e) => UstadzModel.fromEntity(e)).toList(),
+      ustadz: entity.ustadz?.map((e) => DataUstadzModel.fromEntity(e)).toList(),
       theme: KajianThemeModel.fromEntity(entity.theme),
       timeStart: () {
+        if (entity.timeStart == null || entity.timeStart!.isEmpty) {
+          return emptyString;
+        }
         return entity.timeStart?.substring(0, 5);
       }(),
       // FORMAT: 2025-07-15
@@ -190,7 +193,7 @@ abstract class CustomScheduleModel with _$CustomScheduleModel {
       ustadz: ustadz?.map((e) => e.toEntity()).toList(),
       theme: theme?.toEntity() ?? KajianTheme.empty(),
       timeStart: () {
-        if (timeStart == null) {
+        if (timeStart == null || timeStart!.isEmpty) {
           return emptyString;
         }
         return timeStart!.substring(0, 5);
@@ -315,57 +318,6 @@ abstract class CityModel with _$CityModel {
       id: id ?? 0,
       name: name ?? emptyString,
       provinceId: provinceId ?? emptyString,
-    );
-  }
-}
-
-@freezed
-abstract class UstadzModel with _$UstadzModel {
-  const factory UstadzModel({
-    int? id,
-    @JsonKey(name: 'ustadz_id') String? ustadzId,
-    String? name,
-    String? email,
-    @JsonKey(name: 'place_of_birth') String? placeOfBirth,
-    @JsonKey(name: 'date_of_birth') String? dateOfBirth,
-    @JsonKey(name: 'contact_person') String? contactPerson,
-  }) = _UstadzModel;
-
-  const UstadzModel._();
-
-  factory UstadzModel.fromJson(Map<String, dynamic> json) =>
-      _$UstadzModelFromJson(json);
-
-  factory UstadzModel.empty() => const UstadzModel(
-        id: 0,
-        ustadzId: emptyString,
-        name: emptyString,
-        email: emptyString,
-        placeOfBirth: emptyString,
-        dateOfBirth: emptyString,
-        contactPerson: emptyString,
-      );
-
-  factory UstadzModel.fromEntity(UstadzEntity entity) {
-    return UstadzModel(
-      id: entity.id,
-      ustadzId: entity.id.toString(),
-      name: entity.name,
-      email: entity.email,
-      placeOfBirth: entity.placeOfBirth,
-      dateOfBirth: entity.dateOfBirth,
-      contactPerson: entity.contactPerson,
-    );
-  }
-
-  UstadzEntity toEntity() {
-    return UstadzEntity(
-      id: id ?? 0,
-      name: name ?? emptyString,
-      email: email ?? emptyString,
-      placeOfBirth: placeOfBirth ?? emptyString,
-      dateOfBirth: dateOfBirth ?? emptyString,
-      contactPerson: contactPerson ?? emptyString,
     );
   }
 }

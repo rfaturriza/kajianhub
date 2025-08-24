@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +6,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/features/kajian/presentation/components/label_tag.dart';
 
+import '../../../../core/components/fullscreen_image_dialog.dart';
 import '../../../../core/components/spacer.dart';
 import '../../../../core/route/root_router.dart';
 import '../../../../core/utils/extension/string_ext.dart';
@@ -26,8 +28,10 @@ class KajianTile extends StatelessWidget {
     final imageUrl = kajian.studyLocation.pictureUrl ?? '';
     final prayerName = kajian.prayerSchedule;
     final title = kajian.title;
-    final ustadz =
+    final ustadzName =
         kajian.ustadz.isNotEmpty ? kajian.ustadz.first.name : emptyString;
+    final ustadzPictureUrl =
+        kajian.ustadz.isNotEmpty ? kajian.ustadz.first.pictureUrl : null;
     final time = kajian.timeEnd.isNotEmpty == true
         ? '${kajian.timeStart} - ${kajian.timeEnd}'
         : kajian.timeStart;
@@ -130,9 +134,46 @@ class KajianTile extends StatelessWidget {
                             ),
                           ),
                           const VSpacer(height: 2),
-                          Text(
-                            ustadz,
-                            style: context.textTheme.bodySmall,
+                          Row(
+                            children: [
+                              if (ustadzPictureUrl != null &&
+                                  ustadzPictureUrl.isNotEmpty) ...[
+                                GestureDetector(
+                                  onTap: () {
+                                    showFullscreenImage(
+                                      context,
+                                      imageUrl: ustadzPictureUrl,
+                                      overlayText: ustadzName,
+                                    );
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 10,
+                                    backgroundImage: CachedNetworkImageProvider(
+                                        ustadzPictureUrl),
+                                    onBackgroundImageError: (_, __) {},
+                                    child: CachedNetworkImage(
+                                      imageUrl: ustadzPictureUrl,
+                                      imageBuilder: (context, imageProvider) =>
+                                          Container(),
+                                      errorWidget: (context, url, error) =>
+                                          Icon(
+                                        Symbols.person_rounded,
+                                        color: context
+                                            .theme.colorScheme.onSurfaceVariant,
+                                        size: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const HSpacer(width: 6),
+                              ],
+                              Expanded(
+                                child: Text(
+                                  ustadzName,
+                                  style: context.textTheme.bodySmall,
+                                ),
+                              ),
+                            ],
                           ),
                           const VSpacer(height: 2),
                           Row(

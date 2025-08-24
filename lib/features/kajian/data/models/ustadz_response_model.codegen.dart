@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:quranku/core/utils/extension/string_ext.dart';
 import 'package:quranku/features/kajian/data/models/kajian_schedules_response_model.codegen.dart';
 import 'package:quranku/features/ustadz/domain/entities/ustadz_entity.codegen.dart';
 
@@ -31,6 +30,7 @@ abstract class UstadzResponseModel with _$UstadzResponseModel {
 abstract class DataUstadzModel with _$DataUstadzModel {
   const factory DataUstadzModel({
     int? id,
+    @JsonKey(name: 'ustadz_id') String? ustadzId,
     String? name,
     String? email,
     bool? isAdmin,
@@ -63,11 +63,28 @@ abstract class DataUstadzModel with _$DataUstadzModel {
   UstadzEntity toEntity() {
     return UstadzEntity(
       id: id ?? 0,
-      name: name ?? emptyString,
-      email: email ?? emptyString,
-      placeOfBirth: placeOfBirth ?? emptyString,
-      dateOfBirth: dateOfBirth ?? emptyString,
-      contactPerson: contactPerson ?? emptyString,
+      name: name ?? '',
+      email: email ?? '',
+      placeOfBirth: placeOfBirth,
+      dateOfBirth: dateOfBirth,
+      contactPerson: contactPerson,
+      pictureUrl: pictureUrl,
+      subscribersCount: subscribersCount,
+      kajianCount: kajianCount,
+    );
+  }
+
+  factory DataUstadzModel.fromEntity(UstadzEntity entity) {
+    return DataUstadzModel(
+      id: entity.id,
+      name: entity.name,
+      email: entity.email,
+      placeOfBirth: entity.placeOfBirth,
+      dateOfBirth: entity.dateOfBirth,
+      contactPerson: entity.contactPerson,
+      pictureUrl: entity.pictureUrl,
+      subscribersCount: entity.subscribersCount,
+      kajianCount: entity.kajianCount,
     );
   }
 }

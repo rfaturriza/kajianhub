@@ -2,7 +2,7 @@ name: quranku
 description: Aplikasi quran mobile
 publish_to: "none"
 
-version: 1.15.11+94
+version: 1.15.12+95
 
 environment:
   sdk: ">=3.3.4 <4.0.0"

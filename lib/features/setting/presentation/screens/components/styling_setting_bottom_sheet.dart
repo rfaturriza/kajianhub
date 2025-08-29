@@ -46,42 +46,16 @@ class StylingSettingBottomSheet extends StatelessWidget {
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (context) {
-                          return Dialog(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: ListTile.divideTiles(
-                                color: context.theme.dividerColor,
-                                context: context,
-                                tiles: LastReadReminderModes.values.map((mode) {
-                                  return ListTile(
-                                    tileColor:
-                                        state.lastReadReminderMode == mode
-                                            ? context.theme.primaryColor
-                                                .withValues(alpha: 0.1)
-                                            : null,
-                                    title: Text(
-                                      mode.toTitle(),
-                                      style: context.textTheme.bodyMedium
-                                          ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    subtitle: Text(mode.toDescription()),
-                                    onTap: () {
-                                      stylingBloc.add(
-                                        StylingSettingEvent.setLastReadReminder(
-                                          mode: mode,
-                                        ),
-                                      );
-                                      context.pop();
-                                    },
-                                  );
-                                }).toList(),
-                              ).toList(),
-                            ),
-                          );
-                        },
+                        builder: (context) => DialogLastReadReminderSelection(
+                          currentMode: state.lastReadReminderMode,
+                          onModeSelected: (mode) {
+                            stylingBloc.add(
+                              StylingSettingEvent.setLastReadReminder(
+                                mode: mode,
+                              ),
+                            );
+                          },
+                        ),
                       );
                     },
                     child: Container(
@@ -244,19 +218,48 @@ class StylingSettingBottomSheet extends StatelessWidget {
                 );
               },
             ),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-              title: Text(LocaleKeys.fontStyle.tr()),
-              subtitle: _DropdownArabicFonts(
-                onChangeArabicFontFamily: (fontFamily) {
-                  stylingBloc.add(
-                    StylingSettingEvent.setArabicFontFamily(
-                      fontFamily: fontFamily ?? FontConst.lpmqIsepMisbah,
+            BlocBuilder<StylingSettingBloc, StylingSettingState>(
+              buildWhen: (p, c) => p.fontFamilyArabic != c.fontFamilyArabic,
+              builder: (context, state) {
+                return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  dense: true,
+                  title: Text(LocaleKeys.fontStyle.tr()),
+                  subtitle: Text(LocaleKeys.fontStyleDescription.tr()),
+                  trailing: InkWell(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => DialogFontSelection(
+                          currentFont: state.fontFamilyArabic,
+                          onFontSelected: (font) {
+                            stylingBloc.add(
+                              StylingSettingEvent.setArabicFontFamily(
+                                fontFamily: font,
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: context.theme.primaryColor,
+                        ),
+                      ),
+                      child: Text(
+                        state.fontFamilyArabic,
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -265,47 +268,119 @@ class StylingSettingBottomSheet extends StatelessWidget {
   }
 }
 
-class _DropdownArabicFonts extends StatelessWidget {
-  final Function(String?) onChangeArabicFontFamily;
+class DialogLastReadReminderSelection extends StatelessWidget {
+  final LastReadReminderModes currentMode;
+  final Function(LastReadReminderModes) onModeSelected;
 
-  const _DropdownArabicFonts({required this.onChangeArabicFontFamily});
+  const DialogLastReadReminderSelection({
+    super.key,
+    required this.currentMode,
+    required this.onModeSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<StylingSettingBloc, StylingSettingState>(
-      buildWhen: (p, c) => p.fontFamilyArabic != c.fontFamilyArabic,
-      builder: (context, state) {
-        return DropdownButton(
-          icon: const Icon(Icons.font_download_outlined),
-          padding: EdgeInsets.zero,
-          isExpanded: true,
-          underline: const SizedBox(),
-          menuMaxHeight: context.height * 0.3,
-          borderRadius: BorderRadius.circular(8),
-          items: FontConst.arabicFonts.map((font) {
-            return DropdownMenuItem(
-              value: font,
-              child: ListTile(
-                contentPadding: EdgeInsets.zero,
+    return Dialog(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              LocaleKeys.settingLastReading.tr(),
+              style: context.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          ...ListTile.divideTiles(
+            color: context.theme.dividerColor,
+            context: context,
+            tiles: LastReadReminderModes.values.map((mode) {
+              return ListTile(
+                tileColor: currentMode == mode
+                    ? context.theme.primaryColor.withValues(alpha: 0.1)
+                    : null,
                 title: Text(
-                  "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ",
-                  textAlign: TextAlign.end,
-                  style: context.textTheme.titleLarge?.copyWith(
-                    fontFamily: font,
+                  mode.toTitle(),
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                leading: Text(
-                  font,
-                  textAlign: TextAlign.end,
-                  style: context.textTheme.titleSmall,
-                ),
+                subtitle: Text(mode.toDescription()),
+                onTap: () {
+                  onModeSelected(mode);
+                  context.pop();
+                },
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DialogFontSelection extends StatelessWidget {
+  final String currentFont;
+  final Function(String) onFontSelected;
+
+  const DialogFontSelection({
+    super.key,
+    required this.currentFont,
+    required this.onFontSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              LocaleKeys.fontStyle.tr(),
+              style: context.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
               ),
-            );
-          }).toList(),
-          onChanged: onChangeArabicFontFamily,
-          value: state.fontFamilyArabic,
-        );
-      },
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              shrinkWrap: true,
+              children: ListTile.divideTiles(
+                color: context.theme.dividerColor,
+                context: context,
+                tiles: FontConst.arabicFonts.map((font) {
+                  return ListTile(
+                    tileColor: currentFont == font
+                        ? context.theme.primaryColor.withValues(alpha: 0.1)
+                        : null,
+                    title: Text(
+                      font,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Text(
+                      "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ",
+                      textAlign: TextAlign.end,
+                      style: context.textTheme.titleMedium?.copyWith(
+                        fontFamily: font,
+                      ),
+                    ),
+                    onTap: () {
+                      onFontSelected(font);
+                      context.pop();
+                    },
+                  );
+                }).toList(),
+              ).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

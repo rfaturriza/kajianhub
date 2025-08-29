@@ -81,6 +81,7 @@
   "language": "Language",
   "fontSize": "Font Size",
   "fontStyle": "Font Style",
+  "fontStyleDescription": "Choose Arabic font family",
   "privacyPolicy": "Privacy Policy",
   "aboutApp": "About App",
   "detailPage": "Detail Page",

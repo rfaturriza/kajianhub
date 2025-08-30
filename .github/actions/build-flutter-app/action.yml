@@ -44,8 +44,8 @@ runs:
           echo "🤖 Building Android: $TARGET"
           
           # Set environment variables for Android build
-          export GRADLE_OPTS="-Xmx4096m -XX:MaxPermSize=512m"
-          export JAVA_OPTS="-Xmx4096m"
+          export GRADLE_OPTS="-Xmx6144m -XX:MaxMetaspaceSize=1024m"
+          export JAVA_OPTS="-Xmx6144m"
           
           # First attempt: Normal build
           if flutter build $TARGET; then

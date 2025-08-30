@@ -34,45 +34,53 @@ runs:
       shell: bash
       run: |
         echo "🤖 Configuring Android build environment for better memory management..."
-        
+
         # Create gradle.properties with memory optimizations
         mkdir -p ~/.gradle
         cat > ~/.gradle/gradle.properties << EOF
         # Gradle build optimization
-        org.gradle.jvmargs=-Xmx4096m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
-        org.gradle.parallel=true
+        org.gradle.jvmargs=-Xmx6144m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
+        org.gradle.parallel=false
         org.gradle.caching=true
-        org.gradle.configureondemand=true
-        
+        org.gradle.configureondemand=false
+
         # Android build optimization
         android.useAndroidX=true
         android.enableJetifier=true
         android.enableR8.fullMode=true
-        android.defaults.buildfeatures.buildconfig=false
+        android.defaults.buildfeatures.buildconfig=true
         android.defaults.buildfeatures.aidl=false
         android.defaults.buildfeatures.renderscript=false
-        android.defaults.buildfeatures.resvalues=false
+        android.defaults.buildfeatures.resvalues=true
         android.defaults.buildfeatures.shaders=false
-        
-        # Kotlin optimization
+
+        # Kotlin optimization - reduced memory usage
         kotlin.incremental=true
-        kotlin.compiler.execution.strategy=in-process
-        
+        kotlin.compiler.execution.strategy=out-of-process
+        kotlin.daemon.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m
+
         # Disable unnecessary Gradle features
         org.gradle.welcome=never
         EOF
-        
+
         # Also create project-level gradle.properties for this build
         if [ -d "android" ]; then
           cat > android/gradle.properties << EOF
-        org.gradle.jvmargs=-Xmx4096m -XX:MaxPermSize=512m
+        org.gradle.jvmargs=-Xmx6144m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
         android.useAndroidX=true
         android.enableJetifier=true
         android.enableR8.fullMode=true
+        android.defaults.buildfeatures.buildconfig=true
+        android.defaults.buildfeatures.resvalues=true
+        android.defaults.buildfeatures.aidl=false
+        android.defaults.buildfeatures.renderscript=false
+        android.defaults.buildfeatures.shaders=false
         kotlin.incremental=true
+        kotlin.compiler.execution.strategy=out-of-process
+        kotlin.daemon.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m
         EOF
         fi
-        
+
         echo "✅ Android build environment configured"
 
     - name: Read Flutter Version
@@ -153,10 +161,10 @@ runs:
       shell: bash
       run: |
         echo "🧹 Preparing Android build environment..."
-        
+
         # Clean any existing build artifacts
         flutter clean
-        
+
         # Clean Gradle cache if it exists
         if [ -d "android" ]; then
           cd android
@@ -166,10 +174,10 @@ runs:
           fi
           cd ..
         fi
-        
+
         # Regenerate dependencies
         flutter pub get
-        
+
         echo "✅ Android build preparation complete"
 
     - name: Install iOS CocoaPods dependencies

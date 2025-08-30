@@ -27,11 +27,11 @@ extension ContextExt on BuildContext {
   bool get isPortrait =>
       MediaQuery.of(this).orientation == Orientation.portrait;
 
-  dismissKeyboard() {
+  void dismissKeyboard() {
     FocusScope.of(this).requestFocus(FocusNode());
   }
 
-  showErrorToast(String message) {
+  ToastFuture showErrorToast(String message) {
     return showToast(
       message,
       context: this,
@@ -42,7 +42,7 @@ extension ContextExt on BuildContext {
     );
   }
 
-  showInfoToast(String message) {
+  ToastFuture showInfoToast(String message) {
     return showToast(
       message,
       context: this,
@@ -53,7 +53,7 @@ extension ContextExt on BuildContext {
     );
   }
 
-  showLoadingDialog() {
+  void showLoadingDialog() {
     showDialog(
       context: this,
       barrierDismissible: false,

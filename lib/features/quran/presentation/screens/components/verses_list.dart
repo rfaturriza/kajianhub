@@ -83,7 +83,7 @@ class _VersesListState extends State<VersesList> {
     WidgetsBinding.instance.addPostFrameCallback(_scrollTo);
   }
 
-  void _scrollTo(_) async {
+  void _scrollTo(Duration duration) {
     if (widget.toVerses != null) {
       final toVerse = () {
         if (widget.preBismillah?.isNotEmpty == true) {

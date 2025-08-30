@@ -54,7 +54,7 @@ class _SholatNotificationBottomSheetState
     super.initState();
   }
 
-  init() {
+  void init() {
     _selectedReminderTime = widget.prayerAlarm?.reminderTime ?? 0;
     _selectedNotificationType = widget.prayerAlarm?.alarmType ?? 2;
     _reminderEnabled = widget.prayerAlarm?.reminderEnabled ?? false;
@@ -113,38 +113,45 @@ class _SholatNotificationBottomSheetState
               ),
               SizedBox(height: 20),
               // Notification Type Options
-              ...List.generate(
-                _notificationOptions.length,
-                (index) {
-                  final option = _notificationOptions[index];
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: Icon(
-                      option['icon'],
-                      color: context.theme.colorScheme.onSurface,
-                    ),
-                    title: Text(
-                      option['label'],
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: context.theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        _selectedNotificationType = index;
-                      });
-                    },
-                    trailing: Radio<int>(
-                      value: index,
-                      groupValue: _selectedNotificationType,
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedNotificationType = value!;
-                        });
-                      },
-                    ),
-                  );
+              RadioGroup<int>(
+                groupValue: _selectedNotificationType,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _selectedNotificationType = value;
+                    });
+                  }
                 },
+                child: Column(
+                  children: List.generate(
+                    _notificationOptions.length,
+                    (index) {
+                      final option = _notificationOptions[index];
+                      return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(
+                          option['icon'],
+                          color: context.theme.colorScheme.onSurface,
+                        ),
+                        title: Text(
+                          option['label'],
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            color: context.theme.colorScheme.onSurface,
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _selectedNotificationType = index;
+                          });
+                        },
+                        trailing: Radio<int>(
+                          activeColor: context.theme.colorScheme.primary,
+                          value: index,
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
 
               SizedBox(height: 10),

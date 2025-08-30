@@ -40,10 +40,10 @@ class RemoteConfigService {
     }
   }
 
-  get webViewDonationUrl => _remoteConfig.getString('webview_donation_url');
-  get imageRandomUrl => _remoteConfig.getString('image_random_url');
-  get saweriaUrl => _remoteConfig.getString('saweria_url');
-  get githubUrl => _remoteConfig.getString('github_url');
+  String get webViewDonationUrl => _remoteConfig.getString('webview_donation_url');
+  String get imageRandomUrl => _remoteConfig.getString('image_random_url');
+  String get saweriaUrl => _remoteConfig.getString('saweria_url');
+  String get githubUrl => _remoteConfig.getString('github_url');
   MenusConfig get menuConfigs {
     final rawJson = _remoteConfig.getString('menu_config');
     if (rawJson.isEmpty) {

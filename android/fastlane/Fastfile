@@ -99,8 +99,9 @@ def distribute_to_firebase(groups, release_notes = nil)
   )
 end
 
-def release_lane(update_type: nil, target:, firebase_groups: nil)
-  update_flutter_version(update_type) if update_type
+def release_lane(target:, firebase_groups: nil)
+  # Note: Version bumping is now handled by GitHub Actions, not Fastlane
+  # This ensures consistency and prevents double-bumping
   
   case target
   when "firebase_distribution"
@@ -108,6 +109,22 @@ def release_lane(update_type: nil, target:, firebase_groups: nil)
     build_flutter_app("apk")
     release_notes = generate_release_notes
     distribute_to_firebase(firebase_groups, release_notes)
+  when "internal_with_firebase"
+    # Build and upload to both Google Play Internal Track AND Firebase Distribution
+    UI.message("🚀 Building for internal testing with Firebase distribution...")
+    
+    # First build and upload to Google Play Internal Track
+    build_flutter_app
+    sleep(5) # helps avoid upload rejection due to build mismatch
+    upload_app('internal')
+    UI.success("✅ Uploaded to Google Play Internal Track")
+    
+    # Then build APK and distribute to Firebase
+    ENV['APK_BUILD_MODE'] = 'debug'
+    build_flutter_app("apk")
+    release_notes = generate_release_notes
+    distribute_to_firebase(firebase_groups, release_notes)
+    UI.success("✅ Distributed to Firebase App Distribution")
   else
     build_flutter_app
     sleep(5) # helps avoid upload rejection due to build mismatch
@@ -132,34 +149,34 @@ def release_lane(update_type: nil, target:, firebase_groups: nil)
 end
 
 platform :android do
-  desc "Submit patch update for INTERNAL TESTING build to Google Play"
+  desc "Submit INTERNAL TESTING build to Google Play + Firebase Distribution (build number bump only)"
   lane :internal_patch do
-    release_lane(update_type: "patch", target: "internal")
+    release_lane(target: "internal_with_firebase", firebase_groups: "testers")
   end
 
-  desc "Submit minor update for INTERNAL TESTING build to Google Play"
+  desc "Submit INTERNAL TESTING build to Google Play + Firebase Distribution (build number bump only)"
   lane :internal_minor do
-    release_lane(update_type: "minor", target: "internal")
+    release_lane(target: "internal_with_firebase", firebase_groups: "testers")
   end
   
-  desc "Submit major update for INTERNAL TESTING build to Google Play"
+  desc "Submit INTERNAL TESTING build to Google Play + Firebase Distribution (build number bump only)"
   lane :internal_major do
-    release_lane(update_type: "major", target: "internal")
+    release_lane(target: "internal_with_firebase", firebase_groups: "testers")
   end
 
   desc "Submit patch update for PRODUCTION build to Google Play"
   lane :production_patch do
-    release_lane(update_type: "patch", target: "production")
+    release_lane(target: "production")
   end
 
   desc "Submit minor update for PRODUCTION build to Google Play"
   lane :production_minor do
-    release_lane(update_type: "minor", target: "production")
+    release_lane(target: "production")
   end
 
   desc "Submit major update for PRODUCTION build to Google Play"
   lane :production_major do
-    release_lane(update_type: "major", target: "production")
+    release_lane(target: "production")
   end
 
   desc "Promote INTERNAL track to BETA"
@@ -177,22 +194,28 @@ platform :android do
     release_lane(target: "promote_beta_to_production")
   end
 
-  # Firebase Distribution lanes
-  desc "Submit patch update to Firebase App Distribution"
+  # Firebase Distribution only lanes (build number bump only)
+  desc "Submit build to Firebase App Distribution only (build number bump only)"
   lane :firebase_dist_patch do |options|
     groups = options[:groups] || "testers"
-    release_lane(update_type: "patch", target: "firebase_distribution", firebase_groups: groups)
+    release_lane(target: "firebase_distribution", firebase_groups: groups)
   end
 
-  desc "Submit minor update to Firebase App Distribution"
+  desc "Submit build to Firebase App Distribution only (build number bump only)"
   lane :firebase_dist_minor do |options|
     groups = options[:groups] || "testers"
-    release_lane(update_type: "minor", target: "firebase_distribution", firebase_groups: groups)
+    release_lane(target: "firebase_distribution", firebase_groups: groups)
   end
 
-  desc "Submit major update to Firebase App Distribution"
+  desc "Submit build to Firebase App Distribution only (build number bump only)"
   lane :firebase_dist_major do |options|
     groups = options[:groups] || "testers"
-    release_lane(update_type: "major", target: "firebase_distribution", firebase_groups: groups)
+    release_lane(target: "firebase_distribution", firebase_groups: groups)
+  end
+
+  # Internal Google Play only (without Firebase) - for special cases
+  desc "Submit build to Google Play Internal Track only (no Firebase)"
+  lane :internal_only do
+    release_lane(target: "internal")
   end
 end

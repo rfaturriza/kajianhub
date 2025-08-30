@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # Allow manual triggering
 
 permissions:
   contents: write
@@ -18,7 +19,24 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check if this is a production release
+        id: check_production
+        run: |
+          # Check recent commits for production release indicators
+          recent_commits=$(git log --oneline -n 5)
+          echo "Recent commits:"
+          echo "$recent_commits"
+
+          if echo "$recent_commits" | grep -q "production_"; then
+            echo "is_production=true" >> $GITHUB_OUTPUT
+            echo "🚀 Production release detected in recent commits"
+          else
+            echo "is_production=false" >> $GITHUB_OUTPUT
+            echo "🔧 No production release detected - skipping auto-tag"
+          fi
+
       - name: Extract version from pubspec.yaml
+        if: steps.check_production.outputs.is_production == 'true'
         id: get_version
         run: |
           # Extract version from pubspec.yaml (format: x.y.z+build)
@@ -35,6 +53,7 @@ jobs:
           echo "Full version: $FULL_VERSION"
 
       - name: Check if tag already exists
+        if: steps.check_production.outputs.is_production == 'true'
         id: check_tag
         run: |
           if git tag -l | grep -q "^v${{ steps.get_version.outputs.version }}$"; then
@@ -46,7 +65,7 @@ jobs:
           fi
 
       - name: Create and push tag
-        if: steps.check_tag.outputs.exists == 'false'
+        if: steps.check_production.outputs.is_production == 'true' && steps.check_tag.outputs.exists == 'false'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -60,7 +79,7 @@ jobs:
           echo "✅ Created and pushed tag: v${{ steps.get_version.outputs.version }}"
 
       - name: Create GitHub Release
-        if: steps.check_tag.outputs.exists == 'false'
+        if: steps.check_production.outputs.is_production == 'true' && steps.check_tag.outputs.exists == 'false'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -68,22 +87,29 @@ jobs:
           tag_name: v${{ steps.get_version.outputs.version }}
           release_name: Release v${{ steps.get_version.outputs.version }}
           body: |
-            🚀 **QuranKu v${{ steps.get_version.outputs.version }}**
+            🚀 **KajianHub v${{ steps.get_version.outputs.version }}**
 
             **Build Number:** ${{ steps.get_version.outputs.build_number }}
             **Full Version:** ${{ steps.get_version.outputs.full_version }}
 
-            This release was automatically created from the main branch.
+            This production release was automatically created from the main branch.
 
             ### What's Changed
-            - Auto-generated release from main branch merge
+            - Production release with semantic version bump
+            - Available on Google Play Store and Apple App Store
 
             **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ steps.get_version.outputs.version }}...v${{ steps.get_version.outputs.version }}
           draft: false
           prerelease: false
 
+      - name: Skip non-production release
+        if: steps.check_production.outputs.is_production == 'false'
+        run: |
+          echo "⏭️ Skipping auto-tag creation for non-production release"
+          echo "Auto-tags are only created for production releases (production_patch, production_minor, production_major)"
+
       - name: Tag already exists
-        if: steps.check_tag.outputs.exists == 'true'
+        if: steps.check_production.outputs.is_production == 'true' && steps.check_tag.outputs.exists == 'true'
         run: |
           echo "⚠️ Tag v${{ steps.get_version.outputs.version }} already exists. Skipping tag creation."
           echo "If you want to create a new tag, please bump the version in pubspec.yaml first."

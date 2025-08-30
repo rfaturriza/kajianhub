@@ -208,19 +208,6 @@ platform :ios do
      )
    end
 
-  private_lane :build_ios_debug do
-     build_ios_app(
-       workspace: "Runner.xcworkspace",
-       scheme: "Runner",
-       output_directory: "./fastlane/build",
-       output_name: "app-debug.ipa",
-       configuration: "Debug",
-       silent: true,
-       clean: true,
-       export_method: "development"
-     )
-   end
-
    private_lane :upload_internal do
      upload_to_testflight(
       ipa: "./fastlane/build/app.ipa",
@@ -241,30 +228,7 @@ platform :ios do
     )
   end
 
-  private_lane :distribute_to_firebase_ios do |options|
-    groups = options[:groups] || "testers"
-    release_notes = options[:release_notes] || generate_release_notes_with_gemini["en-US"]
-    use_debug_build = options[:use_debug_build] || false
-    
-    # Check if Firebase is configured for iOS
-    if ENV['FIREBASE_IOS_APP_ID'].nil? || ENV['FIREBASE_IOS_APP_ID'].empty?
-      UI.important("Firebase iOS App ID not configured. Skipping Firebase distribution.")
-      return
-    end
-    
-    # Determine which IPA to use
-    ipa_path = use_debug_build ? "./fastlane/build/app-debug.ipa" : "./fastlane/build/app.ipa"
-    
-    firebase_app_distribution(
-      app: ENV['FIREBASE_IOS_APP_ID'],
-      groups: groups,
-      release_notes: release_notes,
-      ipa_path: ipa_path,
-      firebase_cli_token: ENV['FIREBASE_CLI_TOKEN']
-    )
-  end
-
-  def release_lane(target:, firebase_groups: nil)
+  def release_lane(target:)
     # Note: Version bumping is now handled by GitHub Actions, not Fastlane
     # This ensures consistency and prevents double-bumping
 
@@ -272,26 +236,6 @@ platform :ios do
     when :internal
       build_ios
       upload_internal
-    when :internal_with_firebase
-      # Upload to both TestFlight AND Firebase Distribution
-      UI.message("🚀 Building for internal testing with Firebase distribution...")
-      
-      # First build release version and upload to TestFlight
-      build_ios
-      upload_internal
-      UI.success("✅ Uploaded to TestFlight")
-      
-      # Then build debug version and distribute to Firebase (like Android)
-      UI.message("🔧 Building debug version for Firebase distribution...")
-      build_ios_debug
-      distribute_to_firebase_ios(groups: firebase_groups, use_debug_build: true)
-      UI.success("✅ Distributed debug build to Firebase App Distribution")
-    when :firebase_only
-      # Firebase distribution only with debug build (useful for quick testing)
-      UI.message("🔧 Building debug version for Firebase distribution only...")
-      build_ios_debug
-      distribute_to_firebase_ios(groups: firebase_groups, use_debug_build: true)
-      UI.success("✅ Distributed debug build to Firebase App Distribution only")
     when :production
       build_ios
       upload_production
@@ -300,20 +244,20 @@ platform :ios do
     end
   end
 
-  desc "Internal release to TestFlight + Firebase Distribution (build number bump only)"
+  desc "Internal release to TestFlight (build number bump only)"
   lane :internal_patch do
-    release_lane(target: :internal_with_firebase, firebase_groups: "testers")
+    release_lane(target: :internal)
   end
 
-  desc "Internal release to TestFlight + Firebase Distribution (build number bump only)"
+  desc "Internal release to TestFlight (build number bump only)"
   lane :internal_minor do
-    release_lane(target: :internal_with_firebase, firebase_groups: "testers")
+    release_lane(target: :internal)
   end
   
 
-  desc "Internal release to TestFlight + Firebase Distribution (build number bump only)"
+  desc "Internal release to TestFlight (build number bump only)"
   lane :internal_major do
-    release_lane(target: :internal_with_firebase, firebase_groups: "testers")
+    release_lane(target: :internal)
   end
 
   desc "Production release - patch"
@@ -332,14 +276,8 @@ platform :ios do
   end
 
   # Additional utility lanes
-  desc "Internal release to TestFlight only (no Firebase)"
+  desc "Internal release to TestFlight only"
   lane :internal_testflight_only do
     release_lane(target: :internal)
-  end
-
-  desc "Firebase Distribution only (no TestFlight)"
-  lane :firebase_only do |options|
-    groups = options[:groups] || "testers"
-    release_lane(target: :firebase_only, firebase_groups: groups)
   end
 end

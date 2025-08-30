@@ -1,0 +1,122 @@
+name: "Setup Flutter Environment"
+description: "Reusable action to set up Flutter, dependencies, and Firebase configuration"
+
+inputs:
+  platform:
+    description: "Platform to build for (android/ios)"
+    required: false
+    default: "both"
+  setup-android:
+    description: "Whether to set up Android environment"
+    required: false
+    default: "false"
+  setup-ios:
+    description: "Whether to set up iOS environment"
+    required: false
+    default: "false"
+  install-ruby:
+    description: "Whether to install Ruby and bundler for Fastlane"
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Java for Android
+      if: inputs.setup-android == 'true'
+      uses: actions/setup-java@v3
+      with:
+        java-version: "17"
+        distribution: "temurin"
+
+    - name: Read Flutter Version
+      id: read_version
+      uses: juliangruber/read-file-action@v1
+      with:
+        path: ./.fvm/fvm_config.json
+        trim: true
+
+    - name: Validate and Setup Flutter Version
+      id: setup_flutter
+      shell: bash
+      run: |
+        FLUTTER_VERSION="${{fromJson(steps.read_version.outputs.content).flutterSdkVersion}}"
+        echo "Requested Flutter version: $FLUTTER_VERSION"
+
+        # Validate version format (should be x.y.z)
+        if [[ ! $FLUTTER_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "⚠️ Invalid Flutter version format: $FLUTTER_VERSION"
+          echo "Using fallback version: latest"
+          FLUTTER_VERSION="latest"
+        fi
+
+        echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ steps.setup_flutter.outputs.flutter_version }}
+        channel: "stable"
+        cache: true
+
+    - name: Configure Firebase and Environment
+      shell: bash
+      run: |
+        echo "$FIREBASE_OPTIONS" | base64 --decode > lib/firebase_options.dart
+        echo "$FIREBASE_OPTIONS_DEBUG" | base64 --decode > lib/firebase_options_debug.dart
+        echo "$FIREBASE_ANDROID_JSON" | base64 --decode > android/app/google-services.json
+        echo "$FIREBASE_IOS_PLIST" | base64 --decode > ios/Runner/GoogleService-Info.plist
+        mkdir -p ios/Runner/Firebase/Debug
+        mkdir -p ios/Runner/Firebase/Release
+        echo "$FIREBASE_IOS_PLIST" | base64 --decode > ios/Runner/Firebase/Debug/GoogleService-Info.plist
+        echo "$FIREBASE_IOS_PLIST" | base64 --decode > ios/Runner/Firebase/Release/GoogleService-Info.plist
+        echo "$ENV_FILE" | base64 --decode > .env
+      env:
+        FIREBASE_OPTIONS: ${{ env.FIREBASE_OPTIONS }}
+        FIREBASE_OPTIONS_DEBUG: ${{ env.FIREBASE_OPTIONS_DEBUG }}
+        FIREBASE_ANDROID_JSON: ${{ env.FIREBASE_ANDROID_JSON }}
+        FIREBASE_IOS_PLIST: ${{ env.FIREBASE_IOS_PLIST }}
+        ENV_FILE: ${{ env.ENV_FILE }}
+
+    - name: Setup iOS environment
+      if: inputs.setup-ios == 'true'
+      shell: bash
+      run: |
+        # Check available iOS SDKs and select one that exists
+        echo "🔍 Checking available iOS SDKs..."
+        xcodebuild -showsdks | grep iphoneos || echo "No iOS SDKs found"
+
+        # Check Xcode version
+        echo "📱 Xcode version:"
+        xcodebuild -version || echo "Xcode not found"
+
+        # Set up iOS build environment
+        echo "⚙️ Setting up iOS build environment..."
+        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+    - name: Install Flutter Dependencies
+      shell: bash
+      run: |
+        flutter pub get
+        dart run build_runner build --delete-conflicting-outputs
+        dart run easy_localization:generate -f keys -o locale_keys.g.dart --source-dir assets/translations
+        dart pub global activate flutterfire_cli
+
+    - name: Install iOS CocoaPods dependencies
+      if: inputs.setup-ios == 'true'
+      shell: bash
+      run: |
+        rm -rf build/
+        rm -rf ios/Pods/ ios/Podfile.lock
+        flutter clean
+        flutter pub get
+        cd ios
+        pod install --repo-update
+
+    - name: Setup Ruby & Bundle for Fastlane
+      if: inputs.install-ruby == 'true'
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.2.2"
+        bundler-cache: true
+        working-directory: ${{ inputs.platform }}

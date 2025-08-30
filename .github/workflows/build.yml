@@ -2,9 +2,9 @@ name: Build and Test
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   build:
@@ -15,61 +15,35 @@ jobs:
         target: [ios --no-codesign, apk --debug]
         include:
           - target: ios --no-codesign
-            os: ${{ vars.MACOSVERSIONRUN }}
+            os: ${{ vars.MACOSVERSIONRUN || 'macos-latest' }}
+            platform: ios
           - target: apk --debug
             os: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Java
-        if: matrix.target != 'ios --no-codesign'
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+            platform: android
 
-      - name: Read Flutter Version
-        id: read_version
-        uses: juliangruber/read-file-action@v1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter Environment
+        uses: ./.github/actions/setup-flutter-environment
         with:
-          path: ./.fvm/fvm_config.json
-          trim: true
-          
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{fromJson(steps. read_version.outputs.content).flutterSdkVersion}}
-          channel: 'stable'
-          cache: true
-          
-      - name: Configure Firebase and Environment
-        run: |
-          echo "$FIREBASE_OPTIONS" | base64 --decode > lib/firebase_options.dart
-          echo "$FIREBASE_OPTIONS_DEBUG" | base64 --decode > lib/firebase_options_debug.dart
-          echo "$FIREBASE_ANDROID_JSON" | base64 --decode > android/app/google-services.json
-          echo "$FIREBASE_IOS_PLIST" | base64 --decode > ios/Runner/GoogleService-Info.plist
-          mkdir -p ios/Runner/Firebase/Debug
-          mkdir -p ios/Runner/Firebase/Release
-          echo "$FIREBASE_IOS_PLIST" | base64 --decode > ios/Runner/Firebase/Debug/GoogleService-Info.plist
-          echo "$FIREBASE_IOS_PLIST" | base64 --decode > ios/Runner/Firebase/Release/GoogleService-Info.plist
-          echo "$ENV_FILE" | base64 --decode > .env
+          platform: ${{ matrix.platform }}
+          setup-android: ${{ matrix.platform == 'android' }}
+          setup-ios: ${{ matrix.platform == 'ios' }}
+          install-ruby: "false"
         env:
           FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTION_FILE }}
           FIREBASE_OPTIONS_DEBUG: ${{ secrets.FIREBASE_OPTION_FILE_DEBUG }}
           FIREBASE_ANDROID_JSON: ${{ secrets.GOOGLE_SERVICE_ANDROID_JSON_FILE }}
           FIREBASE_IOS_PLIST: ${{ secrets.GOOGLE_SERVICE_IOS_PLIST_FILE }}
           ENV_FILE: ${{ secrets.ENV_FILE }}
-          
-      - name: Install Dependencies
-        run: |
-          flutter pub get
-          dart run build_runner build --delete-conflicting-outputs
-          dart run easy_localization:generate -f keys -o locale_keys.g.dart --source-dir assets/translations
-          dart pub global activate flutterfire_cli
-      
+
       - name: Run Tests
         run: flutter test --no-pub --coverage
 
-      - name: Build ${{ matrix.target }}
-        run: flutter build ${{ matrix.target }}
+      - name: Build Flutter App
+        uses: ./.github/actions/build-flutter-app
+        with:
+          target: ${{ matrix.target }}
+          platform: ${{ matrix.platform }}

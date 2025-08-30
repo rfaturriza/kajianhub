@@ -25,24 +25,13 @@ jobs:
         with:
           fetch-depth: 0 # Fetch all history for release notes generation
 
-      - name: Set up JDK 17
-        if: ${{ inputs.platform == 'android' }}
-        uses: actions/setup-java@v3
+      - name: Setup Flutter Environment
+        uses: ./.github/actions/setup-flutter-environment
         with:
-          java-version: 17
-          distribution: "temurin"
-
-      - name: Configure Firebase & Env
-        run: |
-          echo "$FIREBASE_OPTIONS" | base64 --decode > lib/firebase_options.dart
-          echo "$FIREBASE_OPTIONS_DEBUG" | base64 --decode > lib/firebase_options_debug.dart
-          echo "$FIREBASE_ANDROID_JSON" | base64 --decode > android/app/google-services.json
-          echo "$FIREBASE_IOS_PLIST" | base64 --decode > ios/Runner/GoogleService-Info.plist
-          mkdir -p ios/Runner/Firebase/Release
-          mkdir -p ios/Runner/Firebase/Debug
-          echo "$FIREBASE_IOS_PLIST" | base64 --decode > ios/Runner/Firebase/Debug/GoogleService-Info.plist
-          echo "$FIREBASE_IOS_PLIST" | base64 --decode > ios/Runner/Firebase/Release/GoogleService-Info.plist
-          echo "$ENV_FILE" | base64 --decode > .env
+          platform: ${{ inputs.platform }}
+          setup-android: ${{ inputs.platform == 'android' }}
+          setup-ios: ${{ inputs.platform == 'ios' }}
+          install-ruby: "true"
         env:
           FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTION_FILE }}
           FIREBASE_OPTIONS_DEBUG: ${{ secrets.FIREBASE_OPTION_FILE_DEBUG }}
@@ -50,32 +39,7 @@ jobs:
           FIREBASE_IOS_PLIST: ${{ secrets.GOOGLE_SERVICE_IOS_PLIST_FILE }}
           ENV_FILE: ${{ secrets.ENV_FILE }}
 
-      - name: Read Flutter version
-        id: read_fvm_config
-        uses: juliangruber/read-file-action@v1.1.6
-        with:
-          path: ./.fvm/fvm_config.json
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ fromJson(steps.read_fvm_config.outputs.content).flutterSdkVersion }}
-
-      - name: Install Dependencies
-        run: |
-          flutter pub get
-          flutter pub run build_runner build --delete-conflicting-outputs
-          flutter pub run easy_localization:generate -f keys -o locale_keys.g.dart --source-dir assets/translations
-          dart pub global activate flutterfire_cli
-
-      - name: Setup Ruby & Bundle
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.2.2"
-          bundler-cache: true
-          working-directory: ${{ inputs.platform }}
-
-      - name: Build & Release
+      - name: Execute Fastlane Lane
         run: |
           if [[ "${{ inputs.platform }}" == "android" ]]; then
             echo "$PLAY_STORE_UPLOAD_KEY" | base64 --decode > app/upload-keystore.jks
@@ -90,17 +54,7 @@ jobs:
               bundle exec fastlane ${{ inputs.lane }}
             fi
           else
-            # Clean build directory for iOS to force rebuild with new deployment target
-            cd ..
-            rm -rf build/
-            rm -rf ios/Pods/ ios/Podfile.lock
-            flutter clean
-            flutter pub get
-            cd ios
-            pod install --repo-update
-            cd ..
-            flutter build ipa --no-codesign
-            cd ios
+            flutter build ios --config-only --no-codesign
             bundle exec fastlane match appstore --readonly
             bundle exec fastlane ${{ inputs.lane }}
           fi

@@ -40,9 +40,44 @@ runs:
             exit 1
           fi
         elif [[ "$PLATFORM" == "android" ]]; then
-          # Android build
+          # Android build with memory management and retry logic
           echo "🤖 Building Android: $TARGET"
-          flutter build $TARGET
+          
+          # Set environment variables for Android build
+          export GRADLE_OPTS="-Xmx4096m -XX:MaxPermSize=512m"
+          export JAVA_OPTS="-Xmx4096m"
+          
+          # First attempt: Normal build
+          if flutter build $TARGET; then
+            echo "✅ Android build successful on first attempt"
+          else
+            echo "⚠️ First attempt failed, cleaning and retrying..."
+            
+            # Clean and retry
+            flutter clean
+            flutter pub get
+            
+            # Second attempt with more aggressive cleanup
+            if [ -d "android" ]; then
+              cd android
+              ./gradlew clean || echo "Gradle clean failed"
+              cd ..
+            fi
+            
+            # Retry build
+            if flutter build $TARGET; then
+              echo "✅ Android build successful on retry"
+            else
+              echo "❌ Android build failed after retry"
+              echo "🔍 Build diagnostics:"
+              flutter doctor -v || echo "Flutter doctor failed"
+              echo "🔍 Java version:"
+              java -version || echo "Java version check failed"
+              echo "🔍 Gradle version:"
+              cd android && ./gradlew --version 2>/dev/null || echo "Gradle version check failed"
+              exit 1
+            fi
+          fi
         else
           # Generic build
           echo "📱 Building: $TARGET"

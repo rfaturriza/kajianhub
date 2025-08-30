@@ -29,6 +29,52 @@ runs:
         java-version: "17"
         distribution: "temurin"
 
+    - name: Configure Android Build Environment
+      if: inputs.setup-android == 'true'
+      shell: bash
+      run: |
+        echo "🤖 Configuring Android build environment for better memory management..."
+        
+        # Create gradle.properties with memory optimizations
+        mkdir -p ~/.gradle
+        cat > ~/.gradle/gradle.properties << EOF
+        # Gradle build optimization
+        org.gradle.jvmargs=-Xmx4096m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
+        org.gradle.parallel=true
+        org.gradle.caching=true
+        org.gradle.configureondemand=true
+        
+        # Android build optimization
+        android.useAndroidX=true
+        android.enableJetifier=true
+        android.enableR8.fullMode=true
+        android.defaults.buildfeatures.buildconfig=false
+        android.defaults.buildfeatures.aidl=false
+        android.defaults.buildfeatures.renderscript=false
+        android.defaults.buildfeatures.resvalues=false
+        android.defaults.buildfeatures.shaders=false
+        
+        # Kotlin optimization
+        kotlin.incremental=true
+        kotlin.compiler.execution.strategy=in-process
+        
+        # Disable unnecessary Gradle features
+        org.gradle.welcome=never
+        EOF
+        
+        # Also create project-level gradle.properties for this build
+        if [ -d "android" ]; then
+          cat > android/gradle.properties << EOF
+        org.gradle.jvmargs=-Xmx4096m -XX:MaxPermSize=512m
+        android.useAndroidX=true
+        android.enableJetifier=true
+        android.enableR8.fullMode=true
+        kotlin.incremental=true
+        EOF
+        fi
+        
+        echo "✅ Android build environment configured"
+
     - name: Read Flutter Version
       id: read_version
       uses: juliangruber/read-file-action@v1
@@ -101,6 +147,30 @@ runs:
         dart run build_runner build --delete-conflicting-outputs
         dart run easy_localization:generate -f keys -o locale_keys.g.dart --source-dir assets/translations
         dart pub global activate flutterfire_cli
+
+    - name: Android Build Preparation
+      if: inputs.setup-android == 'true'
+      shell: bash
+      run: |
+        echo "🧹 Preparing Android build environment..."
+        
+        # Clean any existing build artifacts
+        flutter clean
+        
+        # Clean Gradle cache if it exists
+        if [ -d "android" ]; then
+          cd android
+          if [ -f "gradlew" ]; then
+            chmod +x gradlew
+            ./gradlew clean || echo "Gradle clean failed, continuing..."
+          fi
+          cd ..
+        fi
+        
+        # Regenerate dependencies
+        flutter pub get
+        
+        echo "✅ Android build preparation complete"
 
     - name: Install iOS CocoaPods dependencies
       if: inputs.setup-ios == 'true'

@@ -40,6 +40,11 @@ android {
         versionName flutter.versionName
     }
 
+    buildFeatures {
+        buildConfig true
+        resValues true  // Enable custom resource values feature
+    }
+
     signingConfigs {
         release {
             keyAlias keystoreProperties['keyAlias']

@@ -2,7 +2,7 @@ name: quranku
 description: Aplikasi quran mobile
 publish_to: "none"
 
-version: 1.15.6+89
+version: 1.15.14+97
 
 environment:
   sdk: ">=3.3.4 <4.0.0"
@@ -24,7 +24,7 @@ dependencies:
   lottie: ^3.1.0
   flutter_svg: ^2.0.10+1
   geolocator: ^13.0.2
-  geocoding: ^3.0.0
+  geocoding: ^4.0.0
   freezed_annotation: ^3.0.0
   json_annotation: ^4.8.1
   hive_ce: ^2.11.2
@@ -33,28 +33,28 @@ dependencies:
   oktoast: ^3.4.0
   scrollable_positioned_list: ^0.3.8
   flutter_qiblah: ^3.0.3
-  audioplayers: ^6.1.0
+  audioplayers: ^6.5.0
   share_plus: ^11.0.0
   adhan: ^2.0.0+1
-  flutter_dotenv: ^5.1.0
+  flutter_dotenv: ^6.0.0
   formz: ^0.8.0
   in_app_purchase: ^3.2.0
   package_info_plus: ^8.2.0
   url_launcher: ^6.2.5
-  firebase_core: ^3.8.1
+  firebase_core: ^4.0.0
   flutter_localized_locales: ^2.0.5
   google_mobile_ads: ^6.0.0
-  firebase_messaging: ^15.1.6
+  firebase_messaging: ^16.0.0
   flutter_local_notifications: ^19.2.0
-  firebase_analytics: ^11.3.6
+  firebase_analytics: ^12.0.0
   in_app_review: ^2.0.10
   timeago: ^3.6.1
   provider: ^6.1.2
   webview_flutter: ^4.7.0
-  firebase_remote_config: ^5.2.0
+  firebase_remote_config: ^6.0.0
   dynamic_color: ^1.7.0
   flutter_markdown: ^0.7.3+1
-  go_router: ^15.1.2
+  go_router: ^16.2.0
   go_provider: ^1.8.0
   shimmer: ^3.0.0
   jhijri: ^1.0.0
@@ -63,12 +63,12 @@ dependencies:
   material_symbols_icons: ^4.2815.0
   flutter_alice: ^2.0.1
   overlay_support: ^2.1.0
-  image_picker: ^0.8.6
+  image_picker: ^1.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   build_runner: ^2.4.8
   injectable_generator: ^2.4.1
   freezed: ^3.0.6
@@ -86,6 +86,7 @@ flutter:
     - assets/svg/
     - assets/images/
     - assets/gif/
+    - assets/sounds/
   fonts:
     - family: Lato
       fonts:

@@ -9,6 +9,7 @@ import 'package:quranku/features/kajian/domain/entities/kajian_schedule.codegen.
 import 'package:quranku/features/kajian/presentation/components/label_tag.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/components/fullscreen_image_dialog.dart';
 import '../../../../core/constants/asset_constants.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../components/custom_schedule_card.dart';
@@ -78,6 +79,7 @@ class _KajianDetailScreenState extends State<KajianDetailScreen> {
                 child: _ImageSection(
                   imageUrl: widget.kajian.studyLocation.pictureUrl ?? '',
                   label: kajianTheme,
+                  locationName: widget.kajian.studyLocation.name ?? '',
                 ),
               ),
               SliverToBoxAdapter(
@@ -144,10 +146,12 @@ class _KajianDetailScreenState extends State<KajianDetailScreen> {
 }
 
 class _ImageSection extends StatelessWidget {
+  final String locationName;
   final String imageUrl;
   final String label;
 
   const _ImageSection({
+    required this.locationName,
     required this.imageUrl,
     required this.label,
   });
@@ -157,30 +161,59 @@ class _ImageSection extends StatelessWidget {
     final imageUrl = this.imageUrl.isNotEmpty
         ? this.imageUrl
         : AssetConst.mosqueDummyImageUrl;
-    return Stack(
-      children: [
-        Container(
-          height: 240,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: CachedNetworkImageProvider(
-                imageUrl,
+    return GestureDetector(
+      onTap: () {
+        context.showFullscreenImageDialog(
+          imageUrl: imageUrl,
+          overlayText: locationName,
+        );
+      },
+      child: Stack(
+        children: [
+          Container(
+            height: 240,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: CachedNetworkImageProvider(
+                  imageUrl,
+                ),
+                fit: BoxFit.cover,
               ),
-              fit: BoxFit.cover,
             ),
           ),
-        ),
-        Positioned(
-          bottom: 12,
-          right: 12,
-          child: LabelTag(
-            title: label,
-            backgroundColor: context.theme.colorScheme.tertiary,
-            foregroundColor: context.theme.colorScheme.onTertiary,
+          // Fullscreen indicator
+          Positioned(
+            top: 12,
+            right: 12,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: context.theme.colorScheme.surface.withValues(alpha: 0.8),
+                border: Border.all(
+                  color:
+                      context.theme.colorScheme.outline.withValues(alpha: 0.3),
+                ),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Icon(
+                Icons.fullscreen,
+                color: context.theme.colorScheme.onSurface,
+                size: 16,
+              ),
+            ),
           ),
-        ),
-      ],
+          Positioned(
+            bottom: 12,
+            right: 12,
+            child: LabelTag(
+              title: label,
+              backgroundColor: context.theme.colorScheme.tertiary,
+              foregroundColor: context.theme.colorScheme.onTertiary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -195,6 +228,8 @@ class _InfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ustadzName = kajian.ustadz.isNotEmpty ? kajian.ustadz.first.name : '';
+    final ustadzPictureUrl =
+        kajian.ustadz.isNotEmpty ? kajian.ustadz.first.pictureUrl : null;
     final dayLabel = kajian.dailySchedules.isNotEmpty
         ? kajian.dailySchedules.first.dayLabel
         : '';
@@ -203,51 +238,122 @@ class _InfoSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            kajian.title,
-            style: context.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            ustadzName,
-            style: context.textTheme.bodyLarge?.copyWith(
-              color: context.theme.colorScheme.onSurfaceVariant,
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (ustadzPictureUrl != null && ustadzPictureUrl.isNotEmpty) ...[
+                GestureDetector(
+                  onTap: () {
+                    context.showFullscreenImageDialog(
+                      imageUrl: ustadzPictureUrl,
+                      overlayText: ustadzName,
+                    );
+                  },
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundImage:
+                            CachedNetworkImageProvider(ustadzPictureUrl),
+                        onBackgroundImageError: (_, __) {},
+                        child: CachedNetworkImage(
+                          imageUrl: ustadzPictureUrl,
+                          imageBuilder: (context, imageProvider) => Container(),
+                          errorWidget: (context, url, error) => Icon(
+                            Symbols.person_rounded,
+                            color: context.theme.colorScheme.onSurfaceVariant,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                      // Indicator that the image is clickable
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: context.theme.colorScheme.surface
+                                .withValues(alpha: 0.9),
+                            border: Border.all(
+                              color: context.theme.colorScheme.outline
+                                  .withValues(alpha: 0.3),
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.fullscreen,
+                            color: context.theme.colorScheme.onSurface,
+                            size: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const HSpacer(width: 12),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      kajian.title,
+                      style: context.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      ustadzName,
+                      style: context.textTheme.bodyLarge?.copyWith(
+                        color: context.theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const VSpacer(height: 12),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      LocaleKeys.day.tr(),
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      dayLabel,
-                      style: context.textTheme.bodyMedium,
-                    ),
-                    const VSpacer(height: 8),
-                    Text(
-                      LocaleKeys.time.tr(),
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '${kajian.timeStart} - ${kajian.timeEnd}',
-                      style: context.textTheme.bodyMedium,
-                    ),
-                  ],
+              if ((kajian.customSchedules.isEmpty) == true) ...[
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (dayLabel.isNotEmpty) ...[
+                        Text(
+                          LocaleKeys.day.tr(),
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          dayLabel,
+                          style: context.textTheme.bodyMedium,
+                        ),
+                        const VSpacer(height: 8),
+                      ],
+                      if (kajian.timeStart.isNotEmpty == true ||
+                          kajian.timeEnd.isNotEmpty == true) ...[
+                        Text(
+                          LocaleKeys.time.tr(),
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '${kajian.timeStart} ${kajian.timeEnd.isNotEmpty ? '- ${kajian.timeEnd}' : ''}',
+                          style: context.textTheme.bodyMedium,
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-              ),
+              ],
               Expanded(
                 flex: 7,
                 child: GestureDetector(

@@ -13,8 +13,42 @@ import '../../../domain/entities/surah.codegen.dart';
 import '../detail_surah_screen.dart';
 import 'list_tile_surah.dart';
 
-class SurahList extends StatelessWidget {
+class SurahList extends StatefulWidget {
   const SurahList({super.key});
+
+  @override
+  State<SurahList> createState() => _SurahListState();
+
+
+
+  static void onTapSurah(
+    BuildContext context,
+    Surah? surah, {
+    int? jumpToVerse,
+  }) {
+    context.pushNamed(
+      RootRouter.surahRoute.name,
+      queryParameters: {
+        'jump_to': jumpToVerse?.toString(),
+      },
+      extra: DetailSurahScreenExtra(surah: surah),
+    );
+  }
+}
+
+class _SurahListState extends State<SurahList> {
+  @override
+  void initState() {
+    super.initState();
+    // Trigger fetch only if we don't have data yet
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final surahBloc = context.read<SurahBloc>();
+      if (surahBloc.state is! SurahLoadedState &&
+          surahBloc.state is! SurahLoadingState) {
+        surahBloc.add(const SurahFetchEvent());
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +113,7 @@ class SurahList extends StatelessWidget {
 
                 final surahData = listSurah[index - 1];
                 return ListTileSurah(
-                  onTapSurah: () => onTapSurah(context, surahData),
+                  onTapSurah: () => SurahList.onTapSurah(context, surahData),
                   number: surahData.number?.toString() ?? emptyString,
                   name: surahData.name?.transliteration
                           ?.asLocale(context.locale) ??
@@ -94,20 +128,6 @@ class SurahList extends StatelessWidget {
           },
         );
       },
-    );
-  }
-
-  static void onTapSurah(
-    BuildContext context,
-    Surah? surah, {
-    int? jumpToVerse,
-  }) {
-    context.pushNamed(
-      RootRouter.surahRoute.name,
-      queryParameters: {
-        'jump_to': jumpToVerse?.toString(),
-      },
-      extra: DetailSurahScreenExtra(surah: surah),
     );
   }
 }

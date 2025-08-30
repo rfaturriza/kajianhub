@@ -81,6 +81,7 @@
   "language": "Bahasa",
   "fontSize": "Ukuran font",
   "fontStyle": "Gaya font",
+  "fontStyleDescription": "Pilih font Arab",
   "privacyPolicy": "Kebijakan Privasi",
   "aboutApp": "Tentang Aplikasi",
   "detailPage": "Halaman Detail",
@@ -222,6 +223,7 @@
   "kajian": "Kajian",
   "errorOpenMap": "Mohon maaf, tidak dapat membuka peta",
   "notificationPrayerTitle": "Waktunya {prayer} Pukul {time}",
+  "notificationReminderPrayerTitle": "{ReminderTime} menit tersisa untuk {prayer} pada pukul {time}",
   "notificationPrayerDescription": "Lihat informasi waktu shalat di {location}",
   "ustadzAiButtonLabel": "Ustadz AI",
   "ustadzAiScreen": {
@@ -242,5 +244,13 @@
   "gallery": "Galeri",
   "takePicture": "Ambil gambar",
   "selectPicture": "Pilih gambar",
-  "removePicture": "Hapus gambar"
+  "removePicture": "Hapus gambar",
+  "prayerNotificationDescription": "You can set notifications for each prayer time",
+  "reminderLeadTimeLabel": "Reminder Before",
+  "reminderLeadTimeUnit": "Minutes",
+  "saveButtonLabel": "Save",
+  "notificationTypeAdhan": "Adhan",
+  "notificationTypeStandard": "Notification",
+  "notificationTypeSilent": "Silent",
+  "notificationTypeDisabled": "Inactive"
 }

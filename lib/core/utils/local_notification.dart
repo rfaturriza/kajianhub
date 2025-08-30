@@ -126,19 +126,30 @@ class LocalNotification {
     required TimeOfDay timeOfDay,
     String? payload,
     Pair<String, String>? channel,
+    String? androidSound, // nama file di res/raw (tanpa ekstensi)
+    String?
+        iosSound, // nama file lengkap dengan ekstensi (e.g. notif_sound.aiff)
+    bool mute = false,
   }) async {
     final androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      channel?.first ?? 'periodic_channel',
-      channel?.second ?? 'Periodic Notifications',
+      '${channel?.first ?? 'periodic_channel'}${mute ? '_mute' : ''}${androidSound != null ? '_customSound' : ''}',
+      '${channel?.second ?? 'Periodic Notifications'}${mute ? '_mute' : ''}${androidSound != null ? '_customSound' : ''}',
       importance: Importance.max,
       priority: Priority.high,
       icon: _defaultIcon,
+      playSound: !mute,
+      sound: mute || androidSound == null
+          ? null
+          : RawResourceAndroidNotificationSound(androidSound),
     );
-    const iosPlatformChannelSpecifics = DarwinNotificationDetails(
+
+    final iosPlatformChannelSpecifics = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
-      presentSound: true,
+      presentSound: !mute,
+      sound: mute || iosSound == null ? null : iosSound,
     );
+
     final platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
       iOS: iosPlatformChannelSpecifics,

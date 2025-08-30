@@ -79,15 +79,9 @@ class QuranScreen extends StatelessWidget {
                       child: SizedBox(),
                     );
                   }
-                  return SliverAppBar(
-                    leading: const SizedBox(),
-                    backgroundColor: Colors.transparent,
-                    expandedHeight: 150.0,
-                    pinned: false,
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: KajianHubCard(
-                        isNotAvailable: isNotAvailable,
-                      ),
+                  return SliverToBoxAdapter(
+                    child: KajianHubCard(
+                      isNotAvailable: isNotAvailable,
                     ),
                   );
                 }),

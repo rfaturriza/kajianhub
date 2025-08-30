@@ -15,7 +15,7 @@ jobs:
         target: [ios --no-codesign, apk --debug]
         include:
           - target: ios --no-codesign
-            os: macos-15
+            os: ${{ vars.MACOSVERSIONRUN }}
           - target: apk --debug
             os: ubuntu-latest
     

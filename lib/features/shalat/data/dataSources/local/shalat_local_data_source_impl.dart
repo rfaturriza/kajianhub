@@ -27,7 +27,7 @@ class ShalatLocalDataSourceImpl implements ShalatLocalDataSource {
         final alarm = PrayerInApp.values
             .map((e) => PrayerAlarmModel(
                   prayer: e.name,
-                  isAlarmActive: false,
+                  alarmType: 3,
                 ))
             .toList();
         await setPrayerScheduleSetting(

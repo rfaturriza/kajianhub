@@ -42,11 +42,21 @@ void main() async {
       options: firebase_debug.DefaultFirebaseOptions.currentPlatform,
     );
   }
-  await sl<RemoteConfigService>().initialize();
+  // Initialize remote config and FCM without blocking app startup
+  // These services will work in background and handle failures gracefully
+  sl<RemoteConfigService>().initialize().catchError((e) {
+    if (kDebugMode) {
+      print('Remote config initialization failed: $e');
+    }
+  });
 
   /// iOS skip this step because it's need Account in Apple Developer
   /// iOS also need to upload key to firebase
-  await initializeFCM();
+  initializeFCM().catchError((e) {
+    if (kDebugMode) {
+      print('FCM initialization failed: $e');
+    }
+  });
   await sl<LocalNotification>().init();
 
   timeago.setLocaleMessages('id', timeago.IdMessages());

@@ -34,7 +34,7 @@ android {
     defaultConfig {
         multiDexEnabled true
         applicationId "com.rizz.quranku"
-        minSdkVersion 23
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutter.versionCode
         versionName flutter.versionName
@@ -55,8 +55,8 @@ android {
             resValue "string", "app_name", appName + "-Debug"
         }
         profile {
-            applicationIdSuffix ".debug"
             resValue "string", "app_name", appName + "-Profile"
+            signingConfig signingConfigs.debug
         }
         release {
             signingConfig signingConfigs.release

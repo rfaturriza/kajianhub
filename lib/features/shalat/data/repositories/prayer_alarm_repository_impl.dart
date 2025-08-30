@@ -67,8 +67,12 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
 
     alarms?.forEach((element) async {
       if (element.time == null) return;
-      final hour = TimeOfDay.fromDateTime(element.time!).hour;
-      final minute = TimeOfDay.fromDateTime(element.time!).minute;
+      final hour =
+          TimeOfDay.fromDateTime(element.time!).hour.toString().padLeft(2, '0');
+      final minute = TimeOfDay.fromDateTime(element.time!)
+          .minute
+          .toString()
+          .padLeft(2, '0');
       await localNotification.scheduleDaily(
         id: element.prayer?.index ?? 0,
         title: LocaleKeys.notificationPrayerTitle.tr(namedArgs: {
@@ -122,7 +126,7 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
 
       // Update alarm times based on the new prayer times
       final updatedAlarms = currentSettings.alarms.map((alarm) {
-        if (!alarm.isAlarmActive || alarm.prayer == null) {
+        if (alarm.alarmType == 3 || alarm.prayer == null) {
           return alarm;
         }
 
@@ -161,6 +165,11 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
             newTime = alarm.time;
         }
 
+        if (alarm.reminderEnabled && newTime != null) {
+          // Adjust the time for reminders if enabled
+          newTime = newTime.subtract(Duration(minutes: alarm.reminderTime));
+        }
+
         // Return updated alarm with new time
         return alarm.copyWith(time: newTime);
       }).toList();
@@ -182,27 +191,64 @@ class PrayerAlarmRepositoryImpl implements PrayerAlarmRepository {
 
       // Schedule notifications with the updated times
       for (final element in updatedSettings.alarms) {
-        if (element.time == null || !element.isAlarmActive) continue;
+        if (element.time == null) continue;
+        if (element.alarmType == 3) {
+          await localNotification.cancel(element.prayer?.index ?? 0);
+          continue;
+        }
 
-        final hour = TimeOfDay.fromDateTime(element.time!).hour;
-        final minute = TimeOfDay.fromDateTime(element.time!).minute;
+        final hour = TimeOfDay.fromDateTime(element.time!)
+            .hour
+            .toString()
+            .padLeft(2, '0');
+        final minute = TimeOfDay.fromDateTime(element.time!)
+            .minute
+            .toString()
+            .padLeft(2, '0');
 
         // Cancel existing notification before scheduling a new one
         await localNotification.cancel(element.prayer?.index ?? 0);
 
-        await localNotification.scheduleDaily(
-          id: element.prayer?.index ?? 0,
-          title: LocaleKeys.notificationPrayerTitle.tr(namedArgs: {
-            'prayer': element.prayer?.name.capitalizeEveryWord() ?? '',
-            'time': '$hour:$minute',
-          }),
-          body: LocaleKeys.notificationPrayerDescription.tr(
-            namedArgs: {
-              'location': updatedSettings.location,
-            },
-          ),
-          timeOfDay: TimeOfDay.fromDateTime(element.time!),
-        );
+        String androidSound = 'adzan_general';
+        String iosSound = 'adzan_general.wav';
+
+        if (element.reminderEnabled) {
+          // Schedule reminder notification
+          await localNotification.scheduleDaily(
+            id: element.prayer?.index ?? 0,
+            title: LocaleKeys.notificationReminderPrayerTitle.tr(namedArgs: {
+              'ReminderTime': element.reminderTime.toString(),
+              'prayer': element.prayer?.name.capitalizeEveryWord() ?? '',
+              'time': '$hour:$minute',
+            }),
+            body: LocaleKeys.notificationPrayerDescription.tr(
+              namedArgs: {
+                'location': updatedSettings.location,
+              },
+            ),
+            timeOfDay: TimeOfDay.fromDateTime(element.time!),
+            mute: element.alarmType == 2, // silent,
+            androidSound: element.alarmType == 0 ? androidSound : null,
+            iosSound: element.alarmType == 0 ? iosSound : null,
+          );
+        } else {
+          await localNotification.scheduleDaily(
+            id: element.prayer?.index ?? 0,
+            title: LocaleKeys.notificationPrayerTitle.tr(namedArgs: {
+              'prayer': element.prayer?.name.capitalizeEveryWord() ?? '',
+              'time': '$hour:$minute',
+            }),
+            body: LocaleKeys.notificationPrayerDescription.tr(
+              namedArgs: {
+                'location': updatedSettings.location,
+              },
+            ),
+            timeOfDay: TimeOfDay.fromDateTime(element.time!),
+            mute: element.alarmType == 2, // silent,
+            androidSound: element.alarmType == 0 ? androidSound : null,
+            iosSound: element.alarmType == 0 ? iosSound : null,
+          );
+        }
       }
 
       return right(unit);

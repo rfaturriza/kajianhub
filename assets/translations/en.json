@@ -81,6 +81,7 @@
   "language": "Language",
   "fontSize": "Font Size",
   "fontStyle": "Font Style",
+  "fontStyleDescription": "Choose Arabic font family",
   "privacyPolicy": "Privacy Policy",
   "aboutApp": "About App",
   "detailPage": "Detail Page",
@@ -222,6 +223,7 @@
   "kajian": "Kajian",
   "errorOpenMap": "Sorry, unable to open the map",
   "notificationPrayerTitle": "Time for {prayer} at {time}",
+  "notificationReminderPrayerTitle": "{ReminderTime} minutes are left in {prayer} at {time}",
   "notificationPrayerDescription": "View prayer times information in {location}",
   "ustadzAiButtonLabel": "Ustadz AI",
   "ustadzAiScreen": {
@@ -242,5 +244,13 @@
   "gallery": "Gallery",
   "takePicture": "Take picture",
   "selectPicture": "Select picture",
-  "removePicture": "Remove picture"
+  "removePicture": "Remove picture",
+  "prayerNotificationDescription": "You can set notifications for each prayer time",
+  "reminderLeadTimeLabel": "Reminder Before",
+  "reminderLeadTimeUnit": "Minutes",
+  "saveButtonLabel": "Save",
+  "notificationTypeAdhan": "Adhan",
+  "notificationTypeStandard": "Notification",
+  "notificationTypeSilent": "Silent",
+  "notificationTypeDisabled": "Inactive"
 }

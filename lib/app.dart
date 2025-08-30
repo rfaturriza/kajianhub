@@ -67,7 +67,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
           create: (context) => sl<NetworkInfoBloc>(),
         ),
         BlocProvider<SurahBloc>(
-          create: (context) => sl<SurahBloc>()..add(const SurahFetchEvent()),
+          create: (context) => sl<SurahBloc>(),
         ),
         BlocProvider<JuzBloc>(
           create: (context) => sl<JuzBloc>(),

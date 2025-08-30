@@ -17,13 +17,13 @@ on:
 jobs:
   build:
     name: Release ${{ inputs.platform }}
-    runs-on: ${{ inputs.platform == 'ios' && 'macos-15' || 'ubuntu-latest' }}
+    runs-on: ${{ inputs.platform == 'ios' && vars.MACOSVERSIONRUN || 'ubuntu-latest' }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for release notes generation
+          fetch-depth: 0 # Fetch all history for release notes generation
 
       - name: Set up JDK 17
         if: ${{ inputs.platform == 'android' }}
@@ -90,7 +90,17 @@ jobs:
               bundle exec fastlane ${{ inputs.lane }}
             fi
           else
+            # Clean build directory for iOS to force rebuild with new deployment target
+            cd ..
+            rm -rf build/
+            rm -rf ios/Pods/ ios/Podfile.lock
+            flutter clean
+            flutter pub get
+            cd ios
+            pod install --repo-update
+            cd ..
             flutter build ipa --no-codesign
+            cd ios
             bundle exec fastlane match appstore --readonly
             bundle exec fastlane ${{ inputs.lane }}
           fi
@@ -102,7 +112,7 @@ jobs:
           KEYSTORE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           PLAY_STORE_CONFIG_JSON: ${{ secrets.GPLAY_SERVICE_ACCOUNT_KEY_JSON }}
-          
+
           # Firebase Distribution
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_ANDROID_DEBUG_APP_ID }}
           FIREBASE_CLI_TOKEN: ${{ secrets.FIREBASE_CLI_TOKEN }}

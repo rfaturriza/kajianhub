@@ -59,7 +59,9 @@ abstract class PrayerAlarmModel with _$PrayerAlarmModel {
   const factory PrayerAlarmModel({
     @HiveField(0) DateTime? time,
     @HiveField(1) String? prayer,
-    @HiveField(2) @Default(false) bool isAlarmActive,
+    @HiveField(3) @Default(3) int alarmType,
+    @HiveField(4) @Default(0) int reminderTime,
+    @HiveField(5) @Default(false) bool reminderEnabled,
   }) = _PrayerAlarmModel;
 
   const PrayerAlarmModel._();
@@ -71,7 +73,9 @@ abstract class PrayerAlarmModel with _$PrayerAlarmModel {
     return PrayerAlarmModel(
       time: entity?.time,
       prayer: entity?.prayer?.name,
-      isAlarmActive: entity?.isAlarmActive ?? false,
+      alarmType: entity?.alarmType ?? 3,
+      reminderTime: entity?.reminderTime ?? 0,
+      reminderEnabled: entity?.reminderEnabled ?? false,
     );
   }
 
@@ -82,7 +86,9 @@ abstract class PrayerAlarmModel with _$PrayerAlarmModel {
         (element) => element.name == prayer,
         orElse: () => PrayerInApp.imsak,
       ),
-      isAlarmActive: isAlarmActive,
+      alarmType: alarmType,
+      reminderTime: reminderTime,
+      reminderEnabled: reminderEnabled,
     );
   }
 }

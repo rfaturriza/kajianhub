@@ -14,6 +14,7 @@ class TajweedExampleCache {
     return Hive.box('cacheBox');
   }
 
+  // ignore: strict_top_level_inference
   List<TajweedWord> _generateExampleAyah(_) {
     return TajweedRule.values.map((rule) {
       return TajweedWord(

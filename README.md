@@ -1,10 +1,10 @@
 # KajianHub
 
-[![GitHub issues](https://img.shields.io/github/issues/rfaturriza/muslim_book)](https://github.com/rfaturriza/muslim_book/issues)
-[![GitHub forks](https://img.shields.io/github/forks/rfaturriza/muslim_book)](https://github.com/rfaturriza/muslim_book/network)
-[![GitHub stars](https://img.shields.io/github/stars/rfaturriza/muslim_book)](https://github.com/rfaturriza/muslim_book/stargazers)
-[![GitHub license](https://img.shields.io/github/license/rfaturriza/muslim_book)](https://github.com/rfaturriza/muslim_book/blob/main/LICENSE)
-[![GitHub last commit](https://img.shields.io/github/last-commit/rfaturriza/muslim_book)](https://github.com/rfaturriza/muslim_book/commits/main)
+[![GitHub issues](https://img.shields.io/github/issues/rfaturriza/kajianhub)](https://github.com/rfaturriza/kajianhub/issues)
+[![GitHub forks](https://img.shields.io/github/forks/rfaturriza/kajianhub)](https://github.com/rfaturriza/kajianhub/network)
+[![GitHub stars](https://img.shields.io/github/stars/rfaturriza/kajianhub)](https://github.com/rfaturriza/kajianhub/stargazers)
+[![GitHub license](https://img.shields.io/github/license/rfaturriza/kajianhub)](https://github.com/rfaturriza/kajianhub/blob/main/LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/rfaturriza/kajianhub)](https://github.com/rfaturriza/kajianhub/commits/main)
 
 KajianHub is a Flutter project designed to provide a modern and user-friendly Quran application for users to read and explore the Quranic text.  contributions are welcome.
 
@@ -53,12 +53,12 @@ To run this Flutter project on your local machine, follow these steps:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/rfaturriza/muslim_book.git
+   git clone https://github.com/rfaturriza/kajianhub.git
 
 2. **Navigate to the project directory:**
 
    ```bash
-   cd muslim_book
+   cd kajianhub
 
 3. **Install dependencies:**
 

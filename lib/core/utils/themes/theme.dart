@@ -122,7 +122,7 @@ ThemeData themeData({
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         foregroundColor: primaryColor,
         disabledForegroundColor: isDarkMode
             ? darkColorScheme.onSurface.withValues(alpha: 0.5)
@@ -130,12 +130,24 @@ ThemeData themeData({
         textStyle: textTheme.titleSmall,
       ),
     ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        textStyle: textTheme.titleSmall,
+        foregroundColor:
+            isDarkMode ? darkColorScheme.onPrimary : lightColorScheme.onPrimary,
+        backgroundColor: primaryColor,
+      ),
+    ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         textStyle: textTheme.titleSmall,
         foregroundColor:
             isDarkMode ? darkColorScheme.onPrimary : lightColorScheme.onPrimary,
@@ -202,13 +214,12 @@ ThemeData themeData({
     ),
     inputDecorationTheme: InputDecorationTheme(
       labelStyle: textTheme.titleSmall,
-      border: const OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(100)),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: const OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(100)),
-        borderSide: BorderSide.none,
+      border: const UnderlineInputBorder(),
+      focusedBorder: UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: primaryColor,
+          width: 2,
+        ),
       ),
     ),
   );

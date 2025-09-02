@@ -32,6 +32,11 @@ import '../../features/ustadz/presentation/screens/ustadz_detail_screen.dart';
 import '../../features/ustadz/presentation/screens/ustadz_list_screen.dart';
 import '../../features/ustad_ai/presentation/blocs/ustad_ai/ustad_ai_bloc.dart';
 import '../../features/ustad_ai/presentation/screens/ustad_ai_screen.dart';
+import '../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../features/auth/presentation/bloc/auth_state.dart';
+import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/profile_screen.dart';
+import '../../features/auth/presentation/widgets/auth_wrapper.dart';
 import '../../injection.dart';
 import '../components/error_screen.dart';
 import 'root_router.dart';
@@ -59,6 +64,24 @@ final router = GoRouter(
   navigatorKey: App.navigatorKey,
   initialLocation: RootRouter.rootRoute.path,
   debugLogDiagnostics: kDebugMode,
+  redirect: (context, state) {
+    // Check if user is authenticated for protected routes
+    final authBloc = context.read<AuthBloc>();
+    final isAuthenticated = authBloc.state is AuthAuthenticated;
+    final protectedRoutes = [RootRouter.profileRoute.path];
+
+    if (!isAuthenticated && protectedRoutes.contains(state.matchedLocation)) {
+      return RootRouter.loginRoute.path;
+    }
+
+    // If user is authenticated and trying to access login, redirect to dashboard
+    if (isAuthenticated &&
+        state.matchedLocation == RootRouter.loginRoute.path) {
+      return RootRouter.rootRoute.path;
+    }
+
+    return null;
+  },
   routes: [
     GoRoute(
       name: RootRouter.rootRoute.name,
@@ -252,6 +275,23 @@ final router = GoRouter(
               ),
             ),
           ],
+        ),
+        GoRoute(
+            name: RootRouter.loginRoute.name,
+            path: RootRouter.loginRoute.path,
+            builder: (_, state) {
+              final redirectTo = state.pathParameters["redirectTo"];
+              return LoginScreen(
+                redirectTo: redirectTo,
+              );
+            }),
+        GoRoute(
+          name: RootRouter.profileRoute.name,
+          path: RootRouter.profileRoute.path,
+          builder: (_, __) => AuthWrapper(
+            authenticatedWidget: const ProfileScreen(),
+            unauthenticatedWidget: const LoginScreen(),
+          ),
         ),
         GoRoute(
           name: RootRouter.error.name,

@@ -117,4 +117,16 @@ class RootRouter {
     path: '/ustad-ai',
     parent: rootRoute,
   );
+
+  static const RouteModel loginRoute = RouteModel(
+    name: 'login',
+    path: '/login',
+    parent: rootRoute,
+  );
+
+  static const RouteModel profileRoute = RouteModel(
+    name: 'profile',
+    path: '/profile',
+    parent: rootRoute,
+  );
 }

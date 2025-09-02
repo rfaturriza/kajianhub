@@ -27,6 +27,9 @@ class QuranScreen extends StatelessWidget {
       onPressedQibla: () {
         context.pushNamed(RootRouter.qiblaRoute.name);
       },
+      onPressedAuth: () {
+        context.pushNamed(RootRouter.profileRoute.name);
+      },
     );
     final controller = ScrollController();
 

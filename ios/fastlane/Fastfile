@@ -1,27 +1,30 @@
+require 'net/http'
+require 'json'
+require 'uri'
+
 default_platform(:ios)
 
 platform :ios do
+  desc "Test release notes generation with Gemini AI"
+  lane :test_release_notes do
+    # Skip before_all setup for this test lane
+    release_notes = generate_release_notes_with_gemini
+    UI.success("Generated Release Notes:")
+    UI.message("English (en-US):")
+    UI.message(release_notes["en-US"])
+    UI.message("")
+    UI.message("Indonesian (id):")
+    UI.message(release_notes["id"])
+  end
+
   before_all do
+    # Skip setup for test lanes
+    next if ENV["SKIP_SETUP"] == "true"
+    
     # Ensure required environment variables are set
-    %w[
-      APP_STORE_CONNECT_KEY_ID
-      APP_STORE_CONNECT_ISSUER_ID
-      APP_STORE_CONNECT_API_KEY_CONTENT
-    ].each do |var|
+    %w[APP_STORE_CONNECT_KEY_ID APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_API_KEY_CONTENT].each do |var|
       UI.user_error!("Missing environment variable: #{var}") if ENV[var].to_s.empty?
     end
-
-    setup_ci
-
-    # Ensure required environment variables are set
-    %w[
-      APP_STORE_CONNECT_KEY_ID
-      APP_STORE_CONNECT_ISSUER_ID
-      APP_STORE_CONNECT_API_KEY_CONTENT
-    ].each do |var|
-      UI.user_error!("Missing environment variable: #{var}") if ENV[var].to_s.empty?
-    end
-
     setup_ci
 
     app_store_connect_api_key(
@@ -29,166 +32,252 @@ platform :ios do
       issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
       key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"],
       is_key_content_base64: true,
-      key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"],
-      is_key_content_base64: true,
       in_house: false
     )
 
     sync_code_signing(type: "appstore")
+  end
 
-    sync_code_signing(type: "appstore")
+  private_lane :generate_release_notes_with_gemini do |options|
+    # Get commits since last tag
+    last_tag = sh("git describe --tags --abbrev=0", log: false).strip rescue "HEAD~10"
+    commits = sh("git log #{last_tag}..HEAD --oneline --no-merges", log: false).strip
+    
+    if commits.empty?
+      fallback_notes_en = "Minor bug fixes and improvements"
+      fallback_notes_id = "Perbaikan bug kecil dan peningkatan performa"
+      return {
+        "en-US" => fallback_notes_en,
+        "id" => fallback_notes_id
+      }
+    end
+
+    # Call Gemini API
+    gemini_api_key = ENV["GEMINI_API_KEY"]&.strip
+    if gemini_api_key.nil? || gemini_api_key.empty?
+      UI.important("GEMINI_API_KEY not set. Using default release notes.")
+      fallback_notes_en = "* Bug fixes and performance improvements\n* Enhanced user experience\n* General stability improvements"
+      fallback_notes_id = "* Perbaikan bug dan peningkatan performa\n* Pengalaman pengguna yang lebih baik\n* Peningkatan stabilitas umum"
+      return {
+        "en-US" => fallback_notes_en,
+        "id" => fallback_notes_id
+      }
+    end
+
+    UI.message("API Key present, generating release notes in English and Indonesian...")
+
+    # Generate English release notes
+    english_notes = generate_notes_for_language(commits: commits, language: "English", api_key: gemini_api_key)
+    
+    # Generate Indonesian release notes
+    indonesian_notes = generate_notes_for_language(commits: commits, language: "Indonesian", api_key: gemini_api_key)
+
+    {
+      "en-US" => english_notes,
+      "id" => indonesian_notes
+    }
+  end
+
+  private_lane :generate_notes_for_language do |options|
+    commits = options[:commits]
+    language = options[:language]
+    api_key = options[:api_key]
+    
+    # Prepare prompt for specific language
+    if language == "Indonesian"
+      prompt = <<~PROMPT
+        Generate catatan rilis yang ringkas untuk aplikasi mobile berdasarkan git commits ini. 
+        Fokus pada fitur dan peningkatan yang dapat dilihat pengguna. Maksimal 4000 karakter.
+        Format sebagai teks biasa dengan bullet points menggunakan asterisk (*).
+        Gunakan kategori seperti "Baru:", "Ditingkatkan:", dan "Diperbaiki:" bila sesuai.
+        Tulis dalam bahasa Indonesia yang jelas dan mudah dipahami pengguna. jangan gunakan jargon teknis secara detail. hanya cantumkan informasi fiturnya jangan detail teknis seperti kode, algoritma, components, atau lainnya.
+        
+        Format contoh:
+        * Baru: Deskripsi fitur baru di sini
+        * Ditingkatkan: Deskripsi peningkatan di sini
+        * Diperbaiki: Deskripsi perbaikan bug di sini
+        
+        Commits:
+        #{commits}
+        
+        Buat catatan rilis profesional:
+      PROMPT
+    else
+      prompt = <<~PROMPT
+        Generate concise release notes for a mobile app based on these git commits. 
+        Focus on user-facing features and improvements. Keep it under 4000 characters.
+        Format as plain text with simple bullet points using asterisks (*).
+        Use categories like "New:", "Improved:", and "Fixed:" when appropriate.
+        Write in clear, user-friendly language that customers will understand, don't use technical jargon with details like code, algorithms, components ui, or others.
+        
+        Example format:
+        * New: Feature description here
+        * Improved: Enhancement description here  
+        * Fixed: Bug fix description here
+        
+        Commits:
+        #{commits}
+        
+        Generate professional release notes:
+      PROMPT
+    end
+
+    begin
+      uri = URI("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=#{api_key}")
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+
+      request = Net::HTTP::Post.new(uri)
+      request['Content-Type'] = 'application/json'
+
+      request.body = {
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 500,
+          candidateCount: 1
+        }
+      }.to_json
+
+      response = http.request(request)
+      
+      if response.code == '200'
+        result = JSON.parse(response.body)
+        release_notes = result.dig('candidates', 0, 'content', 'parts', 0, 'text')&.strip
+        
+        if release_notes && !release_notes.empty?
+          UI.success("Generated #{language} release notes with Gemini AI")
+          next release_notes
+        end
+      else
+        UI.error("Gemini API error for #{language}: #{response.code} - #{response.body}")
+      end
+    rescue => e
+      UI.error("Error calling Gemini API for #{language}: #{e.message}")
+    end
+
+    # Fallback release notes based on language
+    if language == "Indonesian"
+      "* Perbaikan bug dan peningkatan performa\n* Pengalaman pengguna yang lebih baik\n* Peningkatan stabilitas umum"
+    else
+      "* Bug fixes and performance improvements\n* Enhanced user experience\n* General stability improvements"
+    end
   end
 
   private_lane :update_ios_version do |options|
     type = options[:type]
-
-  private_lane :update_ios_version do |options|
-    type = options[:type]
+    target = options[:target]
     current_version = get_version_number(xcodeproj: "Runner.xcodeproj")
-    current_build_number = app_store_build_number()
-    version_parts = current_version.split(".").map(&:to_i)
-    current_build_number = app_store_build_number()
+    current_build_number = target == :internal ? latest_testflight_build_number : app_store_build_number
     version_parts = current_version.split(".").map(&:to_i)
 
     case type
     when "major"
-      version_parts[0] += 1
-    case type
-    when "major"
-      version_parts[0] += 1
-      version_parts[1] = 0
-      version_parts[2] = 0
+      version_parts[0] += 1; version_parts[1] = 0; version_parts[2] = 0
     when "minor"
-      version_parts[1] += 1
-    when "minor"
-      version_parts[1] += 1
-      version_parts[2] = 0
-    when "patch"
-      version_parts[2] += 1
-    else
-      UI.user_error!("Invalid update type: #{type}")
+      version_parts[1] += 1; version_parts[2] = 0
     when "patch"
       version_parts[2] += 1
     else
       UI.user_error!("Invalid update type: #{type}")
     end
-
-    updated_version = version_parts.join(".")
+    updated_version = version_parts.join('.')
     updated_build_number = current_build_number + 1
-    updated_version = version_parts.join(".")
-    updated_build_number = current_build_number + 1
-
     increment_version_number(version_number: updated_version, xcodeproj: "Runner.xcodeproj")
     increment_build_number(build_number: updated_build_number, xcodeproj: "Runner.xcodeproj")
   end
 
   private_lane :build_ios do
-    increment_version_number(version_number: updated_version, xcodeproj: "Runner.xcodeproj")
-    increment_build_number(build_number: updated_build_number, xcodeproj: "Runner.xcodeproj")
-  end
+     build_ios_app(
+       workspace: "Runner.xcworkspace",
+       scheme: "Runner",
+       output_directory: "./fastlane/build",
+       output_name: "app.ipa",
+       configuration: "Release",
+       silent: true,
+       clean: true,
+       export_method: "app-store"
+     )
+   end
 
-  private_lane :build_ios do
-    build_ios_app(
-      workspace: "Runner.xcworkspace",
-      workspace: "Runner.xcworkspace",
-      scheme: "Runner",
-      configuration: "Release",
-      silent: true,
-      clean: true,
-      output_directory: "./fastlane/build",
-      output_name: "app.ipa",
-      configuration: "Release",
-      silent: true,
-      clean: true,
-      output_directory: "./fastlane/build",
-      output_name: "app.ipa",
-      export_method: "app-store"
-    )
-  end
-  end
-
-  private_lane :upload_internal do
-  private_lane :upload_internal do
-    upload_to_testflight(
-      ipa: "./fastlane/build/app.ipa",
-      skip_submission: true,
+   private_lane :upload_internal do
+     upload_to_testflight(
       ipa: "./fastlane/build/app.ipa",
       skip_submission: true,
       skip_waiting_for_build_processing: true
-    )
-  end
+     )
+   end
 
-  private_lane :upload_production do
+   private_lane :upload_production do
+    generated_notes = generate_release_notes_with_gemini
+    
     upload_to_app_store(
       ipa: "./fastlane/build/app.ipa",
       skip_screenshots: true,
-      skip_metadata: true,
       precheck_include_in_app_purchases: false,
-      submit_for_review: true
+      submit_for_review: true,
+      release_notes: generated_notes,
     )
   end
 
-  def release_lane(update_type:, target:)
-    update_ios_version(type: update_type)
-    build_ios
+  def release_lane(target:)
+    # Note: Version bumping is now handled by GitHub Actions, not Fastlane
+    # This ensures consistency and prevents double-bumping
 
     case target
     when :internal
+      build_ios
       upload_internal
     when :production
+      build_ios
       upload_production
     else
       UI.user_error!("Unknown target: #{target}")
     end
   end
 
-  desc "Internal release - patch"
+  desc "Internal release to TestFlight (build number bump only)"
   lane :internal_patch do
-    release_lane(update_type: "patch", target: :internal)
+    release_lane(target: :internal)
   end
 
-  desc "Internal release - minor"
+  desc "Internal release to TestFlight (build number bump only)"
   lane :internal_minor do
-    release_lane(update_type: "minor", target: :internal)
+    release_lane(target: :internal)
   end
+  
 
-  desc "Internal release - major"
-  desc "Internal release - minor"
-  lane :internal_minor do
-    release_lane(update_type: "minor", target: :internal)
-  end
-
-  desc "Internal release - major"
+  desc "Internal release to TestFlight (build number bump only)"
   lane :internal_major do
-    release_lane(update_type: "major", target: :internal)
+    release_lane(target: :internal)
   end
 
   desc "Production release - patch"
   lane :production_patch do
-    release_lane(update_type: "patch", target: :production)
+    release_lane(target: :production)
   end
 
   desc "Production release - minor"
   lane :production_minor do
-    release_lane(update_type: "minor", target: :production)
-    release_lane(update_type: "major", target: :internal)
-  end
-
-  desc "Production release - patch"
-  lane :production_patch do
-    release_lane(update_type: "patch", target: :production)
-  end
-
-  desc "Production release - minor"
-  lane :production_minor do
-    release_lane(update_type: "minor", target: :production)
+    release_lane(target: :production)
   end
 
   desc "Production release - major"
   lane :production_major do
-    release_lane(update_type: "major", target: :production)
-  desc "Production release - major"
-  lane :production_major do
-    release_lane(update_type: "major", target: :production)
+    release_lane(target: :production)
+  end
+
+  # Additional utility lanes
+  desc "Internal release to TestFlight only"
+  lane :internal_testflight_only do
+    release_lane(target: :internal)
   end
 end

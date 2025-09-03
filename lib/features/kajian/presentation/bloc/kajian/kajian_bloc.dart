@@ -11,11 +11,12 @@ import 'package:quranku/core/utils/extension/extension.dart';
 import 'package:quranku/features/kajian/domain/entities/filter_kajian_schedule.codegen.dart';
 import 'package:quranku/features/kajian/domain/entities/kajian_schedule.codegen.dart';
 import 'package:quranku/features/kajian/domain/usecases/get_ustadz_list_usecase.dart';
+import 'package:quranku/features/ustadz/domain/entities/ustadz_entity.codegen.dart';
 
 import '../../../../../core/utils/pair.dart';
 import '../../../../shalat/domain/usecase/get_current_location_usecase.dart';
 import '../../../data/models/kajian_schedule_request_model.codegen.dart';
-import '../../../data/models/mosques_response_model.codegen.dart';
+import '../../../data/models/study_locations_response_model.codegen.dart';
 import '../../../domain/usecases/get_cities_usecase.dart';
 import '../../../domain/usecases/get_kajian_list_usecase.dart';
 import '../../../domain/usecases/get_kajian_themes_usecase.dart';
@@ -87,14 +88,8 @@ class KajianBloc extends Bloc<KajianEvent, KajianState> {
     }
     try {
       var request = KajianScheduleRequestModel(
-        type: 'pagination',
         page: event.pageNumber,
         limit: limit,
-        orderBy: 'id',
-        sortBy: 'asc',
-        options: [],
-        relations:
-            'ustadz,studyLocation.province,studyLocation.city,dailySchedules,customSchedules,themes,histories',
       );
       if (state.filter.studyLocationProvinceId != null) {
         request = request.copyWith(
@@ -190,7 +185,10 @@ class KajianBloc extends Bloc<KajianEvent, KajianState> {
       final result = await _getKajianListUseCase(request);
       result.fold(
         (failure) => emit(
-          state.copyWith(status: FormzSubmissionStatus.failure),
+          state.copyWith(
+            status: FormzSubmissionStatus.failure,
+            kajianErrorMessage: failure.errorMessage,
+          ),
         ),
         (data) {
           final currentData = state.kajianResult;

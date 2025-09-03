@@ -1,13 +1,20 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_provider/go_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quranku/features/kajian/domain/entities/study_location_entity.dart';
+import 'package:quranku/features/masjid/presentation/screens/study_location_detail_screen.dart';
 
 import '../../app.dart';
 import '../../features/kajian/domain/entities/kajian_schedule.codegen.dart';
 import '../../features/kajian/presentation/screens/kajian_detail_screen.dart';
 import '../../features/kajian/presentation/screens/kajianhub_screen.dart';
+import '../../features/masjid/presentation/blocs/study_location_detail/study_location_detail_bloc.dart';
+import '../../features/masjid/presentation/blocs/study_location_list/study_location_list_bloc.dart';
+import '../../features/masjid/presentation/screens/study_location_list_screen.dart';
 import '../../features/payment/presentation/screens/donation_screen.dart';
 import '../../features/qibla/presentation/screens/qibla_compass.dart';
 import '../../features/quran/presentation/bloc/shareVerse/share_verse_bloc.dart';
@@ -18,13 +25,38 @@ import '../../features/quran/presentation/screens/share_verse_screen.dart';
 import '../../features/setting/presentation/screens/language_setting_screen.dart';
 import '../../features/setting/presentation/screens/styling_setting_screen.dart';
 import '../../features/shalat/presentation/screens/prayer_schedule_screen.dart';
+import '../../features/ustadz/domain/entities/ustadz_entity.codegen.dart';
+import '../../features/ustadz/presentation/blocs/ustadz_detail/ustadz_detail_bloc.dart';
+import '../../features/ustadz/presentation/blocs/ustadz_list/ustadz_list_bloc.dart';
+import '../../features/ustadz/presentation/screens/ustadz_detail_screen.dart';
+import '../../features/ustadz/presentation/screens/ustadz_list_screen.dart';
 import '../../features/ustad_ai/presentation/blocs/ustad_ai/ustad_ai_bloc.dart';
 import '../../features/ustad_ai/presentation/screens/ustad_ai_screen.dart';
 import '../../injection.dart';
 import '../components/error_screen.dart';
 import 'root_router.dart';
 
+// Custom extra Codec to retain complex objects passed via 'extra'
+class AppExtraCodec extends Codec<Object?, Object?> {
+  @override
+  Converter<Object?, Object?> get encoder => const _AppExtraConverter();
+
+  @override
+  Converter<Object?, Object?> get decoder => const _AppExtraConverter();
+}
+
+// Converter that returns the object unchanged
+class _AppExtraConverter extends Converter<Object?, Object?> {
+  const _AppExtraConverter();
+
+  @override
+  Object? convert(Object? input) => input;
+}
+
 final router = GoRouter(
+  // provide custom codec so complex 'extra' values are not dropped
+  extraCodec: AppExtraCodec(),
+  navigatorKey: App.navigatorKey,
   initialLocation: RootRouter.rootRoute.path,
   debugLogDiagnostics: kDebugMode,
   routes: [
@@ -174,6 +206,52 @@ final router = GoRouter(
             create: (context) => sl<UstadAiBloc>(),
             child: AiScreen(),
           ),
+        ),
+        GoRoute(
+          name: RootRouter.studyLocationRoute.name,
+          path: RootRouter.studyLocationRoute.path,
+          builder: (_, __) => BlocProvider(
+            create: (context) => sl<StudyLocationListBloc>(),
+            child: StudyLocationListScreen(),
+          ),
+          routes: [
+            GoRoute(
+              name: RootRouter.studyLocationDetailRoute.name,
+              path: RootRouter.studyLocationDetailRoute.path,
+              builder: (_, state) => BlocProvider(
+                create: (_) => sl<StudyLocationDetailBloc>()
+                  ..add(
+                    StudyLocationDetailEvent.loadStudies(
+                      studyLocationId: state.pathParameters['id']!,
+                      page: 1,
+                    ),
+                  ),
+                child: StudyLocationDetailScreen(
+                  masjid: state.extra as StudyLocationEntity,
+                ),
+              ),
+            ),
+          ],
+        ),
+        GoRoute(
+          name: RootRouter.ustadzRoute.name,
+          path: RootRouter.ustadzRoute.path,
+          builder: (_, __) => BlocProvider(
+            create: (context) => sl<UstadzListBloc>(),
+            child: UstadzListScreen(),
+          ),
+          routes: [
+            GoRoute(
+              name: RootRouter.ustadzDetailRoute.name,
+              path: RootRouter.ustadzDetailRoute.path,
+              builder: (_, state) => BlocProvider(
+                create: (_) => sl<UstadzDetailBloc>(),
+                child: UstadzDetailScreen(
+                  ustadz: state.extra as UstadzEntity,
+                ),
+              ),
+            ),
+          ],
         ),
         GoRoute(
           name: RootRouter.error.name,

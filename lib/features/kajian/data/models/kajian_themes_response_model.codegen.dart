@@ -6,7 +6,7 @@ part 'kajian_themes_response_model.codegen.freezed.dart';
 part 'kajian_themes_response_model.codegen.g.dart';
 
 @freezed
-class KajianThemesResponseModel with _$KajianThemesResponseModel {
+abstract class KajianThemesResponseModel with _$KajianThemesResponseModel {
   const factory KajianThemesResponseModel({
     List<DataKajianThemeModel>? data,
   }) = _KajianThemesResponseModel;
@@ -22,7 +22,7 @@ class KajianThemesResponseModel with _$KajianThemesResponseModel {
 }
 
 @freezed
-class DataKajianThemeModel with _$DataKajianThemeModel {
+abstract class DataKajianThemeModel with _$DataKajianThemeModel {
   const factory DataKajianThemeModel({
     int? id,
     String? name,

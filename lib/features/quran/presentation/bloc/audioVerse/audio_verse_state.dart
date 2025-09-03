@@ -1,8 +1,9 @@
 part of 'audio_verse_bloc.dart';
 
 @freezed
-class AudioVerseState with _$AudioVerseState {
+abstract class AudioVerseState with _$AudioVerseState {
   const factory AudioVerseState({
+    @Default(false) bool isLoading,
     @Default(PlayerState.stopped) PlayerState playerState,
     @Default(Duration()) Duration position,
     @Default(Duration()) Duration duration,

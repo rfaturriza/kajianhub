@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 
 import '../utils/debouncer.dart';
@@ -63,7 +64,7 @@ class _SearchBoxState extends State<SearchBox> {
       child: Row(
         children: [
           Icon(
-            Icons.manage_search,
+            Symbols.search,
             color: context.theme.colorScheme.onSurface,
           ),
           const SizedBox(width: 8),
@@ -82,9 +83,11 @@ class _SearchBoxState extends State<SearchBox> {
                   : null,
               decoration: InputDecoration(
                 isDense: widget.isDense,
+                contentPadding: const EdgeInsets.all(0),
                 hintText: widget.hintText,
                 hintStyle: context.theme.textTheme.titleSmall?.copyWith(
-                  color: context.theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  color: context.theme.colorScheme.onSurface
+                      .withValues(alpha: 0.5),
                 ),
                 labelStyle: context.theme.textTheme.titleSmall,
                 border: InputBorder.none,

@@ -1,5 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
+
+import '../../../../../generated/locale_keys.g.dart';
+import '../../../../setting/presentation/screens/components/styling_setting_bottom_sheet.dart';
 
 class AppBarDetailScreen extends StatelessWidget
     implements PreferredSizeWidget {
@@ -13,15 +18,9 @@ class AppBarDetailScreen extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      centerTitle: true,
       backgroundColor: Colors.transparent,
       elevation: 0,
-      title: Text(
-        title,
-        style: context.textTheme.titleLarge?.copyWith(
-          color: context.theme.colorScheme.onSurface,
-        ),
-      ),
+      title: Text(title),
     );
   }
 
@@ -45,30 +44,40 @@ class SliverAppBarDetailScreen extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      centerTitle: true,
-      backgroundColor: Colors.transparent,
       pinned: false,
       floating: true,
       elevation: 0,
       title: Text(
         title,
-        style: context.textTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.w700,
-          color: context.theme.colorScheme.onSurface,
-        ),
       ),
-      
       actions: [
+        IconButton(
+          onPressed: onPressedBookmark,
+          icon: () {
+            if (isBookmarked) {
+              return const Icon(Symbols.bookmark);
+            }
+            return const Icon(Symbols.bookmark_border);
+          }(),
+          color: context.theme.colorScheme.tertiary,
+          disabledColor:
+              context.theme.colorScheme.tertiary.withValues(alpha: 0.5),
+        ),
         Padding(
           padding: const EdgeInsets.only(right: 8),
           child: IconButton(
-            onPressed: onPressedBookmark,
-            icon: () {
-              if (isBookmarked) {
-                return const Icon(Icons.bookmark);
-              }
-              return const Icon(Icons.bookmark_border);
-            }(),
+            onPressed: () {
+              showModalBottomSheet(
+                barrierColor: context.theme.scaffoldBackgroundColor
+                    .withValues(alpha: 0.5),
+                context: context,
+                enableDrag: true,
+                builder: (_) => StylingSettingBottomSheet(
+                  title: LocaleKeys.fontStyle.tr(),
+                ),
+              );
+            },
+            icon: const Icon(Symbols.settings),
             color: context.theme.colorScheme.tertiary,
             disabledColor:
                 context.theme.colorScheme.tertiary.withValues(alpha: 0.5),

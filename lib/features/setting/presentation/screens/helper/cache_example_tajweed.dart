@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:quranku/features/quran/presentation/utils/tajweed_word.dart';
 
 import '../../../../quran/presentation/utils/tajweed.dart';
@@ -14,6 +14,7 @@ class TajweedExampleCache {
     return Hive.box('cacheBox');
   }
 
+  // ignore: strict_top_level_inference
   List<TajweedWord> _generateExampleAyah(_) {
     return TajweedRule.values.map((rule) {
       return TajweedWord(
@@ -29,6 +30,7 @@ class TajweedExampleCache {
   Future<List<TajweedWord>> _computeGenerateExampleAyah() async {
     return compute(_generateExampleAyah, null);
   }
+
   Future<List<TajweedWord>> getExampleAyah() async {
     // Ensure the box is open
     final box = await _getBox();

@@ -5,17 +5,17 @@ import 'package:quranku/features/kajian/data/repositories/kajianhub_repository.d
 
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
-import '../../data/models/mosques_response_model.codegen.dart';
+import '../../data/models/study_locations_response_model.codegen.dart';
 
 @injectable
 class GetMosquesUseCase
-    implements UseCase<List<DataMosqueModel>, GetMosquesParams> {
+    implements UseCase<List<DataStudyLocationModel>, GetMosquesParams> {
   final KajianHubRepository repository;
 
   GetMosquesUseCase(this.repository);
 
   @override
-  Future<Either<Failure, List<DataMosqueModel>>> call(
+  Future<Either<Failure, List<DataStudyLocationModel>>> call(
     GetMosquesParams params,
   ) async {
     final result = await repository.getMosqueList(

@@ -7,7 +7,7 @@ part 'surah_name_model.codegen.freezed.dart';
 part 'surah_name_model.codegen.g.dart';
 
 @freezed
-class SurahNameModel with _$SurahNameModel {
+abstract class SurahNameModel with _$SurahNameModel {
   const factory SurahNameModel({
     String? short,
     String? long,
@@ -17,19 +17,20 @@ class SurahNameModel with _$SurahNameModel {
 
   const SurahNameModel._();
 
-  factory SurahNameModel.fromJson(Map<String, dynamic> json) => _$SurahNameModelFromJson(json);
+  factory SurahNameModel.fromJson(Map<String, dynamic> json) =>
+      _$SurahNameModelFromJson(json);
 
   factory SurahNameModel.fromEntity(SurahName entity) => SurahNameModel(
-    short: entity.short,
-    long: entity.long,
-    transliteration: entity.transliteration?.toModel(),
-    translation: entity.translation?.toModel(),
-  );
+        short: entity.short,
+        long: entity.long,
+        transliteration: entity.transliteration?.toModel(),
+        translation: entity.translation?.toModel(),
+      );
 
   SurahName toEntity() => SurahName(
-    short: short,
-    long: long,
-    transliteration: transliteration?.toEntity(),
-    translation: translation?.toEntity(),
-  );
+        short: short,
+        long: long,
+        transliteration: transliteration?.toEntity(),
+        translation: translation?.toEntity(),
+      );
 }

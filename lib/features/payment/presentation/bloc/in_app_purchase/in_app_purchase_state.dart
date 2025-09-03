@@ -1,7 +1,7 @@
 part of 'in_app_purchase_bloc.dart';
 
 @freezed
-class InAppPurchaseState with _$InAppPurchaseState {
+abstract class InAppPurchaseState with _$InAppPurchaseState {
   const factory InAppPurchaseState({
     @Default(FormzSubmissionStatus.initial) FormzSubmissionStatus initStatus,
     @Default(PurchaseStatus.restored) PurchaseStatus purchaseStatus,

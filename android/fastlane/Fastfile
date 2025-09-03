@@ -1,6 +1,7 @@
 default_platform(:android)
 
 ENV['SUPPLY_UPLOAD_MAX_RETRIES'] = '5'
+ENV['APK_BUILD_MODE'] = 'profile'
 
 def get_latest_build_number
   tracks = %w[internal beta production]
@@ -34,8 +35,15 @@ def update_flutter_version(type)
   )
 end
 
-def build_flutter_app
-  sh "flutter build appbundle -v --no-deferred-components"
+def build_flutter_app(build_type = "appbundle")
+  case build_type
+  when "appbundle"
+    sh "flutter build appbundle -v --no-deferred-components"
+  when "apk"
+    sh "flutter build apk --#{ENV['APK_BUILD_MODE']}"
+  else
+    UI.user_error!("Invalid build type: #{build_type}")
+  end
 end
 
 def upload_app(track, promote_to: nil)
@@ -52,58 +60,123 @@ def upload_app(track, promote_to: nil)
   )
 end
 
-def release_lane(update_type: nil, target:)
-  update_flutter_version(update_type) if update_type
-  build_flutter_app
-  sleep(5) # helps avoid upload rejection due to build mismatch
+def generate_release_notes(commit_count = 10)
+  # Get the latest commits and format them for release notes
+  changelog = "Release Notes:\n\n"
+  
+  # Get the latest tag to use as a reference point
+  latest_tag = sh("git describe --tags --abbrev=0 2>/dev/null || echo ''", log: false).strip
+  
+  if latest_tag.empty?
+    # If no tags exist, get the latest commits
+    commits = sh("git log -#{commit_count} --pretty=format:'* %s (%an)' --no-merges", log: false)
+  else
+    # Get commits since the latest tag
+    commits = sh("git log #{latest_tag}..HEAD --pretty=format:'* %s (%an)' --no-merges", log: false)
+    
+    # If no commits since last tag, get the latest commits
+    if commits.empty?
+      commits = sh("git log -#{commit_count} --pretty=format:'* %s (%an)' --no-merges", log: false)
+    end
+  end
+  
+  changelog += "Changes:\n#{commits}\n\n"
+  changelog += "Built on: #{Time.now.strftime('%Y-%m-%d %H:%M:%S')}"
+  
+  return changelog
+end
+
+def distribute_to_firebase(groups, release_notes = nil)
+  # Generate release notes if not provided
+  release_notes ||= generate_release_notes
+
+  firebase_app_distribution(
+    app: ENV['FIREBASE_APP_ID'],
+    groups: groups,
+    release_notes: release_notes,
+    apk_path: "../build/app/outputs/flutter-apk/app-#{ENV['APK_BUILD_MODE']}.apk",
+    firebase_cli_token: ENV['FIREBASE_CLI_TOKEN']
+  )
+end
+
+def release_lane(target:, firebase_groups: nil)
+  # Note: Version bumping is now handled by GitHub Actions, not Fastlane
+  # This ensures consistency and prevents double-bumping
   
   case target
-  when "internal"
+  when "firebase_distribution"
+    ENV['APK_BUILD_MODE'] = 'debug'
+    build_flutter_app("apk")
+    release_notes = generate_release_notes
+    distribute_to_firebase(firebase_groups, release_notes)
+  when "internal_with_firebase"
+    # Build and upload to both Google Play Internal Track AND Firebase Distribution
+    UI.message("🚀 Building for internal testing with Firebase distribution...")
+    
+    # First build and upload to Google Play Internal Track
+    build_flutter_app
+    sleep(5) # helps avoid upload rejection due to build mismatch
     upload_app('internal')
-  when "beta"
-    upload_app('beta')
-  when "production"
-    upload_app('production')
-  when "promote_internal_to_beta"
-    upload_app('internal', promote_to: 'beta')
-  when "promote_internal_to_production"
-    upload_app('internal', promote_to: 'production')
-  when "promote_beta_to_production"
-    upload_app('beta', promote_to: 'production')
+    UI.success("✅ Uploaded to Google Play Internal Track")
+    
+    # Then build APK and distribute to Firebase
+    ENV['APK_BUILD_MODE'] = 'debug'
+    build_flutter_app("apk")
+    release_notes = generate_release_notes
+    distribute_to_firebase(firebase_groups, release_notes)
+    UI.success("✅ Distributed to Firebase App Distribution")
   else
-    UI.user_error!("Invalid target: #{target}")
+    build_flutter_app
+    sleep(5) # helps avoid upload rejection due to build mismatch
+    
+    case target
+    when "internal"
+      upload_app('internal')
+    when "beta"
+      upload_app('beta')
+    when "production"
+      upload_app('production')
+    when "promote_internal_to_beta"
+      upload_app('internal', promote_to: 'beta')
+    when "promote_internal_to_production"
+      upload_app('internal', promote_to: 'production')
+    when "promote_beta_to_production"
+      upload_app('beta', promote_to: 'production')
+    else
+      UI.user_error!("Invalid target: #{target}")
+    end
   end
 end
 
 platform :android do
-  desc "Submit patch update for INTERNAL TESTING build to Google Play"
+  desc "Submit INTERNAL TESTING build to Google Play + Firebase Distribution (build number bump only)"
   lane :internal_patch do
-    release_lane(update_type: "patch", target: "internal")
+    release_lane(target: "internal_with_firebase", firebase_groups: "testers")
   end
 
-  desc "Submit minor update for INTERNAL TESTING build to Google Play"
+  desc "Submit INTERNAL TESTING build to Google Play + Firebase Distribution (build number bump only)"
   lane :internal_minor do
-    release_lane(update_type: "minor", target: "internal")
+    release_lane(target: "internal_with_firebase", firebase_groups: "testers")
   end
   
-  desc "Submit major update for INTERNAL TESTING build to Google Play"
+  desc "Submit INTERNAL TESTING build to Google Play + Firebase Distribution (build number bump only)"
   lane :internal_major do
-    release_lane(update_type: "major", target: "internal")
+    release_lane(target: "internal_with_firebase", firebase_groups: "testers")
   end
 
   desc "Submit patch update for PRODUCTION build to Google Play"
   lane :production_patch do
-    release_lane(update_type: "patch", target: "production")
+    release_lane(target: "production")
   end
 
   desc "Submit minor update for PRODUCTION build to Google Play"
   lane :production_minor do
-    release_lane(update_type: "minor", target: "production")
+    release_lane(target: "production")
   end
 
   desc "Submit major update for PRODUCTION build to Google Play"
   lane :production_major do
-    release_lane(update_type: "major", target: "production")
+    release_lane(target: "production")
   end
 
   desc "Promote INTERNAL track to BETA"
@@ -119,5 +192,30 @@ platform :android do
   desc "Promote BETA track to PRODUCTION"
   lane :promote_beta_to_production do
     release_lane(target: "promote_beta_to_production")
+  end
+
+  # Firebase Distribution only lanes (build number bump only)
+  desc "Submit build to Firebase App Distribution only (build number bump only)"
+  lane :firebase_dist_patch do |options|
+    groups = options[:groups] || "testers"
+    release_lane(target: "firebase_distribution", firebase_groups: groups)
+  end
+
+  desc "Submit build to Firebase App Distribution only (build number bump only)"
+  lane :firebase_dist_minor do |options|
+    groups = options[:groups] || "testers"
+    release_lane(target: "firebase_distribution", firebase_groups: groups)
+  end
+
+  desc "Submit build to Firebase App Distribution only (build number bump only)"
+  lane :firebase_dist_major do |options|
+    groups = options[:groups] || "testers"
+    release_lane(target: "firebase_distribution", firebase_groups: groups)
+  end
+
+  # Internal Google Play only (without Firebase) - for special cases
+  desc "Submit build to Google Play Internal Track only (no Firebase)"
+  lane :internal_only do
+    release_lane(target: "internal")
   end
 end

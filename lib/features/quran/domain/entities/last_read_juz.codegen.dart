@@ -4,7 +4,7 @@ import 'package:quranku/features/quran/domain/entities/verses.codegen.dart';
 part 'last_read_juz.codegen.freezed.dart';
 
 @freezed
-class LastReadJuz with _$LastReadJuz {
+abstract class LastReadJuz with _$LastReadJuz {
   const factory LastReadJuz({
     required String name,
     required int number,

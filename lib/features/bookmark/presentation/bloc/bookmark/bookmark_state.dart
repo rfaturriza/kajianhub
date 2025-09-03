@@ -1,7 +1,7 @@
 part of 'bookmark_bloc.dart';
 
 @freezed
-class BookmarkState with _$BookmarkState {
+abstract class BookmarkState with _$BookmarkState {
   const factory BookmarkState({
     @Default(false) bool isLoading,
     Either<Failure, List<VerseBookmark>>? verseBookmarks,

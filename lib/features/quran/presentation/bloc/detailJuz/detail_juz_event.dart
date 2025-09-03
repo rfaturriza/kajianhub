@@ -1,13 +1,13 @@
 part of 'detail_juz_bloc.dart';
 
 @freezed
-class JuzDetailEvent with _$JuzDetailEvent {
+abstract class JuzDetailEvent with _$JuzDetailEvent {
   const factory JuzDetailEvent.fetchJuzDetail({
     required int? juzNumber,
   }) = FetchJuzDetailEvent;
 
   const factory JuzDetailEvent.onPressedBookmark({
-     JuzBookmark? juzBookmark,
+    JuzBookmark? juzBookmark,
     required bool isBookmarked,
   }) = OnPressedBookmarkEvent;
 

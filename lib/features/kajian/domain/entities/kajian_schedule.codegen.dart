@@ -1,18 +1,21 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:quranku/features/ustadz/domain/entities/ustadz_entity.codegen.dart';
+
+import 'study_location_entity.dart';
 
 part 'kajian_schedule.codegen.freezed.dart';
 
 @freezed
-class KajianSchedules with _$KajianSchedules {
+abstract class KajianSchedules with _$KajianSchedules {
   const factory KajianSchedules({
     required List<DataKajianSchedule> data,
     required LinksKajianSchedule links,
-    required MetaKajianSchedule meta,
+    required MetaKajianHub meta,
   }) = _KajianSchedules;
 }
 
 @freezed
-class DataKajianSchedule with _$DataKajianSchedule {
+abstract class DataKajianSchedule with _$DataKajianSchedule {
   const factory DataKajianSchedule({
     required int id,
     required String title,
@@ -23,18 +26,19 @@ class DataKajianSchedule with _$DataKajianSchedule {
     required String timeEnd,
     required String prayerSchedule,
     required String locationId,
-    required StudyLocation studyLocation,
-    required List<Ustadz> ustadz,
+    required StudyLocationEntity studyLocation,
+    required List<UstadzEntity> ustadz,
     required List<KajianTheme> themes,
     required List<DailySchedule> dailySchedules,
     required List<HistoryKajian> histories,
-    required List<dynamic> customSchedules,
+    required List<CustomSchedule> customSchedules,
+    String? distanceInKm,
   }) = _DataKajianSchedule;
 
   const DataKajianSchedule._();
 
   static DataKajianSchedule empty() {
-    return  const DataKajianSchedule(
+    return DataKajianSchedule(
       id: 0,
       title: '',
       type: '',
@@ -44,22 +48,7 @@ class DataKajianSchedule with _$DataKajianSchedule {
       timeEnd: '',
       prayerSchedule: '',
       locationId: '',
-      studyLocation: StudyLocation(
-        id: 0,
-        name: '',
-        village: '',
-        address: '',
-        provinceId: '',
-        cityId: '',
-        googleMaps: '',
-        longitude: '',
-        latitude: '',
-        contactPerson: '',
-        picture: '',
-        pictureUrl: '',
-        province: Province(id: 0, name: ''),
-        city: City(id: 0, name: '', provinceId: ''),
-      ),
+      studyLocation: StudyLocationEntity(),
       ustadz: [],
       themes: [],
       dailySchedules: [],
@@ -70,7 +59,7 @@ class DataKajianSchedule with _$DataKajianSchedule {
 }
 
 @freezed
-class HistoryKajian with _$HistoryKajian {
+abstract class HistoryKajian with _$HistoryKajian {
   const factory HistoryKajian({
     required int id,
     required String kajianId,
@@ -81,27 +70,26 @@ class HistoryKajian with _$HistoryKajian {
 }
 
 @freezed
-class StudyLocation with _$StudyLocation {
-  const factory StudyLocation({
-    required int id,
-    required String name,
-    required String village,
-    required String address,
-    required String provinceId,
-    required String cityId,
-    required String googleMaps,
-    required String longitude,
-    required String latitude,
-    required String contactPerson,
-    required String picture,
-    required String pictureUrl,
-    required Province province,
-    required City city,
-  }) = _StudyLocation;
+abstract class CustomSchedule with _$CustomSchedule {
+  const factory CustomSchedule({
+    int? id,
+    String? kajianId,
+    String? themeId,
+    String? book,
+    String? prayTime,
+    String? link,
+    KajianTheme? theme,
+    List<UstadzEntity>? ustadz,
+    String? timeStart,
+    DateTime? date,
+    String? title,
+    String? createdAt,
+    String? updatedAt,
+  }) = _CustomSchedule;
 }
 
 @freezed
-class Province with _$Province {
+abstract class Province with _$Province {
   const factory Province({
     required int id,
     required String name,
@@ -109,7 +97,7 @@ class Province with _$Province {
 }
 
 @freezed
-class City with _$City {
+abstract class City with _$City {
   const factory City({
     required int id,
     required String name,
@@ -118,29 +106,26 @@ class City with _$City {
 }
 
 @freezed
-class Ustadz with _$Ustadz {
-  const factory Ustadz({
-    required int id,
-    required String ustadzId,
-    required String name,
-    required String email,
-    required String placeOfBirth,
-    required String dateOfBirth,
-    required String contactPerson,
-  }) = _Ustadz;
-}
-
-@freezed
-class KajianTheme with _$KajianTheme {
+abstract class KajianTheme with _$KajianTheme {
   const factory KajianTheme({
     required int id,
     required String themeId,
     required String theme,
   }) = _KajianTheme;
+
+  const KajianTheme._();
+
+  static KajianTheme empty() {
+    return const KajianTheme(
+      id: 0,
+      themeId: '',
+      theme: '',
+    );
+  }
 }
 
 @freezed
-class DailySchedule with _$DailySchedule {
+abstract class DailySchedule with _$DailySchedule {
   const factory DailySchedule({
     required int id,
     required String dayId,
@@ -149,7 +134,7 @@ class DailySchedule with _$DailySchedule {
 }
 
 @freezed
-class LinksKajianSchedule with _$LinksKajianSchedule {
+abstract class LinksKajianSchedule with _$LinksKajianSchedule {
   const factory LinksKajianSchedule({
     String? first,
     String? last,
@@ -159,8 +144,8 @@ class LinksKajianSchedule with _$LinksKajianSchedule {
 }
 
 @freezed
-class MetaKajianSchedule with _$MetaKajianSchedule {
-  const factory MetaKajianSchedule({
+abstract class MetaKajianHub with _$MetaKajianHub {
+  const factory MetaKajianHub({
     int? currentPage,
     int? from,
     int? lastPage,
@@ -169,11 +154,11 @@ class MetaKajianSchedule with _$MetaKajianSchedule {
     int? perPage,
     int? to,
     int? total,
-  }) = _MetaKajianSchedule;
+  }) = _MetaKajianHub;
 }
 
 @freezed
-class LinksMeta with _$LinksMeta {
+abstract class LinksMeta with _$LinksMeta {
   const factory LinksMeta({
     String? url,
     String? label,

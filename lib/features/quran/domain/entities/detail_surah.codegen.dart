@@ -9,7 +9,7 @@ import 'verses.codegen.dart';
 part 'detail_surah.codegen.freezed.dart';
 
 @freezed
-class DetailSurah with _$DetailSurah {
+abstract class DetailSurah with _$DetailSurah {
   const factory DetailSurah({
     bool? isBookmarked,
     int? number,
@@ -38,7 +38,7 @@ class DetailSurah with _$DetailSurah {
 }
 
 @freezed
-class PreBismillah with _$PreBismillah {
+abstract class PreBismillah with _$PreBismillah {
   const factory PreBismillah({
     VersesText? text,
   }) = _PreBismillah;

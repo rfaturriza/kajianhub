@@ -7,11 +7,10 @@ part 'schedule_model.codegen.freezed.dart';
 part 'schedule_model.codegen.g.dart';
 
 @freezed
-class ScheduleResponseByDayModel with _$ScheduleResponseByDayModel {
+abstract class ScheduleResponseByDayModel with _$ScheduleResponseByDayModel {
   const factory ScheduleResponseByDayModel({
     bool? status,
-    @JsonKey(name: 'data')
-    DataScheduleByDayModel? dataByDay,
+    @JsonKey(name: 'data') DataScheduleByDayModel? dataByDay,
   }) = _ScheduleResponseByDayModel;
 
   const ScheduleResponseByDayModel._();
@@ -20,11 +19,11 @@ class ScheduleResponseByDayModel with _$ScheduleResponseByDayModel {
 }
 
 @freezed
-class ScheduleResponseByMonthModel with _$ScheduleResponseByMonthModel {
+abstract class ScheduleResponseByMonthModel
+    with _$ScheduleResponseByMonthModel {
   const factory ScheduleResponseByMonthModel({
     bool? status,
-    @JsonKey(name: 'data')
-    DataScheduleByMonthModel? dataByMonth,
+    @JsonKey(name: 'data') DataScheduleByMonthModel? dataByMonth,
   }) = _ScheduleResponseByMonthModel;
   const ScheduleResponseByMonthModel._();
 
@@ -33,7 +32,7 @@ class ScheduleResponseByMonthModel with _$ScheduleResponseByMonthModel {
 }
 
 @freezed
-class DataScheduleByDayModel with _$DataScheduleByDayModel {
+abstract class DataScheduleByDayModel with _$DataScheduleByDayModel {
   const factory DataScheduleByDayModel({
     String? id,
     @JsonKey(name: 'lokasi') String? location,
@@ -47,25 +46,26 @@ class DataScheduleByDayModel with _$DataScheduleByDayModel {
   factory DataScheduleByDayModel.fromJson(Map<String, dynamic> json) =>
       _$DataScheduleByDayModelFromJson(json);
 
-  factory DataScheduleByDayModel.fromEntity(ScheduleByDay entity) => DataScheduleByDayModel(
-    id: entity.id,
-    location: entity.location,
-    area: entity.area,
-    coordinate: entity.coordinate?.toModel(),
-    schedule: entity.schedule?.toModel(),
-  );
+  factory DataScheduleByDayModel.fromEntity(ScheduleByDay entity) =>
+      DataScheduleByDayModel(
+        id: entity.id,
+        location: entity.location,
+        area: entity.area,
+        coordinate: entity.coordinate?.toModel(),
+        schedule: entity.schedule?.toModel(),
+      );
 
   ScheduleByDay toEntity() => ScheduleByDay(
-    id: id,
-    location: location,
-    area: area,
-    coordinate: coordinate?.toEntity(),
-    schedule: schedule?.toEntity(),
-  );
+        id: id,
+        location: location,
+        area: area,
+        coordinate: coordinate?.toEntity(),
+        schedule: schedule?.toEntity(),
+      );
 }
 
 @freezed
-class DataScheduleByMonthModel with _$DataScheduleByMonthModel {
+abstract class DataScheduleByMonthModel with _$DataScheduleByMonthModel {
   const factory DataScheduleByMonthModel({
     String? id,
     @JsonKey(name: 'lokasi') String? location,
@@ -79,26 +79,26 @@ class DataScheduleByMonthModel with _$DataScheduleByMonthModel {
   factory DataScheduleByMonthModel.fromJson(Map<String, dynamic> json) =>
       _$DataScheduleByMonthModelFromJson(json);
 
-  factory DataScheduleByMonthModel.fromEntity(ScheduleByMonth entity) => DataScheduleByMonthModel(
-    id: entity.id,
-    location: entity.location,
-    area: entity.area,
-    coordinate: entity.coordinate?.toModel(),
-    schedule: entity.schedule?.map((e) => e.toModel()).toList(),
-  );
+  factory DataScheduleByMonthModel.fromEntity(ScheduleByMonth entity) =>
+      DataScheduleByMonthModel(
+        id: entity.id,
+        location: entity.location,
+        area: entity.area,
+        coordinate: entity.coordinate?.toModel(),
+        schedule: entity.schedule?.map((e) => e.toModel()).toList(),
+      );
 
   ScheduleByMonth toEntity() => ScheduleByMonth(
-    id: id,
-    location: location,
-    area: area,
-    coordinate: coordinate?.toEntity(),
-    schedule: schedule?.map((e) => e.toEntity()).toList(),
-  );
-
+        id: id,
+        location: location,
+        area: area,
+        coordinate: coordinate?.toEntity(),
+        schedule: schedule?.map((e) => e.toEntity()).toList(),
+      );
 }
 
 @freezed
-class ScheduleModel with _$ScheduleModel {
+abstract class ScheduleModel with _$ScheduleModel {
   const factory ScheduleModel({
     @JsonKey(name: 'tanggal') String? date,
     String? imsak,
@@ -117,32 +117,32 @@ class ScheduleModel with _$ScheduleModel {
       _$ScheduleModelFromJson(json);
 
   factory ScheduleModel.fromEntity(Schedule entity) => ScheduleModel(
-    date: entity.date,
-    imsak: entity.imsak,
-    subuh: entity.subuh,
-    syuruq: entity.syuruq,
-    dhuha: entity.dhuha,
-    dzuhur: entity.dzuhur,
-    ashar: entity.ashar,
-    maghrib: entity.maghrib,
-    isya: entity.isya,
-  );
+        date: entity.date,
+        imsak: entity.imsak,
+        subuh: entity.subuh,
+        syuruq: entity.syuruq,
+        dhuha: entity.dhuha,
+        dzuhur: entity.dzuhur,
+        ashar: entity.ashar,
+        maghrib: entity.maghrib,
+        isya: entity.isya,
+      );
 
   Schedule toEntity() => Schedule(
-    date: date,
-    imsak: imsak,
-    subuh: subuh,
-    syuruq: syuruq,
-    dhuha: dhuha,
-    dzuhur: dzuhur,
-    ashar: ashar,
-    maghrib: maghrib,
-    isya: isya,
-  );
+        date: date,
+        imsak: imsak,
+        subuh: subuh,
+        syuruq: syuruq,
+        dhuha: dhuha,
+        dzuhur: dzuhur,
+        ashar: ashar,
+        maghrib: maghrib,
+        isya: isya,
+      );
 }
 
 @freezed
-class CoordinateModel with _$CoordinateModel {
+abstract class CoordinateModel with _$CoordinateModel {
   const factory CoordinateModel({
     double? lat,
     double? lon,
@@ -156,16 +156,16 @@ class CoordinateModel with _$CoordinateModel {
       _$CoordinateModelFromJson(json);
 
   factory CoordinateModel.fromEntity(Coordinate entity) => CoordinateModel(
-    lat: entity.lat,
-    lon: entity.lon,
-    latitude: entity.latitude,
-    longitude: entity.longitude,
-  );
+        lat: entity.lat,
+        lon: entity.lon,
+        latitude: entity.latitude,
+        longitude: entity.longitude,
+      );
 
   Coordinate toEntity() => Coordinate(
-    lat: lat,
-    lon: lon,
-    latitude: latitude,
-    longitude: longitude,
-  );
+        lat: lat,
+        lon: lon,
+        latitude: latitude,
+        longitude: longitude,
+      );
 }

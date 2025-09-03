@@ -1,7 +1,7 @@
 part of 'share_verse_bloc.dart';
 
 @freezed
-class ShareVerseState with _$ShareVerseState {
+abstract class ShareVerseState with _$ShareVerseState {
   const factory ShareVerseState({
     Verses? verse,
     JuzConstant? juz,
@@ -15,5 +15,7 @@ class ShareVerseState with _$ShareVerseState {
     @Default(true) bool isArabicVisible,
     @Default(true) bool isLatinVisible,
     @Default(true) bool isTranslationVisible,
+    // custom background image path
+    String? backgroundImagePath,
   }) = _ShareVerseState;
 }

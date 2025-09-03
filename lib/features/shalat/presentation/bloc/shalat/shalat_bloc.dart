@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_qiblah/flutter_qiblah.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:injectable/injectable.dart';
 import 'package:quranku/core/constants/hive_constants.dart';
 import 'package:quranku/core/utils/extension/dartz_ext.dart';
@@ -16,6 +16,7 @@ import 'package:quranku/core/utils/extension/extension.dart';
 import 'package:quranku/features/shalat/domain/entities/geolocation.codegen.dart';
 import 'package:quranku/features/shalat/domain/usecase/get_location_manual_usecase.dart';
 import 'package:quranku/features/shalat/domain/usecase/schedule_prayer_alarm_usecase.dart';
+import 'package:quranku/features/shalat/domain/usecase/schedule_prayer_alarm_with_location_usecase.dart';
 import 'package:quranku/features/shalat/domain/usecase/set_location_manual_usecase.dart';
 
 import '../../../../../core/error/failures.dart';
@@ -50,6 +51,8 @@ class ShalatBloc extends Bloc<ShalatEvent, ShalatState> {
   final GetPrayerScheduleSettingUseCase _getPrayerScheduleSetting;
   final SetPrayerScheduleSettingUseCase _setPrayerScheduleSetting;
   final SchedulePrayerAlarmUseCase _schedulePrayerAlarmUseCase;
+  final SchedulePrayerAlarmWithLocationUseCase
+      _schedulePrayerAlarmWithLocationUseCase;
 
   StreamSubscription<Either<Failure, LocationStatus>>?
       _streamPermissionLocation;
@@ -59,7 +62,8 @@ class ShalatBloc extends Bloc<ShalatEvent, ShalatState> {
     this._setLocationManual,
     this._getPrayerScheduleSetting,
     this._setPrayerScheduleSetting,
-    this._schedulePrayerAlarmUseCase, {
+    this._schedulePrayerAlarmUseCase,
+    this._schedulePrayerAlarmWithLocationUseCase, {
     required this.getCityId,
     required this.getScheduleByDay,
     required this.getScheduleByMonth,
@@ -80,6 +84,9 @@ class ShalatBloc extends Bloc<ShalatEvent, ShalatState> {
     on<_GetPrayerScheduleSettingEvent>(_onGetPrayerScheduleSetting);
     on<_SetPrayerScheduleSettingEvent>(_onSetPrayerScheduleSetting);
     on<_SchedulePrayerAlarmEvent>(_onSchedulePrayerAlarmEvent);
+    on<_SchedulePrayerAlarmWithLocationEvent>(
+        _onSchedulePrayerAlarmWithLocationEvent);
+    on<_CheckAndUpdateNotificationsEvent>(_onCheckAndUpdateNotificationsEvent);
   }
 
   void _onStreamPermissionLocation() {
@@ -106,7 +113,10 @@ class ShalatBloc extends Bloc<ShalatEvent, ShalatState> {
     Emitter<ShalatState> emit,
   ) async {
     emit(state.copyWith(locale: event.locale ?? const Locale('en', 'US')));
-    add(_SchedulePrayerAlarmEvent());
+
+    // Check for location changes and update notifications if needed
+    add(const _CheckAndUpdateNotificationsEvent());
+
     final box = await Hive.openBox<bool>(HiveConst.permissionBox);
     final hasShown = box.get(HiveConst.hasShownLocationPermissionKey) ?? false;
     emit(state.copyWith(hasShownPermissionDialog: hasShown));
@@ -327,6 +337,7 @@ class ShalatBloc extends Bloc<ShalatEvent, ShalatState> {
     );
     emit(
       state.copyWith(
+        hasAnyChanges: true,
         prayerScheduleSetting: result.fold(
           (failure) => left(
             GeneralFailure(
@@ -344,6 +355,51 @@ class ShalatBloc extends Bloc<ShalatEvent, ShalatState> {
     Emitter<ShalatState> emit,
   ) async {
     await _schedulePrayerAlarmUseCase(NoParams());
+  }
+
+  void _onSchedulePrayerAlarmWithLocationEvent(
+    _SchedulePrayerAlarmWithLocationEvent event,
+    Emitter<ShalatState> emit,
+  ) async {
+    await _schedulePrayerAlarmWithLocationUseCase(
+      SchedulePrayerAlarmWithLocationParams(
+        location: event.location,
+        forceUpdate: event.forceUpdate,
+      ),
+    );
+    emit(
+      state.copyWith(
+        hasAnyChanges: false,
+      ),
+    );
+  }
+
+  void _onCheckAndUpdateNotificationsEvent(
+    _CheckAndUpdateNotificationsEvent event,
+    Emitter<ShalatState> emit,
+  ) async {
+    // Get current location
+    final geoLocationResult = await getCurrentLocation(
+      GetCurrentLocationParams(locale: state.locale),
+    );
+
+    if (geoLocationResult.isLeft()) {
+      // If we can't get the current location, just use the regular scheduling
+      add(_SchedulePrayerAlarmEvent());
+      return;
+    }
+
+    final geoLocation = geoLocationResult.asRight();
+    if (geoLocation == null) {
+      add(_SchedulePrayerAlarmEvent());
+      return;
+    }
+
+    // Schedule prayer alarms with the current location
+    add(_SchedulePrayerAlarmWithLocationEvent(
+      location: geoLocation,
+      forceUpdate: true,
+    ));
   }
 
   @override

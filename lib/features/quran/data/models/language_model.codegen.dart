@@ -6,7 +6,7 @@ part 'language_model.codegen.freezed.dart';
 part 'language_model.codegen.g.dart';
 
 @freezed
-class LanguageModel with _$LanguageModel {
+abstract class LanguageModel with _$LanguageModel {
   const factory LanguageModel({
     String? en,
     String? id,
@@ -15,17 +15,18 @@ class LanguageModel with _$LanguageModel {
 
   const LanguageModel._();
 
-  factory LanguageModel.fromJson(Map<String, dynamic> json) => _$LanguageModelFromJson(json);
+  factory LanguageModel.fromJson(Map<String, dynamic> json) =>
+      _$LanguageModelFromJson(json);
 
   factory LanguageModel.fromEntity(Language entity) => LanguageModel(
-    en: entity.en,
-    id: entity.id,
-    arab: entity.arab,
-  );
+        en: entity.en,
+        id: entity.id,
+        arab: entity.arab,
+      );
 
   Language toEntity() => Language(
-    en: en,
-    id: id,
-    arab: arab,
-  );
+        en: en,
+        id: id,
+        arab: arab,
+      );
 }

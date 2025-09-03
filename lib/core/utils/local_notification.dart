@@ -11,6 +11,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 @Singleton()
 class LocalNotification {
   final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  static const _defaultIcon = 'ic_notification';
 
   Future<void> init() async {
     // Get device timezone
@@ -30,7 +31,7 @@ class LocalNotification {
     }
 
     const initSettingsAndroid = AndroidInitializationSettings(
-      'ic_notification',
+      _defaultIcon,
     );
     final initSettingsDarwin = DarwinInitializationSettings();
 
@@ -56,6 +57,7 @@ class LocalNotification {
       channel?.second ?? 'High Importance Notifications',
       importance: Importance.max,
       priority: Priority.high,
+      icon: _defaultIcon,
       showWhen: false,
     );
     const iosPlatformChannelSpecifics = DarwinNotificationDetails(
@@ -87,6 +89,7 @@ class LocalNotification {
     final androidPlatformChannelSpecifics = AndroidNotificationDetails(
       channel?.first ?? 'reminder_channel',
       channel?.second ?? 'Reminder Channel',
+      icon: _defaultIcon,
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -110,8 +113,6 @@ class LocalNotification {
       body,
       tzDateTime,
       platformChannelSpecifics,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
       matchDateTimeComponents: DateTimeComponents.dateAndTime,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -125,18 +126,30 @@ class LocalNotification {
     required TimeOfDay timeOfDay,
     String? payload,
     Pair<String, String>? channel,
+    String? androidSound, // nama file di res/raw (tanpa ekstensi)
+    String?
+        iosSound, // nama file lengkap dengan ekstensi (e.g. notif_sound.aiff)
+    bool mute = false,
   }) async {
     final androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      channel?.first ?? 'periodic_channel',
-      channel?.second ?? 'Periodic Notifications',
+      '${channel?.first ?? 'periodic_channel'}${mute ? '_mute' : ''}${androidSound != null ? '_customSound' : ''}',
+      '${channel?.second ?? 'Periodic Notifications'}${mute ? '_mute' : ''}${androidSound != null ? '_customSound' : ''}',
       importance: Importance.max,
       priority: Priority.high,
+      icon: _defaultIcon,
+      playSound: !mute,
+      sound: mute || androidSound == null
+          ? null
+          : RawResourceAndroidNotificationSound(androidSound),
     );
-    const iosPlatformChannelSpecifics = DarwinNotificationDetails(
+
+    final iosPlatformChannelSpecifics = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
-      presentSound: true,
+      presentSound: !mute,
+      sound: mute || iosSound == null ? null : iosSound,
     );
+
     final platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
       iOS: iosPlatformChannelSpecifics,
@@ -161,8 +174,6 @@ class LocalNotification {
       body,
       firstSchedule,
       platformChannelSpecifics,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
       matchDateTimeComponents: DateTimeComponents.time,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,

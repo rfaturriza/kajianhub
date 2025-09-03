@@ -3,10 +3,12 @@ import 'package:quranku/features/payment/domain/entities/transaction_body_midtra
 
 part 'transaction_request_model.codegen.freezed.dart';
 part 'transaction_request_model.codegen.g.dart';
+
 @freezed
-class TransactionRequestModel with _$TransactionRequestModel {
+abstract class TransactionRequestModel with _$TransactionRequestModel {
   const factory TransactionRequestModel({
-    @JsonKey(name: "transaction_details") required TransactionDetailsModel transactionDetails,
+    @JsonKey(name: "transaction_details")
+    required TransactionDetailsModel transactionDetails,
     @JsonKey(name: "credit_card") required CreditCardModel creditCard,
   }) = _TransactionRequestModel;
 
@@ -16,14 +18,14 @@ class TransactionRequestModel with _$TransactionRequestModel {
       _$TransactionRequestModelFromJson(json);
 
   TransactionBodyMidtrans toEntity() => TransactionBodyMidtrans(
-    grossAmount: transactionDetails.grossAmount,
-    orderId: transactionDetails.orderId,
-    secureCreditCard: creditCard.secure,
-  );
+        grossAmount: transactionDetails.grossAmount,
+        orderId: transactionDetails.orderId,
+        secureCreditCard: creditCard.secure,
+      );
 }
 
 @freezed
-class TransactionDetailsModel with _$TransactionDetailsModel {
+abstract class TransactionDetailsModel with _$TransactionDetailsModel {
   const factory TransactionDetailsModel({
     @JsonKey(name: "order_id") required String orderId,
     @JsonKey(name: "gross_amount") required int grossAmount,
@@ -34,7 +36,7 @@ class TransactionDetailsModel with _$TransactionDetailsModel {
 }
 
 @freezed
-class CreditCardModel with _$CreditCardModel {
+abstract class CreditCardModel with _$CreditCardModel {
   const factory CreditCardModel({
     required bool secure,
   }) = _CreditCardModel;

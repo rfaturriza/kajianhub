@@ -1,7 +1,7 @@
 part of 'in_app_purchase_bloc.dart';
 
 @freezed
-class InAppPurchaseEvent with _$InAppPurchaseEvent {
+abstract class InAppPurchaseEvent with _$InAppPurchaseEvent {
   const factory InAppPurchaseEvent.streamPurchaseEvent(
     List<PurchaseDetails> purchaseDetails,
   ) = _StreamPurchaseEvent;

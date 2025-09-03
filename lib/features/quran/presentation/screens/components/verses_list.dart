@@ -83,7 +83,7 @@ class _VersesListState extends State<VersesList> {
     WidgetsBinding.instance.addPostFrameCallback(_scrollTo);
   }
 
-  void _scrollTo(_) async {
+  void _scrollTo(Duration duration) {
     if (widget.toVerses != null) {
       final toVerse = () {
         if (widget.preBismillah?.isNotEmpty == true) {
@@ -121,7 +121,7 @@ class _VersesListState extends State<VersesList> {
       if (lastItem != widget.listVerses.length - 1) {
         _itemScrollController.scrollTo(
           index: index,
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOutCubic,
         );
       }
@@ -252,7 +252,8 @@ class _VersesListState extends State<VersesList> {
       },
       child: BlocListener<AudioVerseBloc, AudioVerseState>(
         listener: (context, state) {
-          if (state.audioVersePlaying != null) {
+          if (state.audioVersePlaying != null &&
+              (state.errorMessage == null || state.errorMessage!.isEmpty)) {
             _autoScrollPlayingAudio(state);
           }
         },
@@ -462,7 +463,7 @@ class ListTileVerses extends StatelessWidget {
                                   context, verses, clickFrom, juz, surah);
                             },
                             onSharePressed: () {
-                              context.goNamed(
+                              context.pushNamed(
                                 RootRouter.shareVerseRoute.name,
                                 extra: ShareVerseScreenExtra(
                                   verse: verses,

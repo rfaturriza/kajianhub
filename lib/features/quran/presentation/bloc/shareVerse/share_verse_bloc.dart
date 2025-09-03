@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,6 +32,7 @@ class ShareVerseBloc extends Bloc<ShareVerseEvent, ShareVerseState> {
     on<_OnToggleLatinVisibility>(_onToggleLatinVisibility);
     on<_OnToggleTranslationVisibility>(_onToggleTranslationVisibility);
     on<_OnSharePressed>(_onSharePressed);
+    on<_OnPickBackgroundImage>(_onPickBackgroundImage);
   }
 
   void _onInit(
@@ -50,7 +50,11 @@ class ShareVerseBloc extends Bloc<ShareVerseEvent, ShareVerseState> {
     _OnChangeBackgroundColor event,
     Emitter<ShareVerseState> emit,
   ) {
-    emit(state.copyWith(backgroundColor: event.color));
+    emit(state.copyWith(
+      backgroundColor: event.color,
+      randomImageUrl: null,
+      backgroundImagePath: null,
+    ));
   }
 
   void _onChangeRandomImageUrl(
@@ -61,12 +65,14 @@ class ShareVerseBloc extends Bloc<ShareVerseEvent, ShareVerseState> {
     if (state.backgroundColor != null) {
       emit(state.copyWith(
         backgroundColor: null,
+        backgroundImagePath: null,
       ));
       return;
     }
     emit(state.copyWith(
       randomImageUrl: randomString,
       backgroundColor: null,
+      backgroundImagePath: null,
     ));
   }
 
@@ -125,15 +131,29 @@ class ShareVerseBloc extends Bloc<ShareVerseEvent, ShareVerseState> {
       return;
     }
     emit(state.copyWith(isLoading: false));
-    Share.shareXFiles(
-      [
-        XFile.fromData(
-          pngBytes,
-          name: 'verse-story.png',
-          mimeType: 'image/png',
-        ),
-      ],
+    SharePlus.instance.share(
+      ShareParams(
+        files: [
+          XFile.fromData(
+            pngBytes,
+            name: 'verse-story.png',
+            mimeType: 'image/png',
+          ),
+        ],
+      ),
     );
+  }
+
+  // handle custom background image selection
+  void _onPickBackgroundImage(
+    _OnPickBackgroundImage event,
+    Emitter<ShareVerseState> emit,
+  ) {
+    emit(state.copyWith(
+      backgroundImagePath: event.path,
+      backgroundColor: null,
+      randomImageUrl: null,
+    ));
   }
 
   @override

@@ -1,7 +1,7 @@
 part of 'bookmark_bloc.dart';
 
 @freezed
-class BookmarkEvent with _$BookmarkEvent {
+abstract class BookmarkEvent with _$BookmarkEvent {
   const factory BookmarkEvent.getListVersesBookmark() = _GetListVersesBookmark;
 
   const factory BookmarkEvent.getListSurahBookmark() = _GetListSurahBookmark;
@@ -9,8 +9,8 @@ class BookmarkEvent with _$BookmarkEvent {
   const factory BookmarkEvent.getListJuzBookmark() = _GetListJuzBookmark;
 
   const factory BookmarkEvent.onChangedExpansionPanel({
-   required int index,
-   required bool isExpanded,
+    required int index,
+    required bool isExpanded,
   }) = _OnChangedExpansionPanel;
 }
 

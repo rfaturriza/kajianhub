@@ -1,24 +1,36 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:quranku/core/utils/extension/string_ext.dart';
-import 'package:quranku/features/kajian/domain/entities/kajian_schedule.codegen.dart';
+import 'package:quranku/features/kajian/data/models/kajian_schedules_response_model.codegen.dart';
+import 'package:quranku/features/ustadz/domain/entities/ustadz_entity.codegen.dart';
 
 part 'ustadz_response_model.codegen.freezed.dart';
 part 'ustadz_response_model.codegen.g.dart';
 
 @freezed
-class UstadzResponseModel with _$UstadzResponseModel {
+abstract class UstadzResponseModel with _$UstadzResponseModel {
   const factory UstadzResponseModel({
     List<DataUstadzModel>? data,
+    LinksKajianHubModel? links,
+    MetaKajianHubModel? meta,
   }) = _UstadzResponseModel;
 
   factory UstadzResponseModel.fromJson(Map<String, dynamic> json) =>
       _$UstadzResponseModelFromJson(json);
+
+  const UstadzResponseModel._();
+
+  UstadzListEntity toUstadzListEntity() {
+    return UstadzListEntity(
+      data: data?.map((e) => e.toEntity()).toList() ?? [],
+      meta: meta?.toEntity(),
+    );
+  }
 }
 
 @freezed
-class DataUstadzModel with _$DataUstadzModel {
+abstract class DataUstadzModel with _$DataUstadzModel {
   const factory DataUstadzModel({
     int? id,
+    @JsonKey(name: 'ustadz_id') String? ustadzId,
     String? name,
     String? email,
     bool? isAdmin,
@@ -33,8 +45,8 @@ class DataUstadzModel with _$DataUstadzModel {
     @JsonKey(name: 'city_id') String? cityId,
     String? picture,
     @JsonKey(name: 'picture_url') String? pictureUrl,
-    @JsonKey(name: 'subscribers_count') int? subscribersCount,
-    @JsonKey(name: 'kajian_count') int? kajianCount,
+    @JsonKey(name: 'subscribers_count') String? subscribersCount,
+    @JsonKey(name: 'kajian_count') String? kajianCount,
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
     @JsonKey(name: 'deleted_at') String? deletedAt,
@@ -48,21 +60,37 @@ class DataUstadzModel with _$DataUstadzModel {
   factory DataUstadzModel.fromJson(Map<String, dynamic> json) =>
       _$DataUstadzModelFromJson(json);
 
-  Ustadz toEntity() {
-    return Ustadz(
+  UstadzEntity toEntity() {
+    return UstadzEntity(
       id: id ?? 0,
-      ustadzId: id.toString(),
-      name: name ?? emptyString,
-      email: email ?? emptyString,
-      placeOfBirth: placeOfBirth ?? emptyString,
-      dateOfBirth: dateOfBirth ?? emptyString,
-      contactPerson: contactPerson ?? emptyString,
+      name: name ?? '',
+      email: email ?? '',
+      placeOfBirth: placeOfBirth,
+      dateOfBirth: dateOfBirth,
+      contactPerson: contactPerson,
+      pictureUrl: pictureUrl,
+      subscribersCount: subscribersCount,
+      kajianCount: kajianCount,
+    );
+  }
+
+  factory DataUstadzModel.fromEntity(UstadzEntity entity) {
+    return DataUstadzModel(
+      id: entity.id,
+      name: entity.name,
+      email: entity.email,
+      placeOfBirth: entity.placeOfBirth,
+      dateOfBirth: entity.dateOfBirth,
+      contactPerson: entity.contactPerson,
+      pictureUrl: entity.pictureUrl,
+      subscribersCount: entity.subscribersCount,
+      kajianCount: entity.kajianCount,
     );
   }
 }
 
 @freezed
-class UstadzRolesModel with _$UstadzRolesModel {
+abstract class UstadzRolesModel with _$UstadzRolesModel {
   const factory UstadzRolesModel({
     int? id,
     @JsonKey(name: 'user_id') String? userId,

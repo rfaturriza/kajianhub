@@ -1,7 +1,7 @@
 import 'package:adhan/adhan.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'package:quranku/core/constants/hive_constants.dart';
 import 'package:quranku/features/shalat/data/models/schedule_model.codegen.dart';
 
@@ -9,7 +9,7 @@ part 'schedule.codegen.freezed.dart';
 part 'schedule.codegen.g.dart';
 
 @freezed
-class ScheduleByDay with _$ScheduleByDay {
+abstract class ScheduleByDay with _$ScheduleByDay {
   const factory ScheduleByDay({
     String? id,
     String? location,
@@ -31,7 +31,7 @@ class ScheduleByDay with _$ScheduleByDay {
 }
 
 @freezed
-class ScheduleByMonth with _$ScheduleByMonth {
+abstract class ScheduleByMonth with _$ScheduleByMonth {
   const factory ScheduleByMonth({
     String? id,
     String? location,
@@ -52,7 +52,7 @@ class ScheduleByMonth with _$ScheduleByMonth {
 }
 
 @freezed
-class Schedule with _$Schedule {
+abstract class Schedule with _$Schedule {
   const factory Schedule({
     String? date,
     String? imsak,
@@ -102,7 +102,7 @@ class Schedule with _$Schedule {
 
 @freezed
 @HiveType(typeId: HiveTypeConst.coordinate)
-class Coordinate with _$Coordinate {
+abstract class Coordinate with _$Coordinate {
   const factory Coordinate({
     @HiveField(0) double? lat,
     @HiveField(1) double? lon,

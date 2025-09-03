@@ -1,9 +1,9 @@
 import 'package:adhan/adhan.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hive/hive.dart';
-import 'package:quranku/features/shalat/presentation/helper/helper_time_shalat.dart';
+import 'package:hive_ce/hive.dart';
 
 import '../../../../core/constants/hive_constants.dart';
+import '../../domain/entities/prayer_in_app.dart';
 import '../../domain/entities/prayer_schedule_setting.codegen.dart';
 
 part 'prayer_schedule_setting_model.codegen.freezed.dart';
@@ -11,7 +11,7 @@ part 'prayer_schedule_setting_model.codegen.g.dart';
 
 @freezed
 @HiveType(typeId: HiveTypeConst.prayerScheduleSettingModel)
-class PrayerScheduleSettingModel with _$PrayerScheduleSettingModel {
+abstract class PrayerScheduleSettingModel with _$PrayerScheduleSettingModel {
   const factory PrayerScheduleSettingModel({
     @HiveField(0) @Default([]) List<PrayerAlarmModel> alarms,
     @HiveField(1) @Default('egyptian') String calculationMethod,
@@ -55,11 +55,13 @@ class PrayerScheduleSettingModel with _$PrayerScheduleSettingModel {
 
 @freezed
 @HiveType(typeId: HiveTypeConst.prayerAlarmModel)
-class PrayerAlarmModel with _$PrayerAlarmModel {
+abstract class PrayerAlarmModel with _$PrayerAlarmModel {
   const factory PrayerAlarmModel({
     @HiveField(0) DateTime? time,
     @HiveField(1) String? prayer,
-    @HiveField(2) @Default(false) bool isAlarmActive,
+    @HiveField(3) @Default(3) int alarmType,
+    @HiveField(4) @Default(0) int reminderTime,
+    @HiveField(5) @Default(false) bool reminderEnabled,
   }) = _PrayerAlarmModel;
 
   const PrayerAlarmModel._();
@@ -71,7 +73,9 @@ class PrayerAlarmModel with _$PrayerAlarmModel {
     return PrayerAlarmModel(
       time: entity?.time,
       prayer: entity?.prayer?.name,
-      isAlarmActive: entity?.isAlarmActive ?? false,
+      alarmType: entity?.alarmType ?? 3,
+      reminderTime: entity?.reminderTime ?? 0,
+      reminderEnabled: entity?.reminderEnabled ?? false,
     );
   }
 
@@ -82,7 +86,9 @@ class PrayerAlarmModel with _$PrayerAlarmModel {
         (element) => element.name == prayer,
         orElse: () => PrayerInApp.imsak,
       ),
-      isAlarmActive: isAlarmActive,
+      alarmType: alarmType,
+      reminderTime: reminderTime,
+      reminderEnabled: reminderEnabled,
     );
   }
 }

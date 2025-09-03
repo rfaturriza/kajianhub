@@ -2,12 +2,13 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../domain/entities/prayer_kajian_schedules.codegen.dart';
 import 'kajian_schedules_response_model.codegen.dart';
+import 'study_locations_response_model.codegen.dart';
 
 part 'prayer_kajian_schedules_response_model.codegen.freezed.dart';
 part 'prayer_kajian_schedules_response_model.codegen.g.dart';
 
 @freezed
-class PrayerKajianSchedulesByMosqueResponseModel
+abstract class PrayerKajianSchedulesByMosqueResponseModel
     with _$PrayerKajianSchedulesByMosqueResponseModel {
   const factory PrayerKajianSchedulesByMosqueResponseModel({
     String? prayDate,
@@ -20,11 +21,12 @@ class PrayerKajianSchedulesByMosqueResponseModel
 }
 
 @freezed
-class PrayerKajianSchedulesResponseModel with _$PrayerKajianSchedulesResponseModel {
+abstract class PrayerKajianSchedulesResponseModel
+    with _$PrayerKajianSchedulesResponseModel {
   const factory PrayerKajianSchedulesResponseModel({
     List<PrayerKajianScheduleModel>? data,
-    LinksKajianScheduleModel? links,
-    MetaKajianScheduleModel? meta,
+    LinksKajianHubModel? links,
+    MetaKajianHubModel? meta,
   }) = _PrayerKajianSchedulesResponseModel;
 
   const PrayerKajianSchedulesResponseModel._();
@@ -36,16 +38,17 @@ class PrayerKajianSchedulesResponseModel with _$PrayerKajianSchedulesResponseMod
   PrayerkajianSchedules toEntity() {
     return PrayerkajianSchedules(
       data: data?.map((e) => e.toEntity()).toList() ?? [],
-      links: links?.toEntity() ?? LinksKajianScheduleModel.empty().toEntity(),
-      meta: meta?.toEntity() ?? MetaKajianScheduleModel.empty().toEntity(),
+      links: links?.toEntity() ?? LinksKajianHubModel.empty().toEntity(),
+      meta: meta?.toEntity() ?? MetaKajianHubModel.empty().toEntity(),
     );
   }
 }
 
 @freezed
-class DataPrayerKajianScheduleModel with _$DataPrayerKajianScheduleModel {
+abstract class DataPrayerKajianScheduleModel
+    with _$DataPrayerKajianScheduleModel {
   const factory DataPrayerKajianScheduleModel({
-    StudyLocationModel? studyLocation,
+    DataStudyLocationModel? studyLocation,
     List<PrayerKajianScheduleModel>? schedules,
   }) = _DataPrayerKajianScheduleModel;
 
@@ -54,7 +57,7 @@ class DataPrayerKajianScheduleModel with _$DataPrayerKajianScheduleModel {
 }
 
 @freezed
-class PrayerKajianScheduleModel with _$PrayerKajianScheduleModel {
+abstract class PrayerKajianScheduleModel with _$PrayerKajianScheduleModel {
   const factory PrayerKajianScheduleModel({
     int? id,
     @JsonKey(name: 'pray_date') String? prayDate,
@@ -67,7 +70,7 @@ class PrayerKajianScheduleModel with _$PrayerKajianScheduleModel {
     String? khatib,
     String? imam,
     String? link,
-    StudyLocationModel? studyLocation,
+    DataStudyLocationModel? studyLocation,
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
     @JsonKey(name: 'deleted_at') String? deletedAt,

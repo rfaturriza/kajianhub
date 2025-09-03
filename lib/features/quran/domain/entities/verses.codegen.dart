@@ -6,7 +6,7 @@ import '../../data/models/verses_model.codegen.dart';
 part 'verses.codegen.freezed.dart';
 
 @freezed
-class Verses with _$Verses {
+abstract class Verses with _$Verses {
   const factory Verses({
     bool? isBookmarked,
     VersesNumber? number,
@@ -30,7 +30,7 @@ class Verses with _$Verses {
 }
 
 @freezed
-class VersesNumber with _$VersesNumber {
+abstract class VersesNumber with _$VersesNumber {
   const factory VersesNumber({
     int? inQuran,
     int? inSurah,
@@ -45,7 +45,7 @@ class VersesNumber with _$VersesNumber {
 }
 
 @freezed
-class VersesMeta with _$VersesMeta {
+abstract class VersesMeta with _$VersesMeta {
   const factory VersesMeta({
     int? juz,
     int? page,
@@ -68,7 +68,7 @@ class VersesMeta with _$VersesMeta {
 }
 
 @freezed
-class VersesSajda with _$VersesSajda {
+abstract class VersesSajda with _$VersesSajda {
   const factory VersesSajda({
     bool? recommended,
     bool? obligatory,
@@ -83,7 +83,7 @@ class VersesSajda with _$VersesSajda {
 }
 
 @freezed
-class VersesText with _$VersesText {
+abstract class VersesText with _$VersesText {
   const factory VersesText({
     String? arab,
     Language? transliteration,
@@ -98,7 +98,7 @@ class VersesText with _$VersesText {
 }
 
 @freezed
-class Audio with _$Audio {
+abstract class Audio with _$Audio {
   const factory Audio({
     String? primary,
     List<String>? secondary,
@@ -113,7 +113,7 @@ class Audio with _$Audio {
 }
 
 @freezed
-class VersesTafsir with _$VersesTafsir {
+abstract class VersesTafsir with _$VersesTafsir {
   const factory VersesTafsir({
     TypeVersesTafsir? id,
   }) = _VersesTafsir;
@@ -126,7 +126,7 @@ class VersesTafsir with _$VersesTafsir {
 }
 
 @freezed
-class TypeVersesTafsir with _$TypeVersesTafsir {
+abstract class TypeVersesTafsir with _$TypeVersesTafsir {
   const factory TypeVersesTafsir({
     String? short,
     String? long,

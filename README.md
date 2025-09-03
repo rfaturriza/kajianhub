@@ -1,6 +1,12 @@
-# Muslim Book
+# KajianHub
 
-Muslim Book is a Flutter project designed to provide a modern and user-friendly Quran application for users to read and explore the Quranic text.  contributions are welcome.
+[![GitHub issues](https://img.shields.io/github/issues/rfaturriza/kajianhub)](https://github.com/rfaturriza/kajianhub/issues)
+[![GitHub forks](https://img.shields.io/github/forks/rfaturriza/kajianhub)](https://github.com/rfaturriza/kajianhub/network)
+[![GitHub stars](https://img.shields.io/github/stars/rfaturriza/kajianhub)](https://github.com/rfaturriza/kajianhub/stargazers)
+[![GitHub license](https://img.shields.io/github/license/rfaturriza/kajianhub)](https://github.com/rfaturriza/kajianhub/blob/main/LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/rfaturriza/kajianhub)](https://github.com/rfaturriza/kajianhub/commits/main)
+
+KajianHub is a Flutter project designed to provide a modern and user-friendly Quran application for users to read and explore the Quranic text.  contributions are welcome.
 
 <div style="display: flex; justify-content: center; align-items: center">
   <a href="https://apps.apple.com/id/app/kajianhub/id6739066951" target="_blank">
@@ -22,8 +28,11 @@ Muslim Book is a Flutter project designed to provide a modern and user-friendly 
 - Get It & Injectable
 - Github action CI
 - Fastlane CD
+- Firebase App Distribution
 
 ## Features
+- [✔] Display Studies (Kajian) list.
+- [✔] Display Study (Kajian) detail.
 - [✔] Display Quranic (Surah and Juz mode) text with translations.
 - [✔] Localization in English and Bahasa Indonesia.
 - [✔] Search functionality for finding specific Surah.
@@ -36,8 +45,7 @@ Muslim Book is a Flutter project designed to provide a modern and user-friendly 
 - [✔] Setting for changing font size, font type, language, etc.
 - [✔] Light and Dark mode for more comfortable reading.
 - [✔] Display Quranic text with tajweed.
-- [In Progress] Display detail Shalat time in calendar/permonth.
-- [In Progress] Localization more languages.
+- [✔] Display detail Shalat time in calendar/permonth.
 
 ## Installation
 To run this Flutter project on your local machine, follow these steps:
@@ -45,12 +53,12 @@ To run this Flutter project on your local machine, follow these steps:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/rfaturriza/muslim_book.git
+   git clone https://github.com/rfaturriza/kajianhub.git
 
 2. **Navigate to the project directory:**
 
    ```bash
-   cd muslim_book
+   cd kajianhub
 
 3. **Install dependencies:**
 
@@ -68,8 +76,37 @@ To run this Flutter project on your local machine, follow these steps:
     ```bash
     flutter run
     
+## CI/CD with GitHub Actions
+
+This project uses GitHub Actions for continuous integration and deployment. The following workflows are available:
+
+### Android Build & Deploy
+- Builds and deploys the Android app to Google Play Store or Firebase App Distribution
+- Supports version bumping (patch, minor, major)
+- Auto-generates release notes from commit history for Firebase Distribution
+
+#### Available Lanes:
+- **Google Play Store:**
+  - `internal_patch`, `internal_minor`, `internal_major`: Deploy to internal testing track
+  - `production_patch`, `production_minor`, `production_major`: Deploy to production track
+  - `promote_internal_to_beta`, `promote_beta_to_production`, `promote_internal_to_production`: Promote between tracks
+
+- **Firebase Distribution:**
+  - `firebase_dist_patch`, `firebase_dist_minor`, `firebase_dist_major`: Deploy to Firebase App Distribution
+
+### Required Secrets for Firebase Distribution:
+- `FIREBASE_APP_ID`: Your Firebase App ID for the Android app
+- `FIREBASE_CLI_TOKEN`: Firebase CLI token for authentication
+
+### How to Use:
+1. Go to the "Actions" tab in your GitHub repository
+2. Select the "Android Build & Deploy" workflow
+3. Click "Run workflow"
+4. Choose the desired lane and Firebase Distribution groups (if applicable)
+5. Click "Run workflow" to start the build and deployment process
+
 ## Contributing
-We welcome contributions from the community to help improve and expand the Muslim Book project. If you'd like to contribute, please follow these guidelines:
+We welcome contributions from the community to help improve and expand the KajianHub project. If you'd like to contribute, please follow these guidelines:
 
 Fork the repository and create a new branch for your feature or bug fix.
 
@@ -88,4 +125,4 @@ This project is licensed under the MIT License - see the LICENSE.md file for det
 If you have any questions or suggestions regarding the project, feel free to reach out to us:
 
 Email: rfaturriza@gmail.com
-We appreciate your interest in contributing to the Muslim Book project!
+We appreciate your interest in contributing to the KajianHub project!

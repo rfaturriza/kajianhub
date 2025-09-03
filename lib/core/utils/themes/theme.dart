@@ -31,7 +31,7 @@ ThemeData themeData({
     visualDensity: VisualDensity.adaptivePlatformDensity,
     fontFamily: FontConst.lato,
     textTheme: textTheme,
-    tabBarTheme: TabBarTheme(
+    tabBarTheme: TabBarThemeData(
       labelColor: primaryColor,
       labelStyle: textTheme.titleMedium?.copyWith(
         fontWeight: FontWeight.w500,
@@ -50,6 +50,11 @@ ThemeData themeData({
             isDarkMode ? darkColorScheme.onSurface : lightColorScheme.onSurface,
       ),
       actionsIconTheme: IconThemeData(
+        color:
+            isDarkMode ? darkColorScheme.onSurface : lightColorScheme.onSurface,
+      ),
+      titleTextStyle: textTheme.titleMedium?.copyWith(
+        fontWeight: FontWeight.bold,
         color:
             isDarkMode ? darkColorScheme.onSurface : lightColorScheme.onSurface,
       ),
@@ -101,7 +106,7 @@ ThemeData themeData({
         }),
       ),
     ),
-    dialogTheme: DialogTheme(
+    dialogTheme: DialogThemeData(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),

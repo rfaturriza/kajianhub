@@ -1,7 +1,7 @@
 part of 'styling_setting_bloc.dart';
 
 @freezed
-class StylingSettingEvent with _$StylingSettingEvent {
+abstract class StylingSettingEvent with _$StylingSettingEvent {
   const factory StylingSettingEvent.init() = _Init;
 
   const factory StylingSettingEvent.setArabicFontFamily({

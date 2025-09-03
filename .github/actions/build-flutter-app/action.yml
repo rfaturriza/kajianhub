@@ -1,0 +1,87 @@
+name: "Build Flutter App"
+description: "Reusable action to build Flutter apps with fallback strategies"
+
+inputs:
+  target:
+    description: "Build target (ios --no-codesign, apk --debug, etc.)"
+    required: true
+  platform:
+    description: "Platform (android/ios)"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build Flutter App
+      shell: bash
+      run: |
+        TARGET="${{ inputs.target }}"
+        PLATFORM="${{ inputs.platform }}"
+
+        echo "🏗️ Building Flutter app: $TARGET"
+
+        if [[ "$TARGET" == "ios --no-codesign" ]]; then
+          # iOS build with fallback strategies
+          echo "🍎 Building iOS with no-codesign..."
+          
+          # First attempt: Standard release build
+          if flutter build ios --no-codesign --release --no-tree-shake-icons; then
+            echo "✅ iOS Release build successful"
+          elif flutter build ios --no-codesign --debug; then
+            echo "⚠️ iOS Debug build successful (Release failed)"
+          elif flutter build ios --simulator --debug; then
+            echo "⚠️ iOS Simulator build successful (Device builds failed)"
+          else
+            echo "❌ All iOS build attempts failed"
+            echo "🔍 Available destinations:"
+            xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -showdestinations 2>/dev/null || echo "Could not list destinations"
+            echo "🔍 Available SDKs:"
+            xcodebuild -showsdks | grep -E "(ios|macos)" 2>/dev/null || echo "Could not list SDKs"
+            exit 1
+          fi
+        elif [[ "$PLATFORM" == "android" ]]; then
+          # Android build with memory management and retry logic
+          echo "🤖 Building Android: $TARGET"
+          
+          # Set environment variables for Android build
+          export GRADLE_OPTS="-Xmx6144m -XX:MaxMetaspaceSize=1024m"
+          export JAVA_OPTS="-Xmx6144m"
+          
+          # First attempt: Normal build
+          if flutter build $TARGET; then
+            echo "✅ Android build successful on first attempt"
+          else
+            echo "⚠️ First attempt failed, cleaning and retrying..."
+            
+            # Clean and retry
+            flutter clean
+            flutter pub get
+            
+            # Second attempt with more aggressive cleanup
+            if [ -d "android" ]; then
+              cd android
+              ./gradlew clean || echo "Gradle clean failed"
+              cd ..
+            fi
+            
+            # Retry build
+            if flutter build $TARGET; then
+              echo "✅ Android build successful on retry"
+            else
+              echo "❌ Android build failed after retry"
+              echo "🔍 Build diagnostics:"
+              flutter doctor -v || echo "Flutter doctor failed"
+              echo "🔍 Java version:"
+              java -version || echo "Java version check failed"
+              echo "🔍 Gradle version:"
+              cd android && ./gradlew --version 2>/dev/null || echo "Gradle version check failed"
+              exit 1
+            fi
+          fi
+        else
+          # Generic build
+          echo "📱 Building: $TARGET"
+          flutter build $TARGET
+        fi
+
+        echo "✅ Build completed successfully"

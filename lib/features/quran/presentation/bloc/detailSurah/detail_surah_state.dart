@@ -1,7 +1,7 @@
 part of 'detail_surah_bloc.dart';
 
 @freezed
-class SurahDetailState with _$SurahDetailState {
+abstract class SurahDetailState with _$SurahDetailState {
   const factory SurahDetailState({
     @Default(false) bool isLoading,
     Either<Failure, DetailSurah?>? detailSurahResult,

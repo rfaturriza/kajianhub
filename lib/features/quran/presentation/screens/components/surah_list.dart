@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quranku/core/components/error_screen.dart';
 import 'package:quranku/core/components/search_box.dart';
-import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/features/quran/presentation/bloc/surah/surah_bloc.dart';
 
 import '../../../../../core/route/root_router.dart';
@@ -14,8 +13,42 @@ import '../../../domain/entities/surah.codegen.dart';
 import '../detail_surah_screen.dart';
 import 'list_tile_surah.dart';
 
-class SurahList extends StatelessWidget {
+class SurahList extends StatefulWidget {
   const SurahList({super.key});
+
+  @override
+  State<SurahList> createState() => _SurahListState();
+
+
+
+  static void onTapSurah(
+    BuildContext context,
+    Surah? surah, {
+    int? jumpToVerse,
+  }) {
+    context.pushNamed(
+      RootRouter.surahRoute.name,
+      queryParameters: {
+        'jump_to': jumpToVerse?.toString(),
+      },
+      extra: DetailSurahScreenExtra(surah: surah),
+    );
+  }
+}
+
+class _SurahListState extends State<SurahList> {
+  @override
+  void initState() {
+    super.initState();
+    // Trigger fetch only if we don't have data yet
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final surahBloc = context.read<SurahBloc>();
+      if (surahBloc.state is! SurahLoadedState &&
+          surahBloc.state is! SurahLoadingState) {
+        surahBloc.add(const SurahFetchEvent());
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +83,6 @@ class SurahList extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
                 child: SearchBox(
-                  isDense: true,
                   initialValue: surahBloc.state.query ?? emptyString,
                   hintText: LocaleKeys.search.tr(),
                   onChanged: (val) {
@@ -74,17 +106,14 @@ class SurahList extends StatelessWidget {
                   );
                 }
                 if (listSurah == null || listSurah.isEmpty) {
-                  return Center(
-                    child: Text(
-                      LocaleKeys.noData.tr(),
-                      style: context.textTheme.headlineMedium,
-                    ),
+                  return ErrorScreen(
+                    message: LocaleKeys.noData.tr(),
                   );
                 }
 
                 final surahData = listSurah[index - 1];
                 return ListTileSurah(
-                  onTapSurah: () => onTapSurah(context, surahData),
+                  onTapSurah: () => SurahList.onTapSurah(context, surahData),
                   number: surahData.number?.toString() ?? emptyString,
                   name: surahData.name?.transliteration
                           ?.asLocale(context.locale) ??
@@ -99,20 +128,6 @@ class SurahList extends StatelessWidget {
           },
         );
       },
-    );
-  }
-
-  static void onTapSurah(
-    BuildContext context,
-    Surah? surah, {
-    int? jumpToVerse,
-  }) {
-    context.goNamed(
-      RootRouter.surahRoute.name,
-      queryParameters: {
-        'jump_to': jumpToVerse?.toString(),
-      },
-      extra: DetailSurahScreenExtra(surah: surah),
     );
   }
 }

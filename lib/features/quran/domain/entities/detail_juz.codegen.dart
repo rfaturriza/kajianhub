@@ -7,7 +7,7 @@ import 'verses.codegen.dart';
 part 'detail_juz.codegen.freezed.dart';
 
 @freezed
-class DetailJuz with _$DetailJuz {
+abstract class DetailJuz with _$DetailJuz {
   const factory DetailJuz({
     bool? isBookmarked,
     int? juz,

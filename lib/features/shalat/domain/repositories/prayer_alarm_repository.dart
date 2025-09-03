@@ -18,4 +18,12 @@ abstract class PrayerAlarmRepository {
   );
 
   Future<Either<Failure, Unit>> schedulePrayerAlarm();
+  
+  /// Schedules prayer alarms based on the current location
+  /// This ensures notifications are updated when location changes
+  Future<Either<Failure, Unit>> schedulePrayerAlarmWithLocation(GeoLocation location);
+  
+  /// Checks if the current location is significantly different from the stored location
+  /// Returns true if notifications should be updated
+  Future<Either<Failure, bool>> shouldUpdateNotifications(GeoLocation currentLocation);
 }

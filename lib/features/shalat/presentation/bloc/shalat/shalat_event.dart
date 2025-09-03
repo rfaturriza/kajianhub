@@ -1,7 +1,7 @@
 part of 'shalat_bloc.dart';
 
 @freezed
-class ShalatEvent with _$ShalatEvent {
+abstract class ShalatEvent with _$ShalatEvent {
   const factory ShalatEvent.init(
     Locale? locale,
   ) = _Init;
@@ -25,8 +25,7 @@ class ShalatEvent with _$ShalatEvent {
 
   const factory ShalatEvent.onChangedPermissionDialogEvent(
     bool hasShownPermissionDialog,
-  ) =
-      _OnChangedPermissionDialogEvent;
+  ) = _OnChangedPermissionDialogEvent;
 
   const factory ShalatEvent.getLocationManualEvent() = _GetLocationManualEvent;
 
@@ -43,4 +42,12 @@ class ShalatEvent with _$ShalatEvent {
 
   const factory ShalatEvent.schedulePrayerAlarmEvent() =
       _SchedulePrayerAlarmEvent;
+      
+  const factory ShalatEvent.schedulePrayerAlarmWithLocationEvent({
+    required GeoLocation location,
+    @Default(false) bool forceUpdate,
+  }) = _SchedulePrayerAlarmWithLocationEvent;
+  
+  const factory ShalatEvent.checkAndUpdateNotificationsEvent() =
+      _CheckAndUpdateNotificationsEvent;
 }

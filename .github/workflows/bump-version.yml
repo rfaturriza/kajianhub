@@ -37,18 +37,108 @@ jobs:
         id: branch-name
         run: echo "name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
 
-      - name: Bump Version
+      - name: Determine Version Bump Strategy
+        id: bump_strategy
         run: |
-          case "${{ github.event.inputs.lane }}" in
-            *_major) flutter pub global run cider bump major --bump-build ;;
-            *_minor) flutter pub global run cider bump minor --bump-build ;;
-            *_patch) flutter pub global run cider bump patch --bump-build ;;
-            *) echo "Skipping bump: not a version lane" ;;
+          lane="${{ inputs.lane }}"
+          echo "lane=$lane" >> $GITHUB_OUTPUT
+
+          # Only bump semantic version for production releases
+          # For internal/testing, only bump build number
+          case "$lane" in
+            production_major|production_minor|production_patch)
+              echo "is_production=true" >> $GITHUB_OUTPUT
+              echo "bump_type=${lane#production_}" >> $GITHUB_OUTPUT
+              echo "🚀 Production release detected - will bump semantic version"
+              ;;
+            *firebase_dist*|internal_*)
+              echo "is_production=false" >> $GITHUB_OUTPUT
+              echo "bump_type=build_only" >> $GITHUB_OUTPUT
+              echo "🔧 Internal/testing release detected - will only bump build number"
+              ;;
+            promote_*)
+              echo "is_production=false" >> $GITHUB_OUTPUT
+              echo "bump_type=none" >> $GITHUB_OUTPUT
+              echo "📦 Promotion detected - no version bump needed"
+              ;;
+            *)
+              echo "is_production=false" >> $GITHUB_OUTPUT
+              echo "bump_type=none" >> $GITHUB_OUTPUT
+              echo "⚠️ Unknown lane type - skipping version bump"
+              ;;
           esac
 
-      - name: Commit and Push
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: bump version (BOT)"
-          file_pattern: pubspec.yaml
-          branch: ${{ steps.branch-name.outputs.name }}
+      - name: Bump Version
+        run: |
+          case "${{ steps.bump_strategy.outputs.bump_type }}" in
+            major)
+              echo "🔢 Bumping major version"
+              flutter pub global run cider bump major --bump-build
+              ;;
+            minor)
+              echo "🔢 Bumping minor version"
+              flutter pub global run cider bump minor --bump-build
+              ;;
+            patch)
+              echo "🔢 Bumping patch version"
+              flutter pub global run cider bump patch --bump-build
+              ;;
+            build_only)
+              echo "🔢 Bumping build number only"
+              flutter pub global run cider bump build
+              ;;
+            none)
+              echo "⏭️ Skipping version bump"
+              ;;
+            *)
+              echo "⚠️ Unknown bump type, skipping"
+              ;;
+          esac
+
+      - name: Commit and Push Changes
+        if: steps.bump_strategy.outputs.bump_type != 'none'
+        run: |
+          # Check if there are any changes to commit
+          if git diff --quiet pubspec.yaml; then
+            echo "📝 No changes to pubspec.yaml, skipping commit"
+            exit 0
+          fi
+
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          # Get the new version for commit message
+          new_version=$(grep "^version:" pubspec.yaml | sed 's/version: *//')
+
+          git add pubspec.yaml
+          git commit -m "chore[GITHUB-ACTION]: bump version to $new_version (${{ inputs.lane }})"
+
+          echo "✅ Committed version bump: $new_version"
+
+      - name: Push changes
+        if: steps.bump_strategy.outputs.bump_type != 'none'
+        run: |
+          # Check if there are any commits to push
+          if git diff --quiet HEAD~1 2>/dev/null; then
+            echo "📝 No commits to push"
+            exit 0
+          fi
+
+          git remote set-url origin https://x-access-token:${{ secrets.KAJIANHUB_GITHUB_PAT }}@github.com/rfaturriza/muslim_book.git
+
+          # Try direct force push first
+          if ! git push origin ${{ github.ref_name }} --force; then
+            echo "Direct push failed, trying API approach..."
+            
+            # Get the commit SHA
+            COMMIT_SHA=$(git rev-parse HEAD)
+            
+            # Use GitHub API to update the branch reference directly
+            curl -X PATCH \
+              -H "Authorization: token ${{ secrets.KAJIANHUB_GITHUB_PAT }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              -d "{\"sha\":\"$COMMIT_SHA\",\"force\":true}" \
+              "https://api.github.com/repos/rfaturriza/muslim_book/git/refs/heads/${{ github.ref_name }}"
+          fi
+
+          echo "✅ Successfully pushed version changes"

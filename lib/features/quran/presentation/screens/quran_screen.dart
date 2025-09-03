@@ -25,7 +25,7 @@ class QuranScreen extends StatelessWidget {
     final appBar = MainAppBar(
       onPressedMenu: () {},
       onPressedQibla: () {
-        context.goNamed(RootRouter.qiblaRoute.name);
+        context.pushNamed(RootRouter.qiblaRoute.name);
       },
     );
     final controller = ScrollController();
@@ -79,15 +79,9 @@ class QuranScreen extends StatelessWidget {
                       child: SizedBox(),
                     );
                   }
-                  return SliverAppBar(
-                    leading: const SizedBox(),
-                    backgroundColor: Colors.transparent,
-                    expandedHeight: 150.0,
-                    pinned: false,
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: KajianHubCard(
-                        isNotAvailable: isNotAvailable,
-                      ),
+                  return SliverToBoxAdapter(
+                    child: KajianHubCard(
+                      isNotAvailable: isNotAvailable,
                     ),
                   );
                 }),

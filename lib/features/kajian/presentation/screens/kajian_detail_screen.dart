@@ -1,22 +1,21 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/components/spacer.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
-import 'package:quranku/core/utils/extension/extension.dart';
 import 'package:quranku/core/utils/extension/string_ext.dart';
 import 'package:quranku/features/kajian/domain/entities/kajian_schedule.codegen.dart';
 import 'package:quranku/features/kajian/presentation/components/label_tag.dart';
-import 'package:quranku/features/kajian/presentation/components/mosque_image_container.dart';
-import 'package:quranku/features/kajian/presentation/components/schedule_icon_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/components/fullscreen_image_dialog.dart';
 import '../../../../core/constants/asset_constants.dart';
-import '../../../../core/utils/helper.dart';
 import '../../../../generated/locale_keys.g.dart';
+import '../components/custom_schedule_card.dart';
+import '../components/kajian_history_tile.dart';
 
-class KajianDetailScreen extends StatelessWidget {
+class KajianDetailScreen extends StatefulWidget {
   final DataKajianSchedule kajian;
 
   const KajianDetailScreen({
@@ -25,9 +24,42 @@ class KajianDetailScreen extends StatelessWidget {
   });
 
   @override
+  State<KajianDetailScreen> createState() => _KajianDetailScreenState();
+}
+
+class _KajianDetailScreenState extends State<KajianDetailScreen> {
+  var _isSortedHistories = false;
+  var _isSortedCustomSchedules = false;
+
+  void toggleSort() {
+    setState(() {
+      _isSortedHistories = !_isSortedHistories;
+      _isSortedCustomSchedules = !_isSortedCustomSchedules;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final kajianTheme =
-        kajian.themes.isNotEmpty ? kajian.themes.first.theme : '';
+        widget.kajian.themes.isNotEmpty ? widget.kajian.themes.first.theme : '';
+    var tabs = <Widget>[
+      Tab(
+        text: LocaleKeys.history.tr(),
+        height: 30,
+      ),
+    ];
+    if (widget.kajian.customSchedules.isNotEmpty) {
+      tabs = [
+        Tab(
+          text: LocaleKeys.kajianDateSchedule.tr(),
+          height: 30,
+        ),
+        Tab(
+          text: LocaleKeys.history.tr(),
+          height: 30,
+        ),
+      ];
+    }
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -38,29 +70,88 @@ class KajianDetailScreen extends StatelessWidget {
           width: 100,
         ),
       ),
-      body: ListView(
-        children: [
-          _ImageSection(
-            imageUrl: kajian.studyLocation.pictureUrl,
-            label: kajianTheme,
+      body: DefaultTabController(
+        length: tabs.length,
+        child: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return [
+              SliverToBoxAdapter(
+                child: _ImageSection(
+                  imageUrl: widget.kajian.studyLocation.pictureUrl ?? '',
+                  label: kajianTheme,
+                  locationName: widget.kajian.studyLocation.name ?? '',
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: _InfoSection(kajian: widget.kajian),
+                ),
+              ),
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _SliverHeaderDelegate(
+                  minHeight: kToolbarHeight,
+                  maxHeight: kToolbarHeight,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: TabBar(
+                            isScrollable: true,
+                            tabAlignment: TabAlignment.start,
+                            labelPadding: EdgeInsets.symmetric(horizontal: 8),
+                            labelStyle: context.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                            tabs: tabs,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: toggleSort,
+                          icon: Icon(
+                            _isSortedHistories || _isSortedCustomSchedules
+                                ? Symbols.arrow_downward_rounded
+                                : Symbols.arrow_upward_rounded,
+                            color:
+                                _isSortedHistories || _isSortedCustomSchedules
+                                    ? context.theme.colorScheme.primary
+                                    : null,
+                          ),
+                          tooltip:
+                              _isSortedHistories || _isSortedCustomSchedules
+                                  ? 'Sort: Oldest First'
+                                  : 'Sort: Newest First',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ];
+          },
+          body: _TabSection(
+            isSortedHistories: _isSortedHistories,
+            isSortedCustomSchedules: _isSortedCustomSchedules,
+            histories: widget.kajian.histories,
+            customSchedules: widget.kajian.customSchedules,
           ),
-          const VSpacer(height: 12),
-          _InfoSection(kajian: kajian),
-          const VSpacer(height: 12),
-          _HistorySection(
-            histories: kajian.histories,
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
 class _ImageSection extends StatelessWidget {
+  final String locationName;
   final String imageUrl;
   final String label;
 
   const _ImageSection({
+    required this.locationName,
     required this.imageUrl,
     required this.label,
   });
@@ -70,30 +161,59 @@ class _ImageSection extends StatelessWidget {
     final imageUrl = this.imageUrl.isNotEmpty
         ? this.imageUrl
         : AssetConst.mosqueDummyImageUrl;
-    return Stack(
-      children: [
-        Container(
-          height: 240,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: CachedNetworkImageProvider(
-                imageUrl,
+    return GestureDetector(
+      onTap: () {
+        context.showFullscreenImageDialog(
+          imageUrl: imageUrl,
+          overlayText: locationName,
+        );
+      },
+      child: Stack(
+        children: [
+          Container(
+            height: 240,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: CachedNetworkImageProvider(
+                  imageUrl,
+                ),
+                fit: BoxFit.cover,
               ),
-              fit: BoxFit.cover,
             ),
           ),
-        ),
-        Positioned(
-          bottom: 12,
-          right: 12,
-          child: LabelTag(
-            title: label,
-            backgroundColor: context.theme.colorScheme.tertiary,
-            foregroundColor: context.theme.colorScheme.onTertiary,
+          // Fullscreen indicator
+          Positioned(
+            top: 12,
+            right: 12,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: context.theme.colorScheme.surface.withValues(alpha: 0.8),
+                border: Border.all(
+                  color:
+                      context.theme.colorScheme.outline.withValues(alpha: 0.3),
+                ),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Icon(
+                Icons.fullscreen,
+                color: context.theme.colorScheme.onSurface,
+                size: 16,
+              ),
+            ),
           ),
-        ),
-      ],
+          Positioned(
+            bottom: 12,
+            right: 12,
+            child: LabelTag(
+              title: label,
+              backgroundColor: context.theme.colorScheme.tertiary,
+              foregroundColor: context.theme.colorScheme.onTertiary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -108,6 +228,8 @@ class _InfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ustadzName = kajian.ustadz.isNotEmpty ? kajian.ustadz.first.name : '';
+    final ustadzPictureUrl =
+        kajian.ustadz.isNotEmpty ? kajian.ustadz.first.pictureUrl : null;
     final dayLabel = kajian.dailySchedules.isNotEmpty
         ? kajian.dailySchedules.first.dayLabel
         : '';
@@ -116,85 +238,167 @@ class _InfoSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            kajian.title,
-            style: context.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            ustadzName,
-            style: context.textTheme.titleMedium?.copyWith(
-              color: context.theme.colorScheme.onSurfaceVariant,
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (ustadzPictureUrl != null && ustadzPictureUrl.isNotEmpty) ...[
+                GestureDetector(
+                  onTap: () {
+                    context.showFullscreenImageDialog(
+                      imageUrl: ustadzPictureUrl,
+                      overlayText: ustadzName,
+                    );
+                  },
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundImage:
+                            CachedNetworkImageProvider(ustadzPictureUrl),
+                        onBackgroundImageError: (_, __) {},
+                        child: CachedNetworkImage(
+                          imageUrl: ustadzPictureUrl,
+                          imageBuilder: (context, imageProvider) => Container(),
+                          errorWidget: (context, url, error) => Icon(
+                            Symbols.person_rounded,
+                            color: context.theme.colorScheme.onSurfaceVariant,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                      // Indicator that the image is clickable
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: context.theme.colorScheme.surface
+                                .withValues(alpha: 0.9),
+                            border: Border.all(
+                              color: context.theme.colorScheme.outline
+                                  .withValues(alpha: 0.3),
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.fullscreen,
+                            color: context.theme.colorScheme.onSurface,
+                            size: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const HSpacer(width: 12),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      kajian.title,
+                      style: context.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      ustadzName,
+                      style: context.textTheme.bodyLarge?.copyWith(
+                        color: context.theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const VSpacer(height: 12),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      LocaleKeys.day.tr(),
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      dayLabel,
-                      style: context.textTheme.bodyMedium,
-                    ),
-                    const VSpacer(height: 12),
-                    Text(
-                      LocaleKeys.time.tr(),
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '${kajian.timeStart} - ${kajian.timeEnd}',
-                      style: context.textTheme.bodyMedium,
-                    ),
-                  ],
+              if ((kajian.customSchedules.isEmpty) == true) ...[
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (dayLabel.isNotEmpty) ...[
+                        Text(
+                          LocaleKeys.day.tr(),
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          dayLabel,
+                          style: context.textTheme.bodyMedium,
+                        ),
+                        const VSpacer(height: 8),
+                      ],
+                      if (kajian.timeStart.isNotEmpty == true ||
+                          kajian.timeEnd.isNotEmpty == true) ...[
+                        Text(
+                          LocaleKeys.time.tr(),
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '${kajian.timeStart} ${kajian.timeEnd.isNotEmpty ? '- ${kajian.timeEnd}' : ''}',
+                          style: context.textTheme.bodyMedium,
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
-              ),
+              ],
               Expanded(
                 flex: 7,
                 child: GestureDetector(
                   onTap: () async {
-                    final uri = Uri.parse(kajian.studyLocation.googleMaps);
+                    final uri =
+                        Uri.parse(kajian.studyLocation.googleMaps ?? '');
                     if (await canLaunchUrl(uri)) {
                       await launchUrl(uri);
                     }
                   },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            LocaleKeys.location.tr(),
-                            textAlign: TextAlign.end,
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: context.theme.colorScheme.primaryContainer
+                          .withAlpha(100),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Icon(
+                              Symbols.map_rounded,
+                              size: 20,
+                              color: context.theme.colorScheme.primary,
                             ),
-                          ),
-                          const HSpacer(width: 4),
-                          SvgPicture.asset(
-                            AssetConst.googleMapsIcon,
-                            width: 12,
-                          )
-                        ],
-                      ),
-                      Text(
-                        kajian.studyLocation.address,
-                        style: context.textTheme.bodyMedium,
-                      ),
-                    ],
+                            const HSpacer(width: 4),
+                            Text(
+                              LocaleKeys.location.tr(),
+                              textAlign: TextAlign.end,
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const VSpacer(height: 8),
+                        Text(
+                          kajian.studyLocation.address ?? emptyString,
+                          style: context.textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -206,175 +410,161 @@ class _InfoSection extends StatelessWidget {
   }
 }
 
-class _HistorySection extends StatefulWidget {
+class _HistorySection extends StatelessWidget {
   final List<HistoryKajian> histories;
-
   const _HistorySection({
     required this.histories,
   });
 
   @override
-  State<_HistorySection> createState() => _HistorySectionState();
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: histories.length,
+      itemBuilder: (context, index) {
+        return KajianHistoryTile(
+          history: histories[index],
+        );
+      },
+    );
+  }
 }
 
-class _HistorySectionState extends State<_HistorySection> {
+class _ScheduleSection extends StatelessWidget {
+  final List<CustomSchedule> schedules;
+
+  const _ScheduleSection({
+    required this.schedules,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: schedules.length,
+      separatorBuilder: (context, index) => const VSpacer(height: 12),
+      itemBuilder: (context, index) {
+        final schedule = schedules[index];
+        return ScheduleCard(schedule: schedule);
+      },
+    );
+  }
+}
+
+class _TabSection extends StatefulWidget {
+  final bool isSortedHistories;
+  final bool isSortedCustomSchedules;
+  final List<HistoryKajian> histories;
+  final List<CustomSchedule> customSchedules;
+
+  const _TabSection({
+    required this.isSortedHistories,
+    required this.isSortedCustomSchedules,
+    required this.histories,
+    required this.customSchedules,
+  });
+
+  @override
+  State<_TabSection> createState() => _TabSectionState();
+}
+
+class _TabSectionState extends State<_TabSection> {
   late List<HistoryKajian> sortedHistories;
+  late List<CustomSchedule> sortedCustomSchedules;
 
   @override
   void initState() {
     super.initState();
-    sortedHistories = List.from(widget.histories);
+    _updateSortedLists();
+  }
 
-    if (sortedHistories.isNotEmpty && sortedHistories.length > 1) {
-      sortedHistories.sort((a, b) {
-        return DateTime.parse(b.publishedAt)
-            .compareTo(DateTime.parse(a.publishedAt));
-      });
+  @override
+  void didUpdateWidget(_TabSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isSortedHistories != widget.isSortedHistories ||
+        oldWidget.isSortedCustomSchedules != widget.isSortedCustomSchedules) {
+      _updateSortedLists();
     }
   }
 
-  void toggleSort() {
-    if (sortedHistories.isEmpty || sortedHistories.length == 1) return;
-    setState(() {
-      sortedHistories = sortedHistories.reversed.toList();
-    });
+  void _updateSortedLists() {
+    sortedHistories = List.from(widget.histories);
+    sortedCustomSchedules = List.from(widget.customSchedules);
+
+    if (sortedHistories.isNotEmpty && sortedHistories.length > 1) {
+      sortedHistories.sort((a, b) {
+        final comparison = DateTime.parse(b.publishedAt)
+            .compareTo(DateTime.parse(a.publishedAt));
+        return widget.isSortedHistories ? -comparison : comparison;
+      });
+    }
+
+    if (sortedCustomSchedules.isNotEmpty && sortedCustomSchedules.length > 1) {
+      sortedCustomSchedules.sort((a, b) {
+        if (a.date != null && b.date != null) {
+          final comparison = a.date!.compareTo(b.date!);
+          return widget.isSortedCustomSchedules ? -comparison : comparison;
+        }
+        return 0;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         color: context.theme.colorScheme.surfaceContainer,
       ),
-      child: DefaultTabController(
-        length: 1,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: TabBar(
-                    isScrollable: true,
-                    tabAlignment: TabAlignment.start,
-                    labelPadding: EdgeInsets.zero,
-                    labelStyle: context.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    tabs: [
-                      Tab(
-                        text: LocaleKeys.history.tr(),
-                        height: 30,
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: toggleSort,
-                  icon: const Icon(Icons.format_line_spacing_rounded),
-                ),
-              ],
-            ),
-            const VSpacer(height: 8),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: sortedHistories.length,
-              itemBuilder: (context, index) {
-                return _HistoryTile(
-                  history: sortedHistories[index],
-                );
-              },
+      child: TabBarView(
+        children: [
+          if (widget.customSchedules.isNotEmpty) ...[
+            // Schedule Tab
+            _ScheduleSection(
+              schedules: sortedCustomSchedules,
             ),
           ],
-        ),
+          // History Tab
+          _HistorySection(
+            histories: sortedHistories,
+          ),
+        ],
       ),
     );
   }
 }
 
-class _HistoryTile extends StatelessWidget {
-  final HistoryKajian history;
+// Delegate for SliverPersistentHeader to display floating title
+class _SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final double minHeight;
+  final double maxHeight;
+  final Widget child;
 
-  const _HistoryTile({
-    required this.history,
-  });
+  _SliverHeaderDelegate(
+      {required this.minHeight, required this.maxHeight, required this.child});
 
   @override
-  Widget build(BuildContext context) {
-    final id = extractYouTubeVideoId(history.url);
-    var thumbnailUrl = 'https://i.ytimg.com/vi/$id/mqdefault.jpg';
-    if (id == null) {
-      thumbnailUrl = AssetConst.mosqueDummyImageUrl;
-    }
-    final date = () {
-      if (history.publishedAt.isEmpty) {
-        return emptyString;
-      }
-      return DateTime.parse(history.publishedAt)
-          .toEEEEddMMMMyyyy(context.locale);
-    }();
-    return GestureDetector(
-      onTap: () async {
-        final uri = Uri.parse(history.url);
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri);
-        }
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: context.theme.colorScheme.surfaceContainer,
-        ),
-        child: Row(
-          children: [
-            MosqueImageContainer(
-              imageUrl: thumbnailUrl,
-              width: 120,
-              height: 80,
-            ),
-            const HSpacer(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    history.title,
-                    style: context.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const VSpacer(height: 4),
-                  ScheduleIconText(
-                    icon: Icons.calendar_today,
-                    text: date ?? emptyString,
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.play_arrow,
-                      color: context.theme.colorScheme.tertiary),
-                  Text(
-                    LocaleKeys.play.tr(),
-                    style: context.textTheme.bodyMedium,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+  double get minExtent => minHeight;
+
+  @override
+  double get maxExtent => maxHeight;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Material(
+      elevation: overlapsContent ? 4 : 0,
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: SizedBox.expand(child: child),
     );
+  }
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
+    return true;
   }
 }

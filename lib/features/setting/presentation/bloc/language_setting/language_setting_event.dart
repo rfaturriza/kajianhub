@@ -1,7 +1,7 @@
 part of 'language_setting_bloc.dart';
 
 @freezed
-class LanguageSettingEvent with _$LanguageSettingEvent {
+abstract class LanguageSettingEvent with _$LanguageSettingEvent {
   const factory LanguageSettingEvent.setLatinLanguage({
     required Locale locale,
   }) = _SetLatinLanguage;

@@ -2,13 +2,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../generated/locale_keys.g.dart';
-import '../utils/extension/string_ext.dart';
 
 abstract class Failure extends Equatable {
   final String? message;
   const Failure({this.message});
+  
+  String get errorMessage => message ?? LocaleKeys.defaultErrorMessage.tr();
+  
   @override
-  List<Object> get props => [message ?? emptyString];
+  List<Object> get props => [errorMessage];
 }
 
 class ServerFailure extends Failure {

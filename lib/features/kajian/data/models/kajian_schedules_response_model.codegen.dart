@@ -1,17 +1,21 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:quranku/features/kajian/data/models/study_locations_response_model.codegen.dart';
 
 import '../../../../core/utils/extension/string_ext.dart';
 import '../../domain/entities/kajian_schedule.codegen.dart';
+import '../../domain/entities/study_location_entity.dart';
+import 'ustadz_response_model.codegen.dart';
 
 part 'kajian_schedules_response_model.codegen.freezed.dart';
 part 'kajian_schedules_response_model.codegen.g.dart';
 
 @freezed
-class KajianSchedulesResponseModel with _$KajianSchedulesResponseModel {
+abstract class KajianSchedulesResponseModel
+    with _$KajianSchedulesResponseModel {
   const factory KajianSchedulesResponseModel({
     List<DataKajianScheduleModel>? data,
-    LinksKajianScheduleModel? links,
-    MetaKajianScheduleModel? meta,
+    LinksKajianHubModel? links,
+    MetaKajianHubModel? meta,
   }) = _KajianSchedulesResponseModel;
 
   const KajianSchedulesResponseModel._();
@@ -24,22 +28,22 @@ class KajianSchedulesResponseModel with _$KajianSchedulesResponseModel {
       data: entity.data
           .map((e) => DataKajianScheduleModel.fromEntity(e))
           .toList(),
-      links: LinksKajianScheduleModel.fromEntity(entity.links),
-      meta: MetaKajianScheduleModel.fromEntity(entity.meta),
+      links: LinksKajianHubModel.fromEntity(entity.links),
+      meta: MetaKajianHubModel.fromEntity(entity.meta),
     );
   }
 
   KajianSchedules toEntity() {
     return KajianSchedules(
       data: data?.map((e) => e.toEntity()).toList() ?? [],
-      links: links?.toEntity() ?? LinksKajianScheduleModel.empty().toEntity(),
-      meta: meta?.toEntity() ?? MetaKajianScheduleModel.empty().toEntity(),
+      links: links?.toEntity() ?? LinksKajianHubModel.empty().toEntity(),
+      meta: meta?.toEntity() ?? MetaKajianHubModel.empty().toEntity(),
     );
   }
 }
 
 @freezed
-class DataKajianScheduleModel with _$DataKajianScheduleModel {
+abstract class DataKajianScheduleModel with _$DataKajianScheduleModel {
   const factory DataKajianScheduleModel({
     int? id,
     String? title,
@@ -50,12 +54,13 @@ class DataKajianScheduleModel with _$DataKajianScheduleModel {
     @JsonKey(name: 'time_end') String? timeEnd,
     @JsonKey(name: 'jadwal_shalat') String? prayerSchedule,
     @JsonKey(name: 'location_id') String? locationId,
-    StudyLocationModel? studyLocation,
-    List<UstadzModel>? ustadz,
+    DataStudyLocationModel? studyLocation,
+    List<DataUstadzModel>? ustadz,
     List<KajianThemeModel>? themes,
     List<DailyScheduleModel>? dailySchedules,
     List<HistoryKajianModel>? histories,
-    List<dynamic>? customSchedules,
+    List<CustomScheduleModel>? customSchedules,
+    @JsonKey(name: 'distance_in_km') double? distanceInKm,
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
     @JsonKey(name: 'deleted_at') String? deletedAt,
@@ -80,8 +85,8 @@ class DataKajianScheduleModel with _$DataKajianScheduleModel {
       timeEnd: entity.timeEnd,
       prayerSchedule: entity.prayerSchedule,
       locationId: entity.locationId,
-      studyLocation: StudyLocationModel.fromEntity(entity.studyLocation),
-      ustadz: entity.ustadz.map((e) => UstadzModel.fromEntity(e)).toList(),
+      studyLocation: DataStudyLocationModel.fromEntity(entity.studyLocation),
+      ustadz: entity.ustadz.map((e) => DataUstadzModel.fromEntity(e)).toList(),
       themes: entity.themes.map((e) => KajianThemeModel.fromEntity(e)).toList(),
       dailySchedules: entity.dailySchedules
           .map((e) => DailyScheduleModel.fromEntity(e))
@@ -89,7 +94,12 @@ class DataKajianScheduleModel with _$DataKajianScheduleModel {
       histories: entity.histories
           .map((e) => HistoryKajianModel.fromEntity(e))
           .toList(),
-      customSchedules: entity.customSchedules,
+      customSchedules: entity.customSchedules
+          .map((e) => CustomScheduleModel.fromEntity(e))
+          .toList(),
+      distanceInKm: entity.distanceInKm != null
+          ? double.tryParse(entity.distanceInKm!)
+          : null,
     );
   }
 
@@ -101,32 +111,103 @@ class DataKajianScheduleModel with _$DataKajianScheduleModel {
       typeLabel: typeLabel ?? emptyString,
       book: book ?? emptyString,
       timeStart: () {
-        if (timeStart == null) {
+        if (timeStart == null || timeStart!.isEmpty) {
           return emptyString;
         }
         return timeStart!.substring(0, 5);
       }(),
       timeEnd: () {
-        if (timeEnd == null) {
+        if (timeEnd == null || timeEnd!.isEmpty) {
           return emptyString;
         }
         return timeEnd!.substring(0, 5);
       }(),
       prayerSchedule: prayerSchedule?.capitalize() ?? emptyString,
       locationId: locationId ?? emptyString,
-      studyLocation:
-          studyLocation?.toEntity() ?? StudyLocationModel.empty().toEntity(),
+      studyLocation: studyLocation?.toEntity() ?? StudyLocationEntity(),
       ustadz: ustadz?.map((e) => e.toEntity()).toList() ?? [],
       themes: themes?.map((e) => e.toEntity()).toList() ?? [],
       dailySchedules: dailySchedules?.map((e) => e.toEntity()).toList() ?? [],
       histories: histories?.map((e) => e.toEntity()).toList() ?? [],
-      customSchedules: customSchedules ?? [],
+      customSchedules: customSchedules?.map((e) => e.toEntity()).toList() ?? [],
+      distanceInKm: distanceInKm?.toString() ?? emptyString,
     );
   }
 }
 
 @freezed
-class HistoryKajianModel with _$HistoryKajianModel {
+abstract class CustomScheduleModel with _$CustomScheduleModel {
+  const factory CustomScheduleModel({
+    int? id,
+    @JsonKey(name: 'kajian_id') String? kajianId,
+    @JsonKey(name: 'theme_id') String? themeId,
+    String? book,
+    @JsonKey(name: 'pray_time') String? prayTime,
+    String? link,
+    String? date,
+    KajianThemeModel? theme,
+    List<DataUstadzModel>? ustadz,
+    @JsonKey(name: 'time_start') String? timeStart,
+    String? title,
+    @JsonKey(name: 'created_at') String? createdAt,
+    @JsonKey(name: 'updated_at') String? updatedAt,
+  }) = _CustomScheduleModel;
+
+  const CustomScheduleModel._();
+
+  factory CustomScheduleModel.fromJson(Map<String, dynamic> json) =>
+      _$CustomScheduleModelFromJson(json);
+
+  factory CustomScheduleModel.fromEntity(CustomSchedule entity) {
+    return CustomScheduleModel(
+      id: entity.id,
+      kajianId: entity.kajianId,
+      themeId: entity.themeId,
+      book: entity.book,
+      prayTime: entity.prayTime,
+      link: entity.link,
+      ustadz: entity.ustadz?.map((e) => DataUstadzModel.fromEntity(e)).toList(),
+      theme: KajianThemeModel.fromEntity(entity.theme),
+      timeStart: () {
+        if (entity.timeStart == null || entity.timeStart!.isEmpty) {
+          return emptyString;
+        }
+        return entity.timeStart?.substring(0, 5);
+      }(),
+      // FORMAT: 2025-07-15
+      date: entity.date?.toIso8601String().substring(0, 10),
+      title: entity.title,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  CustomSchedule toEntity() {
+    return CustomSchedule(
+      id: id ?? 0,
+      kajianId: kajianId ?? emptyString,
+      themeId: themeId ?? emptyString,
+      book: book ?? emptyString,
+      prayTime: prayTime ?? emptyString,
+      link: link ?? emptyString,
+      ustadz: ustadz?.map((e) => e.toEntity()).toList(),
+      theme: theme?.toEntity() ?? KajianTheme.empty(),
+      timeStart: () {
+        if (timeStart == null || timeStart!.isEmpty) {
+          return emptyString;
+        }
+        return timeStart!.substring(0, 5);
+      }(),
+      date: DateTime.tryParse(date ?? emptyString),
+      title: title ?? emptyString,
+      createdAt: createdAt ?? emptyString,
+      updatedAt: updatedAt ?? emptyString,
+    );
+  }
+}
+
+@freezed
+abstract class HistoryKajianModel with _$HistoryKajianModel {
   const factory HistoryKajianModel({
     int? id,
     @JsonKey(name: 'kajian_id') String? kajianId,
@@ -174,89 +255,7 @@ class HistoryKajianModel with _$HistoryKajianModel {
 }
 
 @freezed
-class StudyLocationModel with _$StudyLocationModel {
-  const factory StudyLocationModel({
-    int? id,
-    String? name,
-    String? village,
-    String? address,
-    @JsonKey(name: 'province_id') String? provinceId,
-    @JsonKey(name: 'city_id') String? cityId,
-    @JsonKey(name: 'google_maps') String? googleMaps,
-    String? longitude,
-    String? latitude,
-    @JsonKey(name: 'contact_person') String? contactPerson,
-    String? picture,
-    @JsonKey(name: 'picture_url') String? pictureUrl,
-    ProvinceModel? province,
-    CityModel? city,
-    @JsonKey(name: 'created_at') String? createdAt,
-    @JsonKey(name: 'updated_at') String? updatedAt,
-  }) = _StudyLocationModel;
-
-  const StudyLocationModel._();
-
-  factory StudyLocationModel.fromJson(Map<String, dynamic> json) =>
-      _$StudyLocationModelFromJson(json);
-
-  factory StudyLocationModel.empty() => const StudyLocationModel(
-        id: 0,
-        name: emptyString,
-        village: emptyString,
-        address: emptyString,
-        provinceId: emptyString,
-        cityId: emptyString,
-        googleMaps: emptyString,
-        longitude: emptyString,
-        latitude: emptyString,
-        contactPerson: emptyString,
-        picture: emptyString,
-        pictureUrl: emptyString,
-        province: ProvinceModel(id: 0, name: emptyString),
-        city: CityModel(id: 0, name: emptyString, provinceId: emptyString),
-      );
-
-  factory StudyLocationModel.fromEntity(StudyLocation entity) {
-    return StudyLocationModel(
-      id: entity.id,
-      name: entity.name,
-      village: entity.village,
-      address: entity.address,
-      provinceId: entity.provinceId,
-      cityId: entity.cityId,
-      googleMaps: entity.googleMaps,
-      longitude: entity.longitude,
-      latitude: entity.latitude,
-      contactPerson: entity.contactPerson,
-      picture: entity.picture,
-      pictureUrl: entity.pictureUrl,
-      province: ProvinceModel.fromEntity(entity.province),
-      city: CityModel.fromEntity(entity.city),
-    );
-  }
-
-  StudyLocation toEntity() {
-    return StudyLocation(
-      id: id ?? 0,
-      name: name ?? emptyString,
-      village: village ?? emptyString,
-      address: address ?? emptyString,
-      provinceId: provinceId ?? emptyString,
-      cityId: cityId ?? emptyString,
-      googleMaps: googleMaps ?? emptyString,
-      longitude: longitude ?? emptyString,
-      latitude: latitude ?? emptyString,
-      contactPerson: contactPerson ?? emptyString,
-      picture: picture ?? emptyString,
-      pictureUrl: pictureUrl ?? emptyString,
-      province: province?.toEntity() ?? ProvinceModel.empty().toEntity(),
-      city: city?.toEntity() ?? CityModel.empty().toEntity(),
-    );
-  }
-}
-
-@freezed
-class ProvinceModel with _$ProvinceModel {
+abstract class ProvinceModel with _$ProvinceModel {
   const factory ProvinceModel({
     int? id,
     String? name,
@@ -288,7 +287,7 @@ class ProvinceModel with _$ProvinceModel {
 }
 
 @freezed
-class CityModel with _$CityModel {
+abstract class CityModel with _$CityModel {
   const factory CityModel({
     int? id,
     String? name,
@@ -324,59 +323,7 @@ class CityModel with _$CityModel {
 }
 
 @freezed
-class UstadzModel with _$UstadzModel {
-  const factory UstadzModel({
-    int? id,
-    @JsonKey(name: 'ustadz_id') String? ustadzId,
-    String? name,
-    String? email,
-    @JsonKey(name: 'place_of_birth') String? placeOfBirth,
-    @JsonKey(name: 'date_of_birth') String? dateOfBirth,
-    @JsonKey(name: 'contact_person') String? contactPerson,
-  }) = _UstadzModel;
-
-  const UstadzModel._();
-
-  factory UstadzModel.fromJson(Map<String, dynamic> json) =>
-      _$UstadzModelFromJson(json);
-
-  factory UstadzModel.empty() => const UstadzModel(
-        id: 0,
-        ustadzId: emptyString,
-        name: emptyString,
-        email: emptyString,
-        placeOfBirth: emptyString,
-        dateOfBirth: emptyString,
-        contactPerson: emptyString,
-      );
-
-  factory UstadzModel.fromEntity(Ustadz entity) {
-    return UstadzModel(
-      id: entity.id,
-      ustadzId: entity.ustadzId,
-      name: entity.name,
-      email: entity.email,
-      placeOfBirth: entity.placeOfBirth,
-      dateOfBirth: entity.dateOfBirth,
-      contactPerson: entity.contactPerson,
-    );
-  }
-
-  Ustadz toEntity() {
-    return Ustadz(
-      id: id ?? 0,
-      ustadzId: ustadzId ?? emptyString,
-      name: name ?? emptyString,
-      email: email ?? emptyString,
-      placeOfBirth: placeOfBirth ?? emptyString,
-      dateOfBirth: dateOfBirth ?? emptyString,
-      contactPerson: contactPerson ?? emptyString,
-    );
-  }
-}
-
-@freezed
-class KajianThemeModel with _$KajianThemeModel {
+abstract class KajianThemeModel with _$KajianThemeModel {
   const factory KajianThemeModel({
     int? id,
     @JsonKey(name: 'theme_id') String? themeId,
@@ -394,11 +341,11 @@ class KajianThemeModel with _$KajianThemeModel {
         theme: emptyString,
       );
 
-  factory KajianThemeModel.fromEntity(KajianTheme entity) {
+  factory KajianThemeModel.fromEntity(KajianTheme? entity) {
     return KajianThemeModel(
-      id: entity.id,
-      themeId: entity.themeId,
-      theme: entity.theme,
+      id: entity?.id,
+      themeId: entity?.themeId,
+      theme: entity?.theme,
     );
   }
 
@@ -412,7 +359,7 @@ class KajianThemeModel with _$KajianThemeModel {
 }
 
 @freezed
-class DailyScheduleModel with _$DailyScheduleModel {
+abstract class DailyScheduleModel with _$DailyScheduleModel {
   const factory DailyScheduleModel({
     int? id,
     @JsonKey(name: 'day_id') String? dayId,
@@ -448,28 +395,28 @@ class DailyScheduleModel with _$DailyScheduleModel {
 }
 
 @freezed
-class LinksKajianScheduleModel with _$LinksKajianScheduleModel {
-  const factory LinksKajianScheduleModel({
+abstract class LinksKajianHubModel with _$LinksKajianHubModel {
+  const factory LinksKajianHubModel({
     String? first,
     String? last,
     String? prev,
     String? next,
-  }) = _LinksKajianScheduleModel;
+  }) = _LinksKajianHubModel;
 
-  const LinksKajianScheduleModel._();
+  const LinksKajianHubModel._();
 
-  factory LinksKajianScheduleModel.fromJson(Map<String, dynamic> json) =>
-      _$LinksKajianScheduleModelFromJson(json);
+  factory LinksKajianHubModel.fromJson(Map<String, dynamic> json) =>
+      _$LinksKajianHubModelFromJson(json);
 
-  factory LinksKajianScheduleModel.empty() => const LinksKajianScheduleModel(
+  factory LinksKajianHubModel.empty() => const LinksKajianHubModel(
         first: emptyString,
         last: emptyString,
         prev: emptyString,
         next: emptyString,
       );
 
-  factory LinksKajianScheduleModel.fromEntity(LinksKajianSchedule entity) {
-    return LinksKajianScheduleModel(
+  factory LinksKajianHubModel.fromEntity(LinksKajianSchedule entity) {
+    return LinksKajianHubModel(
       first: entity.first,
       last: entity.last,
       prev: entity.prev,
@@ -488,8 +435,8 @@ class LinksKajianScheduleModel with _$LinksKajianScheduleModel {
 }
 
 @freezed
-class MetaKajianScheduleModel with _$MetaKajianScheduleModel {
-  const factory MetaKajianScheduleModel({
+abstract class MetaKajianHubModel with _$MetaKajianHubModel {
+  const factory MetaKajianHubModel({
     @JsonKey(name: 'current_page') int? currentPage,
     int? from,
     @JsonKey(name: 'last_page') int? lastPage,
@@ -498,14 +445,14 @@ class MetaKajianScheduleModel with _$MetaKajianScheduleModel {
     @JsonKey(name: 'per_page') int? perPage,
     int? to,
     int? total,
-  }) = _MetaKajianScheduleModel;
+  }) = _MetaKajianHubModel;
 
-  const MetaKajianScheduleModel._();
+  const MetaKajianHubModel._();
 
-  factory MetaKajianScheduleModel.fromJson(Map<String, dynamic> json) =>
-      _$MetaKajianScheduleModelFromJson(json);
+  factory MetaKajianHubModel.fromJson(Map<String, dynamic> json) =>
+      _$MetaKajianHubModelFromJson(json);
 
-  factory MetaKajianScheduleModel.empty() => const MetaKajianScheduleModel(
+  factory MetaKajianHubModel.empty() => const MetaKajianHubModel(
         currentPage: 0,
         from: 0,
         lastPage: 0,
@@ -516,8 +463,8 @@ class MetaKajianScheduleModel with _$MetaKajianScheduleModel {
         total: 0,
       );
 
-  factory MetaKajianScheduleModel.fromEntity(MetaKajianSchedule entity) {
-    return MetaKajianScheduleModel(
+  factory MetaKajianHubModel.fromEntity(MetaKajianHub entity) {
+    return MetaKajianHubModel(
       currentPage: entity.currentPage,
       from: entity.from,
       lastPage: entity.lastPage,
@@ -529,8 +476,8 @@ class MetaKajianScheduleModel with _$MetaKajianScheduleModel {
     );
   }
 
-  MetaKajianSchedule toEntity() {
-    return MetaKajianSchedule(
+  MetaKajianHub toEntity() {
+    return MetaKajianHub(
       currentPage: currentPage ?? 0,
       from: from ?? 0,
       lastPage: lastPage ?? 0,
@@ -544,7 +491,7 @@ class MetaKajianScheduleModel with _$MetaKajianScheduleModel {
 }
 
 @freezed
-class LinksMetaModel with _$LinksMetaModel {
+abstract class LinksMetaModel with _$LinksMetaModel {
   const factory LinksMetaModel({
     String? url,
     String? label,

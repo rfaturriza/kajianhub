@@ -1,8 +1,9 @@
 import 'package:dartz/dartz.dart';
-import 'package:quranku/features/kajian/data/models/mosques_response_model.codegen.dart';
+import 'package:quranku/features/kajian/data/models/study_locations_response_model.codegen.dart';
 import 'package:quranku/features/kajian/data/models/prayer_kajian_schedules_response_model.codegen.dart';
 import 'package:quranku/features/kajian/domain/entities/kajian_schedule.codegen.dart';
 import 'package:quranku/features/kajian/domain/entities/prayer_kajian_schedules.codegen.dart';
+import 'package:quranku/features/ustadz/domain/entities/ustadz_entity.codegen.dart';
 
 import '../../../../core/error/failures.dart';
 import '../models/kajian_schedule_request_model.codegen.dart';
@@ -32,7 +33,7 @@ abstract class KajianHubRepository {
     required PrayerKajianScheduleRequestModel request,
   });
 
-  Future<Either<Failure, List<DataMosqueModel>>> getMosqueList({
+  Future<Either<Failure, List<DataStudyLocationModel>>> getMosqueList({
     String? type,
     String? orderBy,
     String? sortBy,
@@ -52,7 +53,7 @@ abstract class KajianHubRepository {
     String? relations,
   });
 
-  Future<Either<Failure, List<Ustadz>>> getUstadzList({
+  Future<Either<Failure, List<UstadzEntity>>> getUstadzList({
     String? type,
     String? orderBy,
     String? sortBy,

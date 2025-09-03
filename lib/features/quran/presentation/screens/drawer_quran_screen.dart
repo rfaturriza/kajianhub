@@ -8,7 +8,6 @@ import 'package:in_app_review/in_app_review.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:quranku/core/constants/url_constants.dart';
 import 'package:quranku/core/route/root_router.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:share_plus/share_plus.dart';
@@ -85,18 +84,55 @@ class _ListItemMenu extends StatelessWidget {
           ),
         ),
         ButtonDrawer(
-          icon: Icons.language,
+          icon: Symbols.language,
           title: LocaleKeys.language.tr(),
           onTap: () {
-            context.goNamed(RootRouter.languageSettingRoute.name);
+            context.pushNamed(RootRouter.languageSettingRoute.name);
           },
           withDecoration: false,
         ),
         ButtonDrawer(
-          icon: Icons.format_size,
+          icon: Symbols.format_color_text_rounded,
           title: LocaleKeys.stylingView.tr(),
           onTap: () {
-            context.goNamed(RootRouter.styleSettingRoute.name);
+            context.pushNamed(RootRouter.styleSettingRoute.name);
+          },
+          withDecoration: false,
+        ),
+        VSpacer(),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+          ),
+          child: Text(
+            LocaleKeys.menu.tr(),
+            style: context.textTheme.titleSmall?.copyWith(
+              color: context.theme.colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        ButtonDrawer(
+          icon: Symbols.menu_book_rounded,
+          title: LocaleKeys.kajian.tr(),
+          onTap: () {
+            context.pushNamed(RootRouter.kajianRoute.name);
+          },
+          withDecoration: false,
+        ),
+        ButtonDrawer(
+          icon: Symbols.mosque,
+          title: LocaleKeys.mosque.tr(),
+          onTap: () {
+            context.pushNamed(RootRouter.studyLocationRoute.name);
+          },
+          withDecoration: false,
+        ),
+        ButtonDrawer(
+          icon: Symbols.person,
+          title: 'Ustadz',
+          onTap: () {
+            context.pushNamed(RootRouter.ustadzRoute.name);
           },
           withDecoration: false,
         ),
@@ -137,7 +173,7 @@ class _Footer extends StatelessWidget {
                     inAppReview.requestReview();
                   }
                 },
-                icon: Icons.rate_review_rounded,
+                icon: Symbols.rate_review_rounded,
                 title: LocaleKeys.rateUs.tr(),
               ),
             ),
@@ -160,16 +196,18 @@ class _Footer extends StatelessWidget {
                       'https://apps.apple.com/app/${appName.toLowerCase()}/id$iosAppId';
                   final link = Platform.isIOS ? linkIOS : linkAndroid;
 
-                  await Share.share(
-                    LocaleKeys.shareAppDescription.tr(
-                      args: [
-                        info.appName,
-                        link,
-                      ],
+                  await SharePlus.instance.share(
+                    ShareParams(
+                      text: LocaleKeys.shareAppDescription.tr(
+                        args: [
+                          info.appName,
+                          link,
+                        ],
+                      ),
                     ),
                   );
                 },
-                icon: Icons.share_rounded,
+                icon: Symbols.share_rounded,
                 title: '',
               ),
             ),
@@ -179,9 +217,9 @@ class _Footer extends StatelessWidget {
           const VSpacer(),
           ButtonDrawer(
             onTap: () {
-              context.goNamed(RootRouter.donationRoute.name);
+              context.pushNamed(RootRouter.donationRoute.name);
             },
-            icon: Icons.volunteer_activism,
+            icon: Symbols.volunteer_activism,
             title: LocaleKeys.supportUs.tr(),
           ),
           const VSpacer(),
@@ -191,18 +229,18 @@ class _Footer extends StatelessWidget {
           onTap: () async {
             try {
               await launchUrl(
-                Uri.parse(UrlConst.urlGithub),
+                Uri.parse(sl<RemoteConfigService>().githubUrl),
                 mode: LaunchMode.externalApplication,
               );
             } catch (e) {
               debugPrint(e.toString());
             }
           },
-          icon: Icons.sentiment_satisfied_alt_rounded,
+          icon: Symbols.sentiment_satisfied_alt_rounded,
           title: LocaleKeys.muslimBookIsOpenSource.tr(
             args: [LocaleKeys.appName.tr()],
           ),
-          subtitle: UrlConst.urlGithub,
+          subtitle: sl<RemoteConfigService>().githubUrl,
         ),
         const VSpacer(),
       ],
@@ -258,8 +296,8 @@ class _AppInfoState extends State<_AppInfo> {
         ),
         trailing: IconButton(
           icon: context.isDarkMode
-              ? const Icon(Icons.dark_mode_rounded)
-              : const Icon(Icons.light_mode_rounded),
+              ? const Icon(Symbols.dark_mode_rounded)
+              : const Icon(Symbols.light_mode_rounded),
           onPressed: () {
             showModalBottomSheet(
               useSafeArea: true,
@@ -309,7 +347,7 @@ class _ThemePickerBottomSheet extends StatelessWidget {
                 title: Text(LocaleKeys.systemMode.tr()),
                 selected: themeProvider.themeMode == ThemeMode.system,
                 trailing: themeProvider.themeMode == ThemeMode.system
-                    ? const Icon(Icons.check)
+                    ? const Icon(Symbols.check)
                     : null,
                 onTap: () {
                   themeProvider.setThemeMode(ThemeMode.system);
@@ -320,7 +358,7 @@ class _ThemePickerBottomSheet extends StatelessWidget {
                 title: Text(LocaleKeys.lightMode.tr()),
                 selected: themeProvider.themeMode == ThemeMode.light,
                 trailing: themeProvider.themeMode == ThemeMode.light
-                    ? const Icon(Icons.check)
+                    ? const Icon(Symbols.check)
                     : null,
                 onTap: () {
                   themeProvider.setThemeMode(ThemeMode.light);
@@ -331,7 +369,7 @@ class _ThemePickerBottomSheet extends StatelessWidget {
                 title: Text(LocaleKeys.darkMode.tr()),
                 selected: themeProvider.themeMode == ThemeMode.dark,
                 trailing: themeProvider.themeMode == ThemeMode.dark
-                    ? const Icon(Icons.check)
+                    ? const Icon(Symbols.check)
                     : null,
                 onTap: () {
                   themeProvider.setThemeMode(ThemeMode.dark);

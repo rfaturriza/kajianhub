@@ -1,7 +1,7 @@
 part of 'language_setting_bloc.dart';
 
 @freezed
-class LanguageSettingState with _$LanguageSettingState {
+abstract class LanguageSettingState with _$LanguageSettingState {
   const factory LanguageSettingState({
     Locale? languageLatin,
     Locale? languagePrayerTime,

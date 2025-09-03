@@ -11,7 +11,7 @@ import 'package:quranku/core/utils/extension/dartz_ext.dart';
 
 import '../../../../../core/utils/pair.dart';
 import '../../../../shalat/domain/usecase/get_current_location_usecase.dart';
-import '../../../data/models/mosques_response_model.codegen.dart';
+import '../../../data/models/study_locations_response_model.codegen.dart';
 import '../../../data/models/prayer_kajian_schedule_request_model.codegen.dart';
 import '../../../domain/entities/filter_prayer_schedule.codegen.dart';
 import '../../../domain/entities/kajian_schedule.codegen.dart';

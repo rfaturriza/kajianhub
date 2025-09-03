@@ -1,7 +1,7 @@
 part of 'detail_surah_bloc.dart';
 
 @freezed
-class SurahDetailEvent with _$SurahDetailEvent {
+abstract class SurahDetailEvent with _$SurahDetailEvent {
   const factory SurahDetailEvent.fetchSurahDetail({
     int? surahNumber,
   }) = FetchSurahDetailEvent;

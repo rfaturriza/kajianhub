@@ -1,0 +1,200 @@
+name: "Setup Flutter Environment"
+description: "Reusable action to set up Flutter, dependencies, and Firebase configuration"
+
+inputs:
+  platform:
+    description: "Platform to build for (android/ios)"
+    required: false
+    default: "both"
+  setup-android:
+    description: "Whether to set up Android environment"
+    required: false
+    default: "false"
+  setup-ios:
+    description: "Whether to set up iOS environment"
+    required: false
+    default: "false"
+  install-ruby:
+    description: "Whether to install Ruby and bundler for Fastlane"
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Java for Android
+      if: inputs.setup-android == 'true'
+      uses: actions/setup-java@v3
+      with:
+        java-version: "17"
+        distribution: "temurin"
+
+    - name: Configure Android Build Environment
+      if: inputs.setup-android == 'true'
+      shell: bash
+      run: |
+        echo "🤖 Configuring Android build environment for better memory management..."
+
+        # Create gradle.properties with memory optimizations
+        mkdir -p ~/.gradle
+        cat > ~/.gradle/gradle.properties << EOF
+        # Gradle build optimization
+        org.gradle.jvmargs=-Xmx6144m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
+        org.gradle.parallel=false
+        org.gradle.caching=true
+        org.gradle.configureondemand=false
+
+        # Android build optimization
+        android.useAndroidX=true
+        android.enableJetifier=true
+        android.enableR8.fullMode=true
+        android.defaults.buildfeatures.buildconfig=true
+        android.defaults.buildfeatures.aidl=false
+        android.defaults.buildfeatures.renderscript=false
+        android.defaults.buildfeatures.resvalues=true
+        android.defaults.buildfeatures.shaders=false
+
+        # Kotlin optimization - reduced memory usage
+        kotlin.incremental=true
+        kotlin.compiler.execution.strategy=out-of-process
+        kotlin.daemon.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m
+
+        # Disable unnecessary Gradle features
+        org.gradle.welcome=never
+        EOF
+
+        # Also create project-level gradle.properties for this build
+        if [ -d "android" ]; then
+          cat > android/gradle.properties << EOF
+        org.gradle.jvmargs=-Xmx6144m -XX:MaxMetaspaceSize=1024m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
+        android.useAndroidX=true
+        android.enableJetifier=true
+        android.enableR8.fullMode=true
+        android.defaults.buildfeatures.buildconfig=true
+        android.defaults.buildfeatures.resvalues=true
+        android.defaults.buildfeatures.aidl=false
+        android.defaults.buildfeatures.renderscript=false
+        android.defaults.buildfeatures.shaders=false
+        kotlin.incremental=true
+        kotlin.compiler.execution.strategy=out-of-process
+        kotlin.daemon.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m
+        EOF
+        fi
+
+        echo "✅ Android build environment configured"
+
+    - name: Read Flutter Version
+      id: read_version
+      uses: juliangruber/read-file-action@v1
+      with:
+        path: ./.fvm/fvm_config.json
+        trim: true
+
+    - name: Validate and Setup Flutter Version
+      id: setup_flutter
+      shell: bash
+      run: |
+        FLUTTER_VERSION="${{fromJson(steps.read_version.outputs.content).flutterSdkVersion}}"
+        echo "Requested Flutter version: $FLUTTER_VERSION"
+
+        # Validate version format (should be x.y.z)
+        if [[ ! $FLUTTER_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "⚠️ Invalid Flutter version format: $FLUTTER_VERSION"
+          echo "Using fallback version: latest"
+          FLUTTER_VERSION="latest"
+        fi
+
+        echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ steps.setup_flutter.outputs.flutter_version }}
+        channel: "stable"
+        cache: true
+
+    - name: Configure Firebase and Environment
+      shell: bash
+      run: |
+        echo "$FIREBASE_OPTIONS" | base64 --decode > lib/firebase_options.dart
+        echo "$FIREBASE_OPTIONS_DEBUG" | base64 --decode > lib/firebase_options_debug.dart
+        echo "$FIREBASE_ANDROID_JSON" | base64 --decode > android/app/google-services.json
+        echo "$FIREBASE_IOS_PLIST" | base64 --decode > ios/Runner/GoogleService-Info.plist
+        mkdir -p ios/Runner/Firebase/Debug
+        mkdir -p ios/Runner/Firebase/Release
+        echo "$FIREBASE_IOS_PLIST" | base64 --decode > ios/Runner/Firebase/Debug/GoogleService-Info.plist
+        echo "$FIREBASE_IOS_PLIST" | base64 --decode > ios/Runner/Firebase/Release/GoogleService-Info.plist
+        echo "$ENV_FILE" | base64 --decode > .env
+      env:
+        FIREBASE_OPTIONS: ${{ env.FIREBASE_OPTIONS }}
+        FIREBASE_OPTIONS_DEBUG: ${{ env.FIREBASE_OPTIONS_DEBUG }}
+        FIREBASE_ANDROID_JSON: ${{ env.FIREBASE_ANDROID_JSON }}
+        FIREBASE_IOS_PLIST: ${{ env.FIREBASE_IOS_PLIST }}
+        ENV_FILE: ${{ env.ENV_FILE }}
+
+    - name: Setup iOS environment
+      if: inputs.setup-ios == 'true'
+      shell: bash
+      run: |
+        # Check available iOS SDKs and select one that exists
+        echo "🔍 Checking available iOS SDKs..."
+        xcodebuild -showsdks | grep iphoneos || echo "No iOS SDKs found"
+
+        # Check Xcode version
+        echo "📱 Xcode version:"
+        xcodebuild -version || echo "Xcode not found"
+
+        # Set up iOS build environment
+        echo "⚙️ Setting up iOS build environment..."
+        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+    - name: Install Flutter Dependencies
+      shell: bash
+      run: |
+        flutter pub get
+        dart run build_runner build --delete-conflicting-outputs
+        dart run easy_localization:generate -f keys -o locale_keys.g.dart --source-dir assets/translations
+        dart pub global activate flutterfire_cli
+
+    - name: Android Build Preparation
+      if: inputs.setup-android == 'true'
+      shell: bash
+      run: |
+        echo "🧹 Preparing Android build environment..."
+
+        # Clean any existing build artifacts
+        flutter clean
+
+        # Clean Gradle cache if it exists
+        if [ -d "android" ]; then
+          cd android
+          if [ -f "gradlew" ]; then
+            chmod +x gradlew
+            ./gradlew clean || echo "Gradle clean failed, continuing..."
+          fi
+          cd ..
+        fi
+
+        # Regenerate dependencies
+        flutter pub get
+
+        echo "✅ Android build preparation complete"
+
+    - name: Install iOS CocoaPods dependencies
+      if: inputs.setup-ios == 'true'
+      shell: bash
+      run: |
+        rm -rf build/
+        rm -rf ios/Pods/ ios/Podfile.lock
+        flutter clean
+        flutter pub get
+        cd ios
+        pod install --repo-update
+
+    - name: Setup Ruby & Bundle for Fastlane
+      if: inputs.install-ruby == 'true'
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.2.2"
+        bundler-cache: true
+        working-directory: ${{ inputs.platform }}

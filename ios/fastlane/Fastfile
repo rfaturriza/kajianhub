@@ -25,6 +25,12 @@ platform :ios do
     %w[APP_STORE_CONNECT_KEY_ID APP_STORE_CONNECT_ISSUER_ID APP_STORE_CONNECT_API_KEY_CONTENT].each do |var|
       UI.user_error!("Missing environment variable: #{var}") if ENV[var].to_s.empty?
     end
+    
+    # Set CI environment for non-interactive mode
+    ENV["FASTLANE_SKIP_UPDATE_CHECK"] = "1"
+    ENV["FASTLANE_HIDE_CHANGELOG"] = "1"
+    ENV["FASTLANE_DISABLE_COLORS"] = "1" if ENV["CI"] == "true"
+    
     setup_ci
 
     app_store_connect_api_key(
@@ -190,7 +196,7 @@ platform :ios do
       UI.user_error!("Invalid update type: #{type}")
     end
     updated_version = version_parts.join('.')
-    updated_build_number = current_build_number + 1
+    updated_build_number = current_build_number.to_i + 1
     increment_version_number(version_number: updated_version, xcodeproj: "Runner.xcodeproj")
     increment_build_number(build_number: updated_build_number, xcodeproj: "Runner.xcodeproj")
   end
@@ -212,25 +218,43 @@ platform :ios do
      upload_to_testflight(
       ipa: "./fastlane/build/app.ipa",
       skip_submission: true,
-      skip_waiting_for_build_processing: true
+      skip_waiting_for_build_processing: true,
+      distribute_external: false,
+      notify_external_testers: false
      )
    end
 
    private_lane :upload_production do
     generated_notes = generate_release_notes_with_gemini
     
-    upload_to_app_store(
-      ipa: "./fastlane/build/app.ipa",
-      skip_screenshots: true,
-      precheck_include_in_app_purchases: false,
-      submit_for_review: true,
-      release_notes: generated_notes,
-    )
+    UI.message("Generated release notes:")
+    UI.message("English: #{generated_notes['en-US']}")
+    UI.message("Indonesian: #{generated_notes['id']}")
+    
+    begin
+      upload_to_app_store(
+        ipa: "./fastlane/build/app.ipa",
+        skip_screenshots: true,
+        skip_metadata: true,
+        skip_app_version_update: true,
+        precheck_include_in_app_purchases: false,
+        submit_for_review: ENV.fetch("SUBMIT_FOR_REVIEW", "false") == "true",
+        automatic_release: ENV.fetch("AUTOMATIC_RELEASE", "false") == "true",
+        release_notes: generated_notes,
+        force: true,
+        run_precheck_before_submit: false
+      )
+      UI.success("Successfully uploaded to App Store!")
+    rescue => ex
+      UI.error("Failed to upload to App Store: #{ex.message}")
+      raise ex
+    end
   end
 
   def release_lane(target:)
-    # Note: Version bumping is now handled by GitHub Actions, not Fastlane
-    # This ensures consistency and prevents double-bumping
+    # Note: Version bumping is now handled by GitHub Actions, not Fastlane.
+    # Only use Fastlane for version bumping if GitHub Actions is not managing it.
+    # This ensures consistency and prevents double-bumping.
 
     case target
     when :internal

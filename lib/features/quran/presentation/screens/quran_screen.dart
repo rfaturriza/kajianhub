@@ -45,21 +45,8 @@ class QuranScreen extends StatelessWidget {
               return [
                 BlocBuilder<LastReadCubit, LastReadState>(
                     builder: (context, state) {
-                  final height = () {
-                    if (state.lastReadSurah.isNotEmpty ||
-                        state.lastReadJuz.isNotEmpty) {
-                      return 170.0;
-                    } else {
-                      return 111.0;
-                    }
-                  }();
-                  return SliverAppBar(
-                    leading: const SizedBox(),
-                    backgroundColor: Colors.transparent,
-                    expandedHeight: height,
-                    pinned: false,
-                    flexibleSpace: const ShalatInfoCard(),
-                    collapsedHeight: height,
+                  return SliverToBoxAdapter(
+                    child: const ShalatInfoCard(),
                   );
                 }),
                 SliverToBoxAdapter(

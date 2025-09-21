@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_qiblah/flutter_qiblah.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/components/dialog.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/core/utils/extension/dartz_ext.dart';
@@ -191,7 +192,19 @@ class _PrayTimeInfo extends StatelessWidget {
                           icon: const Icon(Icons.refresh),
                         ),
                       ],
-                      if (state.locationStatus?.status.isNotGranted ==
+                      if (state.locationStatus?.enabled == false) ...[
+                        IconButton(
+                          onPressed: () async {
+                            await Geolocator.openLocationSettings();
+                            shalatBloc.add(
+                              const ShalatEvent.onChangedPermissionDialogEvent(
+                                false,
+                              ),
+                            );
+                          },
+                          icon: const Icon(Symbols.settings),
+                        ),
+                      ] else if (state.locationStatus?.status.isNotGranted ==
                           true) ...[
                         IconButton(
                           onPressed: () async {
@@ -236,7 +249,16 @@ class _PrayTimeInfo extends StatelessWidget {
                           overflow: TextOverflow.clip,
                         ),
                       ],
-                      if (state.locationStatus?.status.isNotGranted ==
+                      if (state.locationStatus?.enabled == false) ...[
+                        Text(
+                          LocaleKeys.errorLocationDisabled.tr(),
+                          style: context.textTheme.titleSmall?.copyWith(
+                            color: context.theme.colorScheme.onSurface,
+                          ),
+                          textAlign: TextAlign.end,
+                          overflow: TextOverflow.clip,
+                        ),
+                      ] else if (state.locationStatus?.status.isNotGranted ==
                           true) ...[
                         Text(
                           LocaleKeys.requestAccessLocation.tr(),

@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quranku/core/route/root_router.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
-import 'package:quranku/core/utils/extension/extension.dart';
 import 'package:quranku/features/bookmark/presentation/screen/bookmark_screen.dart';
 import 'package:quranku/features/quran/presentation/screens/components/juz_list.dart';
 import 'package:quranku/features/quran/presentation/screens/components/main_app_bar.dart';
@@ -12,7 +11,6 @@ import 'package:quranku/features/shalat/presentation/components/shalat_info_card
 
 import '../../../../generated/locale_keys.g.dart';
 import '../../../kajian/presentation/components/kajianhub_card.dart';
-import '../../../shalat/presentation/bloc/shalat/shalat_bloc.dart';
 import '../bloc/lastRead/last_read_cubit.dart';
 import 'components/surah_list.dart';
 import 'drawer_quran_screen.dart';
@@ -50,44 +48,13 @@ class QuranScreen extends StatelessWidget {
               return [
                 BlocBuilder<LastReadCubit, LastReadState>(
                     builder: (context, state) {
-                  final height = () {
-                    if (state.lastReadSurah.isNotEmpty ||
-                        state.lastReadJuz.isNotEmpty) {
-                      return 170.0;
-                    } else {
-                      return 111.0;
-                    }
-                  }();
-                  return SliverAppBar(
-                    leading: const SizedBox(),
-                    backgroundColor: Colors.transparent,
-                    expandedHeight: height,
-                    pinned: false,
-                    flexibleSpace: const ShalatInfoCard(),
-                    collapsedHeight: height,
-                  );
-                }),
-                BlocBuilder<ShalatBloc, ShalatState>(
-                    buildWhen: (previous, current) {
-                  return previous.geoLocation != current.geoLocation;
-                }, builder: (context, state) {
-                  final isLocationGrant =
-                      state.locationStatus?.status.isGranted;
-                  final isNotIndonesia =
-                      state.geoLocation?.country?.toLowerCase() != 'indonesia';
-                  final isNotAvailable =
-                      isNotIndonesia && isLocationGrant == true;
-                  if (isNotAvailable) {
-                    return const SliverToBoxAdapter(
-                      child: SizedBox(),
-                    );
-                  }
                   return SliverToBoxAdapter(
-                    child: KajianHubCard(
-                      isNotAvailable: isNotAvailable,
-                    ),
+                    child: const ShalatInfoCard(),
                   );
                 }),
+                SliverToBoxAdapter(
+                  child: KajianHubCard(),
+                ),
                 SliverPersistentHeader(
                   key: const ValueKey('tabbar'),
                   pinned: true,

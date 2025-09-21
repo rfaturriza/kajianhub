@@ -1,12 +1,10 @@
 import 'package:dartz/dartz.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_qiblah/flutter_qiblah.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
-import '../../../../generated/locale_keys.g.dart';
 
 @injectable
 class StreamPermissionLocationUseCase
@@ -26,9 +24,7 @@ class StreamPermissionLocationUseCase
     LocationPermission permission;
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      return Left(
-        GeneralFailure(message: LocaleKeys.errorLocationDisabled.tr()),
-      );
+      return Right(LocationStatus(serviceEnabled, LocationPermission.denied));
     }
 
     permission = await Geolocator.checkPermission();

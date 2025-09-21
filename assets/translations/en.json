@@ -36,9 +36,9 @@
   "juzTwentyNineDescription": "Starting from Al-Mulk verse 1 to Al-Mursalat verse 50",
   "juzThirtyDescription": "Starting from An-Naba verse 1 to An-Nas verse 6",
   "search": "Search",
-  "errorLocationDisabled": "Location services are inactive",
-  "errorLocationDenied": "Location permission denied",
-  "errorLocationPermanentDenied": "Location permission permanently denied",
+  "errorLocationDisabled": "Location services are inactive, please enable location services",
+  "errorLocationDenied": "Location permission denied, please allow location permission",
+  "errorLocationPermanentDenied": "Location permission permanently denied, please allow location permission from settings",
   "surah": "Surah",
   "juz": "Juz",
   "verses": "Verses",
@@ -66,7 +66,7 @@
   "badCertificateException": "Oops! There is an issue with the security certificate. Please contact support for assistance.",
   "unknownErrorException": "Oops! An unknown error occurred. Please try again later.",
   "connectedSuccessfully": "Connected successfully",
-  "locationNotFound": "Location not found",
+  "locationNotFound": "Location not found, please try again later",
   "permissionTitle": "Permission",
   "defaultPermissionMessage": "Please grant the required permissions to continue using the app.",
   "cancel": "Cancel",
@@ -163,7 +163,7 @@
   "searchMosqueEmpty": "No mosque found, please try another search",
   "filter": "Filter",
   "play": "Play",
-  "requestAccessLocation": "Request Location Permission",
+  "requestAccessLocation": "Request Access Location",
   "tryAgain": "Try Again",
   "notAvailableInYourCountry": "Sorry, this feature is not available in your country",
   "shareAppDescription": "Check out {}, an app that helps you read the Quran and find prayer times. Download it at {}",
@@ -295,3 +295,4 @@
   "kajianText": "kajian",
   "notLoggedIn": "Not Logged In"
 }
+

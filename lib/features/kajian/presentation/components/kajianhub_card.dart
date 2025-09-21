@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_qiblah/flutter_qiblah.dart';
 import 'package:formz/formz.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
@@ -20,11 +19,8 @@ import 'label_tag.dart';
 import 'mosque_image_container.dart';
 
 class KajianHubCard extends StatelessWidget {
-  final bool isNotAvailable;
-
   const KajianHubCard({
     super.key,
-    this.isNotAvailable = true,
   });
 
   @override
@@ -37,8 +33,13 @@ class KajianHubCard extends StatelessWidget {
       builder: (context, state) {
         final isLocationNotGranted =
             state.locationStatus?.status.isNotGranted == true;
+        final isLocationEnabled = state.locationStatus?.enabled == true;
         final isNotIndonesia =
             state.geoLocation?.country?.toLowerCase() != 'indonesia';
+
+        if (isNotIndonesia) {
+          return const SizedBox();
+        }
         return Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 16,
@@ -55,11 +56,12 @@ class KajianHubCard extends StatelessWidget {
               ),
               const VSpacer(height: 10),
               InkWell(
-                onTap: isLocationNotGranted || isNotIndonesia
-                    ? null
-                    : () {
-                        context.goNamed(RootRouter.kajianRoute.name);
-                      },
+                onTap: () {
+                  if (isLocationNotGranted) {
+                    return;
+                  }
+                  context.goNamed(RootRouter.kajianRoute.name);
+                }(),
                 child: Container(
                   decoration: ShapeDecoration(
                     color: context.theme.colorScheme.surfaceContainer,
@@ -77,26 +79,35 @@ class KajianHubCard extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            if (isNotAvailable) ...[
+                            if (isLocationNotGranted) ...[
                               Flexible(
-                                flex: 7,
-                                child: Center(
-                                  child: Text(
-                                    LocaleKeys.notAvailableInYourCountry.tr(),
-                                    style: context.theme.textTheme.titleSmall,
-                                  ),
+                                flex: 8,
+                                child: const _ErrorInfo(
+                                  onTap: null,
                                 ),
-                              )
-                            ],
-                            if (!isNotAvailable) ...[
+                              ),
+                            ] else if (!isLocationEnabled) ...[
                               Flexible(
-                                flex: 7,
+                                flex: 8,
+                                child: _ErrorInfo(
+                                  message:
+                                      LocaleKeys.errorLocationDisabled.tr(),
+                                  actionLabel:
+                                      LocaleKeys.requestAccessLocation.tr(),
+                                  onTap: () {
+                                    Geolocator.openLocationSettings();
+                                  },
+                                ),
+                              ),
+                            ] else ...[
+                              Flexible(
+                                flex: 8,
                                 child: BlocProvider<KajianBloc>(
                                   create: (context) => sl<KajianBloc>(),
                                   child: const _RecitationInfo(),
                                 ),
                               ),
-                            ]
+                            ],
                           ],
                         ),
                       ),
@@ -116,12 +127,68 @@ class KajianHubCard extends StatelessWidget {
   }
 }
 
+class _ErrorInfo extends StatelessWidget {
+  final String? message;
+  final String? actionLabel;
+  final VoidCallback? onTap;
+  const _ErrorInfo({
+    this.message,
+    this.actionLabel,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 3,
+          child: MosqueImageContainer(
+            imageUrl: AssetConst.mosqueDummyImageUrl,
+            height: 100,
+            width: double.infinity,
+          ),
+        ),
+        const HSpacer(width: 10),
+        Expanded(
+          flex: 7,
+          child: Center(
+            child: GestureDetector(
+              onTap: onTap,
+              child: RichText(
+                textAlign: TextAlign.start,
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: message ?? LocaleKeys.errorGetKajian.tr(),
+                      style: context.theme.textTheme.titleSmall,
+                    ),
+                    TextSpan(
+                      text: '\n',
+                      style: context.theme.textTheme.titleSmall,
+                    ),
+                    TextSpan(
+                      text: actionLabel ?? LocaleKeys.tryAgain.tr(),
+                      style: context.theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _RecitationInfo extends StatelessWidget {
   const _RecitationInfo();
 
   @override
   Widget build(BuildContext context) {
-    final shalatBloc = context.read<ShalatBloc>();
     return BlocListener<ShalatBloc, ShalatState>(
       listenWhen: (previous, current) =>
           previous.locationStatus != current.locationStatus,
@@ -134,45 +201,135 @@ class _RecitationInfo extends StatelessWidget {
               );
         }
       },
-      child: BlocBuilder<ShalatBloc, ShalatState>(
-        buildWhen: (p, c) => p.locationStatus != c.locationStatus,
-        builder: (context, shalatState) {
-          return BlocBuilder<KajianBloc, KajianState>(
-            buildWhen: (previous, current) =>
-                previous.statusRecommended != current.statusRecommended ||
-                previous.recommendedKajian != current.recommendedKajian,
-            builder: (context, state) {
-              if (state.statusRecommended.isInProgress) {
-                return const Center(child: LinearProgressIndicator());
-              }
-              if (shalatState.locationStatus?.status.isNotGranted == true) {
-                return Center(
-                  child: GestureDetector(
-                    onTap: () async {
-                      final p = await Geolocator.requestPermission();
-                      shalatBloc.add(
-                        ShalatEvent.onChangedLocationStatusEvent(
-                          status: LocationStatus(
-                            true,
-                            p,
+      child: BlocBuilder<KajianBloc, KajianState>(
+        buildWhen: (previous, current) =>
+            previous.statusRecommended != current.statusRecommended ||
+            previous.recommendedKajian != current.recommendedKajian,
+        builder: (context, state) {
+          if (state.statusRecommended.isInProgress) {
+            return const Center(child: LinearProgressIndicator());
+          }
+          if (state.statusRecommended.isFailure) {
+            return _ErrorInfo(
+              onTap: () {
+                context.read<KajianBloc>().add(
+                      KajianEvent.fetchNearbyKajian(
+                        locale: context.locale,
+                      ),
+                    );
+              },
+            );
+          }
+          if (state.recommendedKajian == null) {
+            return _ErrorInfo(
+              message: LocaleKeys.nearbyKajianEmptyToday.tr(),
+              actionLabel: LocaleKeys.seeAll.tr(),
+              onTap: () {
+                context.goNamed(RootRouter.kajianRoute.name);
+              },
+            );
+          }
+          final imageUrl = state.recommendedKajian?.studyLocation.pictureUrl ??
+              AssetConst.mosqueDummyImageUrl;
+          return Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: MosqueImageContainer(
+                  imageUrl: imageUrl,
+                  height: 100,
+                  width: double.infinity,
+                ),
+              ),
+              const HSpacer(width: 10),
+              Expanded(
+                flex: 7,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          LabelTag(
+                            title: LocaleKeys
+                                .islamicStudiesNearbyInformationLabel
+                                .tr(),
+                            backgroundColor: context.theme.colorScheme.primary,
+                            foregroundColor:
+                                context.theme.colorScheme.onPrimary,
                           ),
-                        ),
-                      );
-                    },
-                    child: RichText(
-                      textAlign: TextAlign.start,
+                          ...?state.recommendedKajian?.themes.map((e) {
+                            final randomColors = [
+                              Pair(
+                                context.theme.colorScheme.secondary,
+                                context.theme.colorScheme.onSecondary,
+                              ),
+                              Pair(
+                                context.theme.colorScheme.tertiary,
+                                context.theme.colorScheme.onTertiary,
+                              ),
+                              Pair(
+                                context.theme.colorScheme.surface,
+                                context.theme.colorScheme.onSurface,
+                              ),
+                              Pair(
+                                context.theme.colorScheme.primaryContainer,
+                                context.theme.colorScheme.onPrimaryContainer,
+                              ),
+                              Pair(
+                                context.theme.colorScheme.secondaryContainer,
+                                context.theme.colorScheme.onSecondaryContainer,
+                              ),
+                              Pair(
+                                context.theme.colorScheme.tertiaryContainer,
+                                context.theme.colorScheme.onTertiaryContainer,
+                              ),
+                            ];
+                            randomColors.shuffle();
+                            return LabelTag(
+                              title: e.theme,
+                              backgroundColor: randomColors.first.first,
+                              foregroundColor: randomColors.first.second,
+                            );
+                          }),
+                        ],
+                      ),
+                    ),
+                    const VSpacer(height: 2),
+                    Text(
+                      (state.recommendedKajian?.studyLocation.name ?? ''),
+                      style: context.theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const VSpacer(height: 2),
+                    Text(
+                      state.recommendedKajian?.ustadz.isNotEmpty ?? false
+                          ? state.recommendedKajian?.ustadz.first.name ?? ''
+                          : '',
+                      style: context.theme.textTheme.titleSmall,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const VSpacer(height: 2),
+                    RichText(
+                      overflow: TextOverflow.ellipsis,
                       text: TextSpan(
                         children: [
                           TextSpan(
-                            text: LocaleKeys.requestAccessLocation.tr(),
+                            text:
+                                '${state.recommendedKajian?.timeStart ?? ''} - ${state.recommendedKajian?.timeEnd ?? ''}',
                             style: context.theme.textTheme.titleSmall,
                           ),
                           TextSpan(
-                            text: '\n',
+                            text: ' | ',
                             style: context.theme.textTheme.titleSmall,
                           ),
                           TextSpan(
-                            text: LocaleKeys.tryAgain.tr(),
+                            text: state.recommendedKajian?.prayerSchedule ?? '',
                             style: context.theme.textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -180,173 +337,10 @@ class _RecitationInfo extends StatelessWidget {
                         ],
                       ),
                     ),
-                  ),
-                );
-              }
-              if (state.statusRecommended.isFailure) {
-                return Center(
-                  child: GestureDetector(
-                    onTap: () {
-                      context.read<KajianBloc>().add(
-                            KajianEvent.fetchNearbyKajian(
-                              locale: context.locale,
-                            ),
-                          );
-                    },
-                    child: RichText(
-                      textAlign: TextAlign.start,
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: LocaleKeys.errorGetKajian.tr(),
-                            style: context.theme.textTheme.titleSmall,
-                          ),
-                          TextSpan(
-                            text: '\n',
-                            style: context.theme.textTheme.titleSmall,
-                          ),
-                          TextSpan(
-                            text: LocaleKeys.tryAgain.tr(),
-                            style: context.theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              }
-              if (state.statusRecommended.isSuccess &&
-                  state.recommendedKajian == null) {
-                return Center(
-                  child: Text(
-                    LocaleKeys.nearbyKajianEmptyToday.tr(),
-                  ),
-                );
-              }
-              final imageUrl =
-                  state.recommendedKajian?.studyLocation.pictureUrl ??
-                      AssetConst.mosqueDummyImageUrl;
-              return Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: MosqueImageContainer(
-                      imageUrl: imageUrl,
-                      height: 100,
-                      width: double.infinity,
-                    ),
-                  ),
-                  const HSpacer(width: 10),
-                  Expanded(
-                    flex: 7,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              LabelTag(
-                                title: LocaleKeys
-                                    .islamicStudiesNearbyInformationLabel
-                                    .tr(),
-                                backgroundColor:
-                                    context.theme.colorScheme.primary,
-                                foregroundColor:
-                                    context.theme.colorScheme.onPrimary,
-                              ),
-                              ...?state.recommendedKajian?.themes.map((e) {
-                                final randomColors = [
-                                  Pair(
-                                    context.theme.colorScheme.secondary,
-                                    context.theme.colorScheme.onSecondary,
-                                  ),
-                                  Pair(
-                                    context.theme.colorScheme.tertiary,
-                                    context.theme.colorScheme.onTertiary,
-                                  ),
-                                  Pair(
-                                    context.theme.colorScheme.surface,
-                                    context.theme.colorScheme.onSurface,
-                                  ),
-                                  Pair(
-                                    context.theme.colorScheme.primaryContainer,
-                                    context
-                                        .theme.colorScheme.onPrimaryContainer,
-                                  ),
-                                  Pair(
-                                    context
-                                        .theme.colorScheme.secondaryContainer,
-                                    context
-                                        .theme.colorScheme.onSecondaryContainer,
-                                  ),
-                                  Pair(
-                                    context.theme.colorScheme.tertiaryContainer,
-                                    context
-                                        .theme.colorScheme.onTertiaryContainer,
-                                  ),
-                                ];
-                                randomColors.shuffle();
-                                return LabelTag(
-                                  title: e.theme,
-                                  backgroundColor: randomColors.first.first,
-                                  foregroundColor: randomColors.first.second,
-                                );
-                              }),
-                            ],
-                          ),
-                        ),
-                        const VSpacer(height: 2),
-                        Text(
-                          (state.recommendedKajian?.studyLocation.name ?? ''),
-                          style: context.theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const VSpacer(height: 2),
-                        Text(
-                          state.recommendedKajian?.ustadz.isNotEmpty ?? false
-                              ? state.recommendedKajian?.ustadz.first.name ?? ''
-                              : '',
-                          style: context.theme.textTheme.titleSmall,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const VSpacer(height: 2),
-                        RichText(
-                          overflow: TextOverflow.ellipsis,
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text:
-                                    '${state.recommendedKajian?.timeStart ?? ''} - ${state.recommendedKajian?.timeEnd ?? ''}',
-                                style: context.theme.textTheme.titleSmall,
-                              ),
-                              TextSpan(
-                                text: ' | ',
-                                style: context.theme.textTheme.titleSmall,
-                              ),
-                              TextSpan(
-                                text: state.recommendedKajian?.prayerSchedule ??
-                                    '',
-                                style: context.theme.textTheme.titleSmall
-                                    ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
+                  ],
+                ),
+              ),
+            ],
           );
         },
       ),

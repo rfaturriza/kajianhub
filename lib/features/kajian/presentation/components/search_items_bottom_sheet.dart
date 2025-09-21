@@ -89,7 +89,6 @@ class SearchItemBottomSheetState extends State<SearchItemBottomSheet> {
             ],
           ),
           SearchBox(
-            isDense: true,
             initialValue: '',
             backgroundColor: context.theme.colorScheme.surface,
             hintText: LocaleKeys.search.tr(),

@@ -263,7 +263,7 @@
   "emailHint": "Enter your email",
   "passwordHint": "Enter your password",
   "emailRequired": "Please enter your email",
-  "emailInvalid": "Please enter a valid email",
+  "emailInvalid": "Please enter a valid email (e.g. name@example.com)",
   "passwordRequired": "Please enter your password",
   "passwordMinLength": "Password must be at least 6 characters",
   "showPassword": "Show password",
@@ -293,6 +293,7 @@
   "description": "Description",
   "followers": "followers",
   "kajianText": "kajian",
-  "notLoggedIn": "Not Logged In"
+  "notLoggedIn": "Not Logged In",
+  "loginErrorMessage": "Unable to login, please check your credentials and try again"
 }
 

@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:injectable/injectable.dart';
 import 'package:quranku/core/error/exceptions.dart';
 import 'package:quranku/core/error/failures.dart';
@@ -6,6 +7,7 @@ import 'package:quranku/features/auth/data/dataSources/local/auth_local_data_sou
 import 'package:quranku/features/auth/data/dataSources/remote/auth_remote_data_source.dart';
 import 'package:quranku/features/auth/domain/entities/auth_user.codegen.dart';
 import 'package:quranku/features/auth/domain/repositories/auth_repository.dart';
+import 'package:quranku/generated/locale_keys.g.dart';
 
 @LazySingleton(as: AuthRepository)
 class AuthRepositoryImpl implements AuthRepository {
@@ -31,10 +33,10 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       return Right(result.toEntity());
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message));
-    } catch (e) {
-      return Left(GeneralFailure(message: e.toString()));
+    } on ServerException catch (_) {
+      return Left(ServerFailure(message: LocaleKeys.loginErrorMessage.tr()));
+    } catch (_) {
+      return Left(GeneralFailure(message: LocaleKeys.loginErrorMessage.tr()));
     }
   }
 

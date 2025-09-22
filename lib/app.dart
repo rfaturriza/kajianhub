@@ -110,7 +110,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
                 builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
                   return OverlaySupport(
                     child: MaterialApp.router(
-                      routerConfig: router,
+                      routerConfig: router(context.read<AuthBloc>()),
                       title: LocaleKeys.appName.tr(),
                       debugShowCheckedModeBanner: false,
                       theme: themeData(

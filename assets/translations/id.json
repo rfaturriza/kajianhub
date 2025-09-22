@@ -263,7 +263,7 @@
   "emailHint": "Masukkan email Anda",
   "passwordHint": "Masukkan kata sandi Anda",
   "emailRequired": "Mohon masukkan email Anda",
-  "emailInvalid": "Mohon masukkan email yang valid",
+  "emailInvalid": "Mohon masukkan email yang valid (contoh: name@example.com)",
   "passwordRequired": "Mohon masukkan kata sandi Anda",
   "passwordMinLength": "Kata sandi harus minimal 6 karakter",
   "showPassword": "Tampilkan kata sandi",
@@ -293,5 +293,6 @@
   "description": "Deskripsi",
   "followers": "pengikut",
   "kajianText": "kajian",
-  "notLoggedIn": "Belum Masuk"
+  "notLoggedIn": "Belum Masuk",
+  "loginErrorMessage": "Gagal masuk, mohon periksa kembali email dan kata sandi Anda"
 }

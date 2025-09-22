@@ -170,7 +170,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (value == null || value.isEmpty) {
                     return LocaleKeys.emailRequired.tr();
                   }
-                  if (!value.contains('@')) {
+                  final emailRegExp = RegExp(
+                    r'^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$',
+                  );
+                  if (!emailRegExp.hasMatch(value)) {
                     return LocaleKeys.emailInvalid.tr();
                   }
                   return null;

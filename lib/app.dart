@@ -21,6 +21,8 @@ import 'core/route/router.dart';
 import 'features/quran/presentation/bloc/surah/surah_bloc.dart';
 import 'features/setting/presentation/bloc/language_setting/language_setting_bloc.dart';
 import 'features/setting/presentation/bloc/styling_setting/styling_setting_bloc.dart';
+import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/auth/presentation/bloc/auth_event.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -90,6 +92,9 @@ class _AppState extends State<App> with WidgetsBindingObserver {
           create: (context) =>
               sl<StylingSettingBloc>()..add(const StylingSettingEvent.init()),
         ),
+        BlocProvider<AuthBloc>(
+          create: (context) => sl<AuthBloc>()..add(AuthCheckRequested()),
+        ),
       ],
       child: OKToast(
         textAlign: TextAlign.center,
@@ -105,7 +110,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
                 builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
                   return OverlaySupport(
                     child: MaterialApp.router(
-                      routerConfig: router,
+                      routerConfig: router(context.read<AuthBloc>()),
                       title: LocaleKeys.appName.tr(),
                       debugShowCheckedModeBanner: false,
                       theme: themeData(

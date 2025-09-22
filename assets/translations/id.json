@@ -294,5 +294,13 @@
   "followers": "pengikut",
   "kajianText": "kajian",
   "notLoggedIn": "Belum Masuk",
-  "loginErrorMessage": "Gagal masuk, mohon periksa kembali email dan kata sandi Anda"
+  "loginErrorMessage": "Gagal masuk, mohon periksa kembali email dan kata sandi Anda",
+  "selectColor": "Pilih Warna",
+  "commonColors": "Warna Umum",
+  "enterHexColor": "Masukkan Kode Warna Hex",
+  "hexColorLabel": "Kode Warna Hex (contoh: #FF5722 atau FF5722)",
+  "hexColorHint": "#RRGGBB",
+  "hexColorExamples": "Contoh: FF0000 (Merah), 00FF00 (Hijau), 0000FF (Biru)",
+  "invalidHexColorFormat": "Format kode warna hex tidak valid",
+  "pleaseEnterSixDigitHexColor": "Silakan masukkan kode warna hex 6 digit"
 }

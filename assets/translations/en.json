@@ -294,6 +294,13 @@
   "followers": "followers",
   "kajianText": "kajian",
   "notLoggedIn": "Not Logged In",
-  "loginErrorMessage": "Unable to login, please check your credentials and try again"
+  "loginErrorMessage": "Unable to login, please check your credentials and try again",
+  "selectColor": "Select Color",
+  "commonColors": "Common Colors",
+  "enterHexColor": "Enter Hex Color",
+  "hexColorLabel": "Hex Color (e.g., #FF5722 or FF5722)",
+  "hexColorHint": "#RRGGBB",
+  "hexColorExamples": "Examples: FF0000 (Red), 00FF00 (Green), 0000FF (Blue)",
+  "invalidHexColorFormat": "Invalid hex color format",
+  "pleaseEnterSixDigitHexColor": "Please enter a 6-digit hex color"
 }
-

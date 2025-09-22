@@ -9,11 +9,17 @@ on:
       lane:
         required: true
         type: string
+    outputs:
+      new_commit_sha:
+        description: "The SHA of the commit with version bump"
+        value: ${{ jobs.bump-version.outputs.commit_sha }}
 
 jobs:
   bump-version:
     name: Bump Version with Cider
     runs-on: ubuntu-latest
+    outputs:
+      commit_sha: ${{ steps.get_commit_sha.outputs.sha }}
 
     steps:
       - name: Checkout code
@@ -142,3 +148,10 @@ jobs:
           fi
 
           echo "✅ Successfully pushed version changes"
+
+      - name: Get final commit SHA
+        id: get_commit_sha
+        run: |
+          sha=$(git rev-parse HEAD)
+          echo "sha=$sha" >> $GITHUB_OUTPUT
+          echo "Final commit SHA: $sha"

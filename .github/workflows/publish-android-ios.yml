@@ -29,6 +29,7 @@ jobs:
     with:
       platform: android
       lane: ${{ github.event.inputs.lane }}
+      commit_sha: ${{ needs.bump-version.outputs.new_commit_sha }}
     secrets: inherit
 
   release-ios:
@@ -37,4 +38,5 @@ jobs:
     with:
       platform: ios
       lane: ${{ github.event.inputs.lane }}
+      commit_sha: ${{ needs.bump-version.outputs.new_commit_sha }}
     secrets: inherit

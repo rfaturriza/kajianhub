@@ -230,7 +230,7 @@ platform :ios do
 
   private_lane :sync_ios_version_with_pubspec do
     # Read version from pubspec.yaml (which was updated by GitHub Actions)
-    pubspec_path = "../pubspec.yaml"
+    pubspec_path = "../../pubspec.yaml"
     unless File.exist?(pubspec_path)
       UI.user_error!("pubspec.yaml not found at #{pubspec_path}")
     end

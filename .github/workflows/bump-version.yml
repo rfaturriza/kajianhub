@@ -59,8 +59,8 @@ jobs:
               ;;
             *firebase_dist*|internal_*)
               echo "is_production=false" >> $GITHUB_OUTPUT
-              echo "bump_type=build_only" >> $GITHUB_OUTPUT
-              echo "🔧 Internal/testing release detected - will only bump build number"
+              echo "bump_type=patch" >> $GITHUB_OUTPUT
+              echo "🔧 Internal/testing release detected - will only bump patch and build number"
               ;;
             promote_*)
               echo "is_production=false" >> $GITHUB_OUTPUT
@@ -88,10 +88,6 @@ jobs:
             patch)
               echo "🔢 Bumping patch version"
               flutter pub global run cider bump patch --bump-build
-              ;;
-            build_only)
-              echo "🔢 Bumping build number only"
-              flutter pub global run cider bump build
               ;;
             none)
               echo "⏭️ Skipping version bump"

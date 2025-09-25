@@ -230,7 +230,9 @@
     "title": "Tanya Ustadz AI",
     "description": "Tanyakan pertanyaan seputar Islam kepada Ustadz AI",
     "labelTextField": "Tanya apa saja tentang Islam",
-    "generating": "Ditunggu ya, pertanyaan kamu sedang diproses"
+    "generating": "Ditunggu ya, pertanyaan kamu sedang diproses",
+    "disclaimerTitle": "Pemberitahuan AI",
+    "disclaimerMessage": "🤖 Halo! Aku cuma AI yang berusaha bantuin jawab pertanyaan tentang Islam. Jawabanku mungkin nggak selalu tepat, jadi tolong cek ulang sama ustadz atau sumber Islam yang terpercaya ya. Anggap aja aku teman belajar, bukan pengganti ilmu yang sesungguhnya! 📚✨"
   },
   "totalStudies": "Total Kajian",
   "subscribe": "Berlangganan",

@@ -230,7 +230,9 @@
     "title": "Ask Ustadz AI",
     "description": "Ask questions about Islam to Ustadz AI",
     "labelTextField": "Ask anything about Islam",
-    "generating": "Please wait, your question is being processed"
+    "generating": "Please wait, your question is being processed",
+    "disclaimerTitle": "AI Assistant Notice",
+    "disclaimerMessage": "🤖 Hey there! I'm just an AI trying my best to help with Islamic questions. My answers might not always be perfect, so please double-check with knowledgeable scholars or trusted Islamic sources. Think of me as a study buddy, not a replacement for real expertise! 📚✨"
   },
   "totalStudies": "Total Studies",
   "subscribe": "Subscribe",

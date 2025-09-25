@@ -81,10 +81,10 @@ GoRouter router(AuthBloc authBloc) => GoRouter(
           return RootRouter.loginRoute.path;
         }
 
-        // If user is authenticated and trying to access login, redirect to dashboard
-        if (isAuthenticated &&
-            state.matchedLocation == RootRouter.loginRoute.path) {
-          return RootRouter.rootRoute.path;
+        // If user is authenticated and trying to access login, redirect to dashboard or redirectTo param
+        if (isAuthenticated && state.matchedLocation == RootRouter.loginRoute.path) {
+          final redirectTo = state.uri.queryParameters['redirectTo'];
+          return redirectTo ?? RootRouter.rootRoute.path;
         }
 
         return null;

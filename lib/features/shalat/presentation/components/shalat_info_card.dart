@@ -33,88 +33,80 @@ class ShalatInfoCard extends StatelessWidget {
       listener: (context, state) {
         if (state.locationStatus?.status.isNotGranted == true &&
             state.hasShownPermissionDialog == false) {
-          AppDialog.showPermissionDialog(
-            context,
-            content: LocaleKeys.permissionMessageLocation.tr(),
-            onOk: () async {
-              final p = await Geolocator.requestPermission();
-              shalatBloc.add(
-                ShalatEvent.onChangedLocationStatusEvent(
-                  status: LocationStatus(
-                    true,
-                    p,
+          // Use post frame callback to avoid setState during build
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            AppDialog.showPermissionDialog(
+              context,
+              content: LocaleKeys.permissionMessageLocation.tr(),
+              onOk: () async {
+                final p = await Geolocator.requestPermission();
+                shalatBloc.add(
+                  ShalatEvent.onChangedLocationStatusEvent(
+                    status: LocationStatus(
+                      true,
+                      p,
+                    ),
                   ),
-                ),
+                );
+              },
+            ).whenComplete(() {
+              shalatBloc.add(
+                const ShalatEvent.onChangedPermissionDialogEvent(true),
               );
-            },
-          ).whenComplete(() {
-            shalatBloc.add(
-              const ShalatEvent.onChangedPermissionDialogEvent(true),
-            );
+            });
           });
         }
       },
-      child: Stack(
-        children: [
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            decoration: ShapeDecoration(
-              image: const DecorationImage(
-                image: CachedNetworkImageProvider(
-                  AssetConst.backgroundShalatTimeCardNetwork,
-                ),
-                alignment: Alignment.bottomCenter,
-                fit: BoxFit.cover,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+      child: Container(
+        margin: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 10,
+        ),
+        decoration: ShapeDecoration(
+          image: DecorationImage(
+            image: const CachedNetworkImageProvider(
+              AssetConst.backgroundShalatTimeCardNetwork,
+            ),
+            alignment: Alignment.bottomCenter,
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              context.theme.colorScheme.surfaceContainer.withAlpha(200),
+              BlendMode.srcOver,
             ),
           ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            decoration: ShapeDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  context.theme.colorScheme.surfaceContainer.withAlpha(200),
-                  context.theme.colorScheme.surfaceContainer.withAlpha(180)
-                ], // Customize your gradient colors
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 17.5,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  InkWell(
-                    child: const _PrayTimeInfo(),
-                    onTap: () {
-                      context.pushNamed(RootRouter.prayerTimeRoute.name);
-                    },
-                  ),
-                  BlocBuilder<LastReadCubit, LastReadState>(
-                      builder: (context, state) {
-                    if (state.lastReadSurah.isEmpty &&
-                        state.lastReadJuz.isEmpty) {
-                      return const SizedBox();
-                    }
-                    return const Divider(thickness: 2);
-                  }),
-                  const _LastReadInfo(),
-                ],
-              ),
-            ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5),
           ),
-        ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 17.5,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              InkWell(
+                child: const _PrayTimeInfo(),
+                onTap: () {
+                  context.pushNamed(RootRouter.prayerTimeRoute.name);
+                },
+              ),
+              BlocBuilder<LastReadCubit, LastReadState>(
+                  builder: (context, state) {
+                if (state.lastReadSurah.isEmpty && state.lastReadJuz.isEmpty) {
+                  return const SizedBox();
+                }
+                return Divider(
+                  thickness: 2,
+                  color: context.theme.colorScheme.onPrimaryContainer,
+                );
+              }),
+              const _LastReadInfo(),
+            ],
+          ),
+        ),
       ),
     );
   }

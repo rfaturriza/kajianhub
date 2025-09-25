@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quranku/core/route/root_router.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
@@ -11,7 +10,6 @@ import 'package:quranku/features/shalat/presentation/components/shalat_info_card
 
 import '../../../../generated/locale_keys.g.dart';
 import '../../../kajian/presentation/components/kajianhub_card.dart';
-import '../bloc/lastRead/last_read_cubit.dart';
 import 'components/surah_list.dart';
 import 'drawer_quran_screen.dart';
 
@@ -43,15 +41,14 @@ class QuranScreen extends StatelessWidget {
               physics: const BouncingScrollPhysics(),
             ),
             controller: controller,
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
+            headerSliverBuilder: (
+              BuildContext context,
+              bool innerBoxIsScrolled,
+            ) {
               return [
-                BlocBuilder<LastReadCubit, LastReadState>(
-                    builder: (context, state) {
-                  return SliverToBoxAdapter(
-                    child: const ShalatInfoCard(),
-                  );
-                }),
+                SliverToBoxAdapter(
+                  child: const ShalatInfoCard(),
+                ),
                 SliverToBoxAdapter(
                   child: KajianHubCard(),
                 ),

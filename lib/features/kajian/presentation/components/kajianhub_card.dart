@@ -61,12 +61,12 @@ class KajianHubCard extends StatelessWidget {
                     return;
                   }
                   context.goNamed(RootRouter.kajianRoute.name);
-                }(),
+                },
                 child: Container(
                   decoration: ShapeDecoration(
                     color: context.theme.colorScheme.surfaceContainer,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                   child: Row(
@@ -194,11 +194,14 @@ class _RecitationInfo extends StatelessWidget {
           previous.locationStatus != current.locationStatus,
       listener: (context, state) {
         if (state.locationStatus?.status.isGranted == true) {
-          context.read<KajianBloc>().add(
-                KajianEvent.fetchNearbyKajian(
-                  locale: context.locale,
-                ),
-              );
+          // Use post frame callback to avoid setState during build
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.read<KajianBloc>().add(
+                  KajianEvent.fetchNearbyKajian(
+                    locale: context.locale,
+                  ),
+                );
+          });
         }
       },
       child: BlocBuilder<KajianBloc, KajianState>(
@@ -237,7 +240,7 @@ class _RecitationInfo extends StatelessWidget {
                 flex: 3,
                 child: MosqueImageContainer(
                   imageUrl: imageUrl,
-                  height: 100,
+                  height: 110,
                   width: double.infinity,
                 ),
               ),

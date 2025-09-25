@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BlocListenable<B extends StateStreamable<S>, S> extends ChangeNotifier {
@@ -15,7 +15,10 @@ class BlocListenable<B extends StateStreamable<S>, S> extends ChangeNotifier {
         .where((event) => whenListen?.call(_bloc.state, event) ?? true)
         .listen(
       (_) {
-        notifyListeners();
+        // Use post frame callback to avoid setState during build
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          notifyListeners();
+        });
       },
     );
   }

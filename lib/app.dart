@@ -23,6 +23,7 @@ import 'features/setting/presentation/bloc/language_setting/language_setting_blo
 import 'features/setting/presentation/bloc/styling_setting/styling_setting_bloc.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/bloc/auth_event.dart';
+import 'features/auth/presentation/bloc/auth_state.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -109,26 +110,30 @@ class _AppState extends State<App> with WidgetsBindingObserver {
               return DynamicColorBuilder(
                 builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
                   return OverlaySupport(
-                    child: MaterialApp.router(
-                      routerConfig: router(context.read<AuthBloc>()),
-                      title: LocaleKeys.appName.tr(),
-                      debugShowCheckedModeBanner: false,
-                      theme: themeData(
-                        isDarkMode: false,
-                        colorScheme: isDynamicColor ? lightDynamic : null,
-                      ),
-                      darkTheme: themeData(
-                        isDarkMode: true,
-                        colorScheme: isDynamicColor ? darkDynamic : null,
-                      ),
-                      themeMode: themeProvider.themeMode,
-                      localizationsDelegates: [
-                        for (var delegate in context.localizationDelegates)
-                          delegate,
-                        const LocaleNamesLocalizationsDelegate(),
-                      ],
-                      supportedLocales: context.supportedLocales,
-                      locale: context.locale,
+                    child: BlocBuilder<AuthBloc, AuthState>(
+                      builder: (context, state) {
+                        return MaterialApp.router(
+                          routerConfig: router(context.read<AuthBloc>()),
+                          title: LocaleKeys.appName.tr(),
+                          debugShowCheckedModeBanner: false,
+                          theme: themeData(
+                            isDarkMode: false,
+                            colorScheme: isDynamicColor ? lightDynamic : null,
+                          ),
+                          darkTheme: themeData(
+                            isDarkMode: true,
+                            colorScheme: isDynamicColor ? darkDynamic : null,
+                          ),
+                          themeMode: themeProvider.themeMode,
+                          localizationsDelegates: [
+                            for (var delegate in context.localizationDelegates)
+                              delegate,
+                            const LocaleNamesLocalizationsDelegate(),
+                          ],
+                          supportedLocales: context.supportedLocales,
+                          locale: context.locale,
+                        );
+                      },
                     ),
                   );
                 },

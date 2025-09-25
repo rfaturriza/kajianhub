@@ -37,7 +37,6 @@ import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/profile_screen.dart';
-import '../../features/auth/presentation/widgets/auth_wrapper.dart';
 import '../../injection.dart';
 import '../components/error_screen.dart';
 import 'root_router.dart';
@@ -300,10 +299,7 @@ GoRouter router(AuthBloc authBloc) => GoRouter(
             GoRoute(
               name: RootRouter.profileRoute.name,
               path: RootRouter.profileRoute.path,
-              builder: (_, __) => AuthWrapper(
-                authenticatedWidget: const ProfileScreen(),
-                unauthenticatedWidget: const LoginScreen(),
-              ),
+              builder: (_, __) => ProfileScreen(),
             ),
             GoRoute(
               name: RootRouter.error.name,

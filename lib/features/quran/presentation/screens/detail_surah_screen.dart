@@ -113,9 +113,7 @@ class _DetailSurahScaffold extends StatelessWidget {
           }
         },
         builder: (context, state) {
-          final detailSurah = (state.detailSurahResult?.isRight() ?? false)
-              ? state.detailSurahResult?.asRight()
-              : null;
+          final detailSurah = state.detailSurahResult?.asRight();
           return NestedScrollView(
             floatHeaderSlivers: true,
             headerSliverBuilder: (context, _) {

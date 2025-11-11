@@ -28,18 +28,20 @@ on:
         type: string
 
 jobs:
+  bump-version:
+    if: ${{ github.event.inputs.lane != 'promote_internal_to_beta' && github.event.inputs.lane != 'promote_beta_to_production' && github.event.inputs.lane != 'promote_internal_to_production' }}
+    uses: ./.github/workflows/bump-version.yml
+    with:
+      lane: ${{ github.event.inputs.lane }}
+    secrets: inherit
+
   release-android:
+    needs: bump-version
+    if: always() && (needs.bump-version.result == 'success' || needs.bump-version.result == 'skipped')
     uses: ./.github/workflows/release-app.yml
     with:
       platform: android
       lane: ${{ github.event.inputs.lane }}
       firebase_groups: ${{ github.event.inputs.firebase_groups }}
-    secrets: inherit
-
-  bump-version:
-    needs: release-android
-    if: ${{ github.event.inputs.lane != 'promote_internal_to_beta' && github.event.inputs.lane != 'promote_beta_to_production' && github.event.inputs.lane != 'promote_internal_to_production' }}
-    uses: ./.github/workflows/bump-version.yml
-    with:
-      lane: ${{ github.event.inputs.lane }}
+      commit_sha: ${{ needs.bump-version.outputs.new_commit_sha }}
     secrets: inherit

@@ -178,29 +178,6 @@ platform :ios do
     end
   end
 
-  private_lane :update_ios_version do |options|
-    type = options[:type]
-    target = options[:target]
-    current_version = get_version_number(xcodeproj: "Runner.xcodeproj")
-    current_build_number = target == :internal ? latest_testflight_build_number : app_store_build_number
-    version_parts = current_version.split(".").map(&:to_i)
-
-    case type
-    when "major"
-      version_parts[0] += 1; version_parts[1] = 0; version_parts[2] = 0
-    when "minor"
-      version_parts[1] += 1; version_parts[2] = 0
-    when "patch"
-      version_parts[2] += 1
-    else
-      UI.user_error!("Invalid update type: #{type}")
-    end
-    updated_version = version_parts.join('.')
-    updated_build_number = current_build_number.to_i + 1
-    increment_version_number(version_number: updated_version, xcodeproj: "Runner.xcodeproj")
-    increment_build_number(build_number: updated_build_number, xcodeproj: "Runner.xcodeproj")
-  end
-
   private_lane :build_ios do
      build_ios_app(
        workspace: "Runner.xcworkspace",
@@ -251,10 +228,53 @@ platform :ios do
     end
   end
 
+  private_lane :sync_ios_version_with_pubspec do
+    # Read version from pubspec.yaml (which was updated by GitHub Actions)
+    pubspec_path = "../../pubspec.yaml"
+    unless File.exist?(pubspec_path)
+      UI.user_error!("pubspec.yaml not found at #{pubspec_path}")
+    end
+    
+    pubspec_content = File.read(pubspec_path)
+    version_line = pubspec_content.match(/^version:\s*(.+)$/)
+    
+    if version_line.nil?
+      UI.user_error!("Could not find version in pubspec.yaml")
+    end
+    
+    full_version = version_line[1].strip
+    version_name, build_number = full_version.split('+')
+    
+    UI.message("📦 Current iOS project version before sync:")
+    current_ios_version = get_version_number(xcodeproj: "Runner.xcodeproj")
+    current_ios_build = get_build_number(xcodeproj: "Runner.xcodeproj")
+    UI.message("   Version: #{current_ios_version}, Build: #{current_ios_build}")
+    
+    UI.message("📝 Syncing iOS version with pubspec.yaml: #{version_name} (#{build_number})")
+    
+    # Update iOS project version to match pubspec.yaml
+    increment_version_number(
+      version_number: version_name,
+      xcodeproj: "Runner.xcodeproj"
+    )
+    
+    increment_build_number(
+      build_number: build_number,
+      xcodeproj: "Runner.xcodeproj"
+    )
+    
+    # Verify the update
+    updated_ios_version = get_version_number(xcodeproj: "Runner.xcodeproj")
+    updated_ios_build = get_build_number(xcodeproj: "Runner.xcodeproj")
+    
+    UI.success("✅ iOS version synced successfully!")
+    UI.message("   New Version: #{updated_ios_version}, New Build: #{updated_ios_build}")
+  end
+
   def release_lane(target:)
     # Note: Version bumping is now handled by GitHub Actions, not Fastlane.
-    # Only use Fastlane for version bumping if GitHub Actions is not managing it.
-    # This ensures consistency and prevents double-bumping.
+    # Sync iOS version with the updated pubspec.yaml version.
+    sync_ios_version_with_pubspec
 
     case target
     when :internal

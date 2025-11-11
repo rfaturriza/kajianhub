@@ -962,7 +962,6 @@ class _SearchImamSection extends StatelessWidget {
             ),
             const VSpacer(height: 8),
             SearchBox(
-              isDense: true,
               borderRadius: BorderRadius.circular(4),
               padding: EdgeInsets.zero,
               border: Border.all(
@@ -1015,7 +1014,6 @@ class _SearchKhatibSection extends StatelessWidget {
             ),
             const VSpacer(height: 5),
             SearchBox(
-              isDense: true,
               borderRadius: BorderRadius.circular(4),
               padding: EdgeInsets.zero,
               border: Border.all(

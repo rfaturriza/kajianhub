@@ -2,7 +2,7 @@ name: quranku
 description: Aplikasi quran mobile
 publish_to: "none"
 
-version: 1.15.14+99
+version: 1.16.0+107
 
 environment:
   sdk: ">=3.3.4 <4.0.0"
@@ -74,7 +74,7 @@ dev_dependencies:
   freezed: ^3.0.6
   json_serializable: ^6.7.1
   hive_ce_generator: ^1.9.1
-  mockito: ^5.4.6
+  mocktail: ^1.0.4
 
 flutter:
   uses-material-design: true

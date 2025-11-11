@@ -182,7 +182,7 @@ class _CanvasPreview extends StatelessWidget {
                                 style: context.textTheme.titleMedium?.copyWith(
                                   fontSize: state.arabicFontSize * 1.5,
                                   fontFamily: stylingState.fontFamilyArabic,
-                                  color: Colors.white,
+                                  color: state.arabicTextColor ?? Colors.white,
                                 ),
                                 textAlign: TextAlign.center,
                               );
@@ -205,7 +205,7 @@ class _CanvasPreview extends StatelessWidget {
                                 style: context.textTheme.bodySmall?.copyWith(
                                   fontSize: state.latinFontSize,
                                   fontWeight: FontWeight.w500,
-                                  color: Colors.white,
+                                  color: state.latinTextColor ?? Colors.white,
                                 ),
                                 textAlign: TextAlign.center,
                               );
@@ -228,7 +228,8 @@ class _CanvasPreview extends StatelessWidget {
                                 style: context.textTheme.bodySmall?.copyWith(
                                   fontSize: state.translationFontSize,
                                   fontWeight: FontWeight.w500,
-                                  color: Colors.white,
+                                  color: state.translationTextColor ??
+                                      Colors.white,
                                 ),
                                 textAlign: TextAlign.center,
                               );
@@ -245,7 +246,7 @@ class _CanvasPreview extends StatelessWidget {
                             style: context.textTheme.bodySmall?.copyWith(
                               fontSize: state.translationFontSize / 1.2,
                               fontWeight: FontWeight.w500,
-                              color: Colors.white,
+                              color: state.translationTextColor ?? Colors.white,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -268,7 +269,8 @@ class _CanvasPreview extends StatelessWidget {
                                 style: context.textTheme.bodySmall?.copyWith(
                                   fontSize: state.translationFontSize / 1.2,
                                   fontWeight: FontWeight.w500,
-                                  color: Colors.white,
+                                  color: state.translationTextColor ??
+                                      Colors.white,
                                 ),
                                 textAlign: TextAlign.center,
                               );
@@ -561,6 +563,15 @@ class _SettingText extends StatelessWidget {
             },
           ),
         ),
+        // Arabic text color selection
+        _TextColorSelector(
+          title: '${LocaleKeys.arabic.tr()} Color',
+          currentColor: null,
+          onColorChanged: (color) {
+            shareBloc.add(ShareVerseEvent.onChangeArabicTextColor(color));
+          },
+          colorBuilder: (context, state) => state.arabicTextColor,
+        ),
         ListTile(
           dense: true,
           title: Text(LocaleKeys.latin.tr()),
@@ -596,6 +607,15 @@ class _SettingText extends StatelessWidget {
               );
             },
           ),
+        ),
+        // Latin text color selection
+        _TextColorSelector(
+          title: '${LocaleKeys.latin.tr()} Color',
+          currentColor: null,
+          onColorChanged: (color) {
+            shareBloc.add(ShareVerseEvent.onChangeLatinTextColor(color));
+          },
+          colorBuilder: (context, state) => state.latinTextColor,
         ),
         ListTile(
           dense: true,
@@ -635,7 +655,382 @@ class _SettingText extends StatelessWidget {
             },
           ),
         ),
+        // Translation text color selection
+        _TextColorSelector(
+          title: '${LocaleKeys.translation.tr()} Color',
+          currentColor: null,
+          onColorChanged: (color) {
+            shareBloc.add(ShareVerseEvent.onChangeTranslationTextColor(color));
+          },
+          colorBuilder: (context, state) => state.translationTextColor,
+        ),
       ],
+    );
+  }
+}
+
+class _TextColorSelector extends StatelessWidget {
+  final String title;
+  final Color? currentColor;
+  final Function(Color) onColorChanged;
+  final Color? Function(BuildContext, ShareVerseState) colorBuilder;
+
+  const _TextColorSelector({
+    required this.title,
+    required this.currentColor,
+    required this.onColorChanged,
+    required this.colorBuilder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              title,
+              style: context.textTheme.bodyMedium,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: BlocBuilder<ShareVerseBloc, ShareVerseState>(
+              buildWhen: (previous, current) {
+                return colorBuilder(context, previous) !=
+                    colorBuilder(context, current);
+              },
+              builder: (context, state) {
+                final currentColor = colorBuilder(context, state);
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      // Color picker button
+                      GestureDetector(
+                        onTap: () => _showColorPickerDialog(context),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: context.theme.colorScheme.surface,
+                            border: Border.all(
+                              color: context.theme.colorScheme.outline,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Icon(
+                            Icons.palette,
+                            color: context.theme.colorScheme.primary,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                      // Hex input button
+                      GestureDetector(
+                        onTap: () => _showHexInputDialog(context),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: context.theme.colorScheme.surface,
+                            border: Border.all(
+                              color: context.theme.colorScheme.outline,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Icon(
+                            Icons.tag,
+                            color: context.theme.colorScheme.primary,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                      // White color (default)
+                      GestureDetector(
+                        onTap: () => onColorChanged(Colors.white),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(
+                              color: (currentColor == null ||
+                                      currentColor == Colors.white)
+                                  ? context.theme.colorScheme.primary
+                                  : Colors.grey,
+                              width: (currentColor == null ||
+                                      currentColor == Colors.white)
+                                  ? 3
+                                  : 1,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: (currentColor == null ||
+                                  currentColor == Colors.white)
+                              ? Icon(
+                                  Icons.check,
+                                  color: context.theme.colorScheme.primary,
+                                  size: 20,
+                                )
+                              : null,
+                        ),
+                      ),
+                      // Color palette
+                      ...Colors.primaries.map(
+                        (color) => GestureDetector(
+                          onTap: () => onColorChanged(color),
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: color,
+                              border: Border.all(
+                                color: currentColor == color
+                                    ? Colors.white
+                                    : Colors.transparent,
+                                width: currentColor == color ? 3 : 1,
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: currentColor == color
+                                ? const Icon(
+                                    Icons.check,
+                                    color: Colors.white,
+                                    size: 20,
+                                  )
+                                : null,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showColorPickerDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(LocaleKeys.selectColor.tr()),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Scrollable extended color palette
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      // Extended color palette
+                      ...Colors.primaries.map(
+                        (primaryColor) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                // Primary color
+                                GestureDetector(
+                                  onTap: () {
+                                    onColorChanged(primaryColor);
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 4),
+                                    decoration: BoxDecoration(
+                                      color: primaryColor,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                          color: Colors.grey.shade300),
+                                    ),
+                                  ),
+                                ),
+                                // Lighter shades
+                                ...([
+                                  100,
+                                  200,
+                                  300,
+                                  400,
+                                  500,
+                                  600,
+                                  700,
+                                  800,
+                                  900
+                                ].map((shade) {
+                                  final MaterialColor materialColor =
+                                      primaryColor;
+                                  final shadeColor =
+                                      materialColor[shade] ?? primaryColor;
+                                  return GestureDetector(
+                                    onTap: () {
+                                      onColorChanged(shadeColor);
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Container(
+                                      width: 30,
+                                      height: 30,
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 2),
+                                      decoration: BoxDecoration(
+                                        color: shadeColor,
+                                        borderRadius: BorderRadius.circular(15),
+                                        border: Border.all(
+                                            color: Colors.grey.shade300),
+                                      ),
+                                    ),
+                                  );
+                                })),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const Divider(),
+              // Sticky Common colors section
+              Text(
+                LocaleKeys.commonColors.tr(),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  Colors.black,
+                  Colors.white,
+                  Colors.grey,
+                  Colors.grey.shade700,
+                  Colors.grey.shade400,
+                  Colors.grey.shade200,
+                ]
+                    .map((color) => GestureDetector(
+                          onTap: () {
+                            onColorChanged(color);
+                            Navigator.of(context).pop();
+                          },
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: color,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.grey.shade300),
+                            ),
+                          ),
+                        ))
+                    .toList(),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(LocaleKeys.cancel.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showHexInputDialog(BuildContext context) {
+    final TextEditingController hexController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(LocaleKeys.enterHexColor.tr()),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: hexController,
+              decoration: InputDecoration(
+                labelText: LocaleKeys.hexColorLabel.tr(),
+                hintText: '#RRGGBB',
+                prefixText: '#',
+                border: OutlineInputBorder(),
+              ),
+              textCapitalization: TextCapitalization.characters,
+              maxLength: 6,
+              onChanged: (value) {
+                // Remove any non-hex characters
+                final cleaned = value.replaceAll(RegExp(r'[^0-9A-Fa-f]'), '');
+                if (cleaned != value) {
+                  hexController.value = TextEditingValue(
+                    text: cleaned,
+                    selection: TextSelection.collapsed(offset: cleaned.length),
+                  );
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Examples: FF0000 (Red), 00FF00 (Green), 0000FF (Blue)',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(LocaleKeys.cancel.tr()),
+          ),
+          TextButton(
+            onPressed: () {
+              final hexValue = hexController.text.trim();
+              if (hexValue.length == 6) {
+                try {
+                  final color = Color(int.parse('FF$hexValue', radix: 16));
+                  onColorChanged(color);
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  // Show error for invalid hex
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text(LocaleKeys.invalidHexColorFormat.tr())),
+                  );
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content:
+                          Text(LocaleKeys.pleaseEnterSixDigitHexColor.tr())),
+                );
+              }
+            },
+            child: Text(LocaleKeys.apply.tr()),
+          ),
+        ],
+      ),
     );
   }
 }

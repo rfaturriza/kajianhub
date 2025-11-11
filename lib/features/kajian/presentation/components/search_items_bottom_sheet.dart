@@ -59,6 +59,33 @@ class SearchItemBottomSheetState extends State<SearchItemBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    void onTap(Pair<String, String> item) {
+      if (!widget.isMultipleSelect) {
+        widget.onSelected(item);
+        context.pop();
+        return;
+      }
+      setState(() {
+        if (_selectedItems.value
+            .where((e) => e.second == item.second)
+            .isNotEmpty) {
+          _selectedItems.value.removeWhere(
+            (e) => e.second == item.second,
+          );
+        } else {
+          _selectedItems.value.add(item);
+        }
+      });
+      widget.onSelected(
+        _selectedItems.value.isEmpty
+            ? null
+            : Pair(
+                _selectedItems.value.map((e) => e.first).toSet().join('|'),
+                _selectedItems.value.map((e) => e.second).toSet().join('|'),
+              ),
+      );
+    }
+
     return SafeArea(
       child: Column(
         children: [
@@ -89,9 +116,8 @@ class SearchItemBottomSheetState extends State<SearchItemBottomSheet> {
             ],
           ),
           SearchBox(
-            isDense: true,
             initialValue: '',
-            backgroundColor: context.theme.colorScheme.surface,
+            backgroundColor: context.theme.colorScheme.surfaceContainerHighest,
             hintText: LocaleKeys.search.tr(),
             onChanged: (value) {
               setState(() {
@@ -105,72 +131,47 @@ class SearchItemBottomSheetState extends State<SearchItemBottomSheet> {
           ),
           const VSpacer(height: 10),
           ValueListenableBuilder(
-              valueListenable: _selectedItems,
-              builder: (context, value, child) {
-                return Expanded(
-                  child: ListView.separated(
-                    controller: widget.scrollController,
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    itemCount: _filteredItems.length,
-                    itemBuilder: (context, index) {
-                      final item = _filteredItems[index];
-                      return ListTile(
-                        trailing: _selectedItems.value
-                                .where((e) => e.second == item.second)
-                                .isNotEmpty
-                            ? Checkbox(value: true, onChanged: (_) {})
-                            : Checkbox(value: false, onChanged: (_) {}),
-                        title: Text(
-                          item.first,
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        selected: _selectedItems.value
+            valueListenable: _selectedItems,
+            builder: (context, value, child) {
+              return Expanded(
+                child: ListView.separated(
+                  controller: widget.scrollController,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  itemCount: _filteredItems.length,
+                  itemBuilder: (context, index) {
+                    final item = _filteredItems[index];
+                    return ListTile(
+                      trailing: Checkbox(
+                        value: _selectedItems.value
                             .where((e) => e.second == item.second)
                             .isNotEmpty,
-                        selectedTileColor:
-                            context.theme.colorScheme.primaryContainer,
-                        onTap: () {
-                          if (!widget.isMultipleSelect) {
-                            widget.onSelected(item);
-                            context.pop();
-                            return;
-                          }
-                          setState(() {
-                            if (_selectedItems.value
-                                .where((e) => e.second == item.second)
-                                .isNotEmpty) {
-                              _selectedItems.value.removeWhere(
-                                (e) => e.second == item.second,
-                              );
-                            } else {
-                              _selectedItems.value.add(item);
-                            }
-                          });
-                          widget.onSelected(
-                            _selectedItems.value.isEmpty
-                                ? null
-                                : Pair(
-                                    _selectedItems.value
-                                        .map((e) => e.first)
-                                        .toSet()
-                                        .join('|'),
-                                    _selectedItems.value
-                                        .map((e) => e.second)
-                                        .toSet()
-                                        .join('|'),
-                                  ),
-                          );
+                        onChanged: (_) {
+                          onTap(item);
                         },
-                      );
-                    },
-                    separatorBuilder: (context, index) {
-                      return const Divider();
-                    },
-                  ),
-                );
-              }),
+                      ),
+                      title: Text(
+                        item.first,
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      selected: _selectedItems.value
+                          .where((e) => e.second == item.second)
+                          .isNotEmpty,
+                      selectedTileColor:
+                          context.theme.colorScheme.surfaceContainerHighest,
+                      onTap: () {
+                        onTap(item);
+                      },
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return const Divider();
+                  },
+                ),
+              );
+            },
+          ),
         ],
       ),
     );

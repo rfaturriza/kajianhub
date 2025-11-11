@@ -31,6 +31,9 @@ class ShareVerseBloc extends Bloc<ShareVerseEvent, ShareVerseState> {
     on<_OnToggleArabicVisibility>(_onToggleArabicVisibility);
     on<_OnToggleLatinVisibility>(_onToggleLatinVisibility);
     on<_OnToggleTranslationVisibility>(_onToggleTranslationVisibility);
+    on<_OnChangeArabicTextColor>(_onChangeArabicTextColor);
+    on<_OnChangeLatinTextColor>(_onChangeLatinTextColor);
+    on<_OnChangeTranslationTextColor>(_onChangeTranslationTextColor);
     on<_OnSharePressed>(_onSharePressed);
     on<_OnPickBackgroundImage>(_onPickBackgroundImage);
   }
@@ -116,6 +119,27 @@ class ShareVerseBloc extends Bloc<ShareVerseEvent, ShareVerseState> {
     Emitter<ShareVerseState> emit,
   ) {
     emit(state.copyWith(isTranslationVisible: event.value ?? false));
+  }
+
+  void _onChangeArabicTextColor(
+    _OnChangeArabicTextColor event,
+    Emitter<ShareVerseState> emit,
+  ) {
+    emit(state.copyWith(arabicTextColor: event.color));
+  }
+
+  void _onChangeLatinTextColor(
+    _OnChangeLatinTextColor event,
+    Emitter<ShareVerseState> emit,
+  ) {
+    emit(state.copyWith(latinTextColor: event.color));
+  }
+
+  void _onChangeTranslationTextColor(
+    _OnChangeTranslationTextColor event,
+    Emitter<ShareVerseState> emit,
+  ) {
+    emit(state.copyWith(translationTextColor: event.color));
   }
 
   void _onSharePressed(

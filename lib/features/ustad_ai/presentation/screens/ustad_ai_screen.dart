@@ -17,6 +17,57 @@ class AiScreen extends StatefulWidget {
 class _AiScreenState extends State<AiScreen> {
   final controller = TextEditingController();
 
+  void _showDisclaimerBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.4,
+        minChildSize: 0.3,
+        maxChildSize: 0.7,
+        expand: false,
+        builder: (context, scrollController) => Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Symbols.info,
+                    color: context.theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    LocaleKeys.ustadzAiScreen_disclaimerTitle.tr(),
+                    style: context.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Text(
+                    LocaleKeys.ustadzAiScreen_disclaimerMessage.tr(),
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     void onSubmit(String value) {
@@ -32,6 +83,13 @@ class _AiScreenState extends State<AiScreen> {
           title: Text(
             LocaleKeys.ustadzAiScreen_title.tr(),
           ),
+          actions: [
+            IconButton(
+              onPressed: _showDisclaimerBottomSheet,
+              icon: const Icon(Symbols.info),
+              tooltip: LocaleKeys.ustadzAiScreen_disclaimerTitle.tr(),
+            ),
+          ],
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,6 +154,8 @@ class _AiScreenState extends State<AiScreen> {
                     controller: controller,
                     decoration: InputDecoration(
                       hintText: LocaleKeys.ustadzAiScreen_labelTextField.tr(),
+                      border: InputBorder.none,
+                      focusedBorder: InputBorder.none,
                     ),
                     onSubmitted: onSubmit,
                   ),

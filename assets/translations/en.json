@@ -305,11 +305,10 @@
   "hexColorExamples": "Examples: FF0000 (Red), 00FF00 (Green), 0000FF (Blue)",
   "invalidHexColorFormat": "Invalid hex color format",
   "pleaseEnterSixDigitHexColor": "Please enter a 6-digit hex color",
-  "pray": "Doa",
-  "otherPray": "Doa Lainnya",
-  "searchPrayHint": "Cari doa...",
-  "prayEmpty": "Maaf, tidak ada doa yang tersedia.",
-  "errorGetPray": "Maaf, terjadi kesalahan saat memuat doa",
-  "prayCopiedToClipboard": "Doa telah disalin ke clipboard"
-  
+  "pray": "Pray",
+  "otherPray": "Other Pray",
+  "searchPrayHint": "Search Pray...",
+  "prayEmpty": "Sorry, no pray found.",
+  "errorGetPray": "Sorry, we're unable to retrieve the pray at the moment. Please try again later.",
+  "prayCopiedToClipboard": "Pray text copied to clipboard"
 }

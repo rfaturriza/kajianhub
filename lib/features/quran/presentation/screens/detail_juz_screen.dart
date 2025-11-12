@@ -94,9 +94,7 @@ class _DetailJuzScaffold extends StatelessWidget {
           }
         },
         builder: (context, state) {
-          final detailJuz = (state.detailJuzResult?.isRight() ?? false)
-              ? state.detailJuzResult?.asRight()
-              : null;
+          final detailJuz = state.detailJuzResult?.asRight();
           return NestedScrollView(
             floatHeaderSlivers: true,
             headerSliverBuilder: (context, _) {

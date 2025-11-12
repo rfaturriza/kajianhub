@@ -32,6 +32,15 @@ abstract class ShareVerseEvent with _$ShareVerseEvent {
   const factory ShareVerseEvent.onToggleTranslationVisibility(bool? value) =
       _OnToggleTranslationVisibility;
 
+  const factory ShareVerseEvent.onChangeArabicTextColor(Color color) =
+      _OnChangeArabicTextColor;
+
+  const factory ShareVerseEvent.onChangeLatinTextColor(Color color) =
+      _OnChangeLatinTextColor;
+
+  const factory ShareVerseEvent.onChangeTranslationTextColor(Color color) =
+      _OnChangeTranslationTextColor;
+
   const factory ShareVerseEvent.onSharePressed(
       RenderRepaintBoundary? boundary) = _OnSharePressed;
 

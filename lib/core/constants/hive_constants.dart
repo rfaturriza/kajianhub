@@ -11,6 +11,7 @@ class HiveConst {
   static const String languageBox = 'quranLanguageBox';
   static const String settingBox = 'settingBox';
   static const String themeModeBox = 'themeModeBox';
+  static const String authBox = 'authBox';
   static const String quranLanguageKey = 'quranLanguageKey';
   static const String latinLanguageKey = 'latinLanguageKey';
   static const String prayerTimeLanguageKey = 'prayerTimeLanguageKey';
@@ -26,11 +27,14 @@ class HiveConst {
   static const String dynamicColorKey = 'dynamicColorKey';
   static const String tajweedCacheBox = 'tajweedCacheBox';
   static const String tajweedStatusKey = 'tajweedModeKey';
-  static const String tajweedCacheClearedVersionKey = 'tajweedCacheClearedVersionKey';
+  static const String tajweedCacheClearedVersionKey =
+      'tajweedCacheClearedVersionKey';
   static const String permissionBox = 'permissionBox';
-  static const String hasShownLocationPermissionKey = 'hasShownLocationPermissionKey';
+  static const String hasShownLocationPermissionKey =
+      'hasShownLocationPermissionKey';
   static const String prayerAlarmScheduleKey = 'prayerAlarmScheduleKey';
   static const String locationPrayerKey = 'locationPrayerKey';
+  static const String authTokenKey = 'authTokenKey';
 }
 
 class HiveTypeConst {

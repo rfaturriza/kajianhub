@@ -17,16 +17,17 @@ on:
           - production_major
 
 jobs:
+  bump-version:
+    uses: ./.github/workflows/bump-version.yml
+    with:
+      lane: ${{ github.event.inputs.lane }}
+    secrets: inherit
+
   release-ios:
+    needs: bump-version
     uses: ./.github/workflows/release-app.yml
     with:
       platform: ios
       lane: ${{ github.event.inputs.lane }}
-    secrets: inherit
-
-  bump-version:
-    needs: release-ios
-    uses: ./.github/workflows/bump-version.yml
-    with:
-      lane: ${{ github.event.inputs.lane }}
+      commit_sha: ${{ needs.bump-version.outputs.new_commit_sha }}
     secrets: inherit

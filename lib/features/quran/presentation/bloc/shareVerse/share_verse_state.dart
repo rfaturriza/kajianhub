@@ -15,6 +15,10 @@ abstract class ShareVerseState with _$ShareVerseState {
     @Default(true) bool isArabicVisible,
     @Default(true) bool isLatinVisible,
     @Default(true) bool isTranslationVisible,
+    // text colors (null means use default white)
+    Color? arabicTextColor,
+    Color? latinTextColor,
+    Color? translationTextColor,
     // custom background image path
     String? backgroundImagePath,
   }) = _ShareVerseState;

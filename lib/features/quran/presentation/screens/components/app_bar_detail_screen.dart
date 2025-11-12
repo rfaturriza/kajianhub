@@ -44,8 +44,8 @@ class SliverAppBarDetailScreen extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      pinned: false,
-      floating: true,
+      pinned: true,
+      floating: false,
       elevation: 0,
       title: Text(
         title,
@@ -55,9 +55,71 @@ class SliverAppBarDetailScreen extends StatelessWidget
           onPressed: onPressedBookmark,
           icon: () {
             if (isBookmarked) {
-              return const Icon(Symbols.bookmark);
+              return const Icon(
+                Symbols.bookmark_remove_rounded,
+                fill: 1,
+              );
             }
-            return const Icon(Symbols.bookmark_border);
+            return const Icon(Symbols.bookmark_add_rounded);
+          }(),
+          color: context.theme.colorScheme.tertiary,
+          disabledColor:
+              context.theme.colorScheme.tertiary.withValues(alpha: 0.5),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: IconButton(
+            onPressed: () {
+              showModalBottomSheet(
+                barrierColor: context.theme.scaffoldBackgroundColor
+                    .withValues(alpha: 0.5),
+                context: context,
+                enableDrag: true,
+                builder: (_) => StylingSettingBottomSheet(
+                  title: LocaleKeys.fontStyle.tr(),
+                ),
+              );
+            },
+            icon: const Icon(Symbols.settings),
+            color: context.theme.colorScheme.tertiary,
+            disabledColor:
+                context.theme.colorScheme.tertiary.withValues(alpha: 0.5),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class QuranDetailScreen extends StatelessWidget implements PreferredSizeWidget {
+  const QuranDetailScreen({
+    super.key,
+    this.isBookmarked = false,
+    required this.title,
+    required this.onPressedBookmark,
+  });
+
+  final bool isBookmarked;
+  final String title;
+  final Function()? onPressedBookmark;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      title: Text(title),
+      actions: [
+        IconButton(
+          onPressed: onPressedBookmark,
+          icon: () {
+            if (isBookmarked) {
+              return const Icon(Symbols.bookmark_remove_rounded);
+            }
+            return const Icon(Symbols.bookmark_add_rounded);
           }(),
           color: context.theme.colorScheme.tertiary,
           disabledColor:

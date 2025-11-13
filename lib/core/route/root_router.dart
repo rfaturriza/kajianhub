@@ -129,4 +129,16 @@ class RootRouter {
     path: '/profile',
     parent: rootRoute,
   );
+
+  static const RouteModel prayRoute = RouteModel(
+    name: 'pray',
+    path: '/pray',
+    parent: rootRoute,
+  );
+
+  static const RouteModel prayDetailRoute = RouteModel(
+    name: 'prayDetail',
+    path: '/detail/:id',
+    parent: prayRoute,
+  );
 }

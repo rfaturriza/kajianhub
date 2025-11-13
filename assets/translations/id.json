@@ -304,5 +304,12 @@
   "hexColorHint": "#RRGGBB",
   "hexColorExamples": "Contoh: FF0000 (Merah), 00FF00 (Hijau), 0000FF (Biru)",
   "invalidHexColorFormat": "Format kode warna hex tidak valid",
-  "pleaseEnterSixDigitHexColor": "Silakan masukkan kode warna hex 6 digit"
+  "pleaseEnterSixDigitHexColor": "Silakan masukkan kode warna hex 6 digit",
+  "pray": "Doa",
+  "otherPray": "Doa Lainnya",
+  "searchPrayHint": "Cari doa...",
+  "prayEmpty": "Maaf, tidak ada doa yang tersedia.",
+  "errorGetPray": "Maaf, terjadi kesalahan saat memuat doa",
+  "prayCopiedToClipboard": "Doa telah disalin ke clipboard"
+
 }

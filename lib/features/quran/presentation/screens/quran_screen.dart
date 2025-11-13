@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:quranku/core/route/root_router.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/features/bookmark/presentation/screen/bookmark_screen.dart';
+import 'package:quranku/features/pray/presentation/screens/pray_screen.dart';
 import 'package:quranku/features/quran/presentation/screens/components/juz_list.dart';
 import 'package:quranku/features/quran/presentation/screens/components/main_app_bar.dart';
 import 'package:quranku/features/shalat/presentation/components/shalat_info_card.dart';
@@ -35,7 +36,7 @@ class QuranScreen extends StatelessWidget {
       appBar: appBar,
       body: SafeArea(
         child: DefaultTabController(
-          length: 3,
+          length: 4,
           child: NestedScrollView(
             scrollBehavior: const ScrollBehavior().copyWith(
               physics: const BouncingScrollPhysics(),
@@ -61,17 +62,19 @@ class QuranScreen extends StatelessWidget {
                         Tab(text: LocaleKeys.surah.tr()),
                         Tab(text: LocaleKeys.juz.tr()),
                         Tab(text: LocaleKeys.bookmark.tr()),
+                        Tab(text: LocaleKeys.pray.tr()),
                       ],
                     ),
                   ),
                 ),
               ];
             },
-            body: const TabBarView(
+            body: TabBarView(
               children: [
                 SurahList(),
                 JuzList(),
                 BookmarkScreen(),
+                PrayScreen(),
               ],
             ),
           ),

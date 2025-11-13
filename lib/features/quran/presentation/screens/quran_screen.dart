@@ -62,7 +62,7 @@ class QuranScreen extends StatelessWidget {
                         Tab(text: LocaleKeys.surah.tr()),
                         Tab(text: LocaleKeys.juz.tr()),
                         Tab(text: LocaleKeys.bookmark.tr()),
-                        Tab(text: 'Doa'),
+                        Tab(text: LocaleKeys.pray.tr()),
                       ],
                     ),
                   ),

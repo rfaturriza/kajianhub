@@ -32,28 +32,38 @@ class PrayRemoteDataSourceImpl implements PrayRemoteDataSource {
     String orderBy = 'id',
     String sortBy = 'asc',
   }) async {
-    final response = await _dio.get(
-      'kajian/prayers',
-      queryParameters: {
-        if (query != null && query.isNotEmpty) 'q': query,
-        'type': 'pagination',
-        'page': page,
-        'limit': limit,
-        'order_by': orderBy,
-        'sort_by': sortBy,
-        'relations': '',
-      },
-    );
-
-    return PrayersResponseModel.fromJson(response.data);
+    try {
+      final response = await _dio.get(
+        'kajian/prayers',
+        queryParameters: {
+          if (query != null && query.isNotEmpty) 'q': query,
+          'type': 'pagination',
+          'page': page,
+          'limit': limit,
+          'order_by': orderBy,
+          'sort_by': sortBy,
+          'relations': '',
+        },
+      );
+      return PrayersResponseModel.fromJson(response.data);
+    } on DioException catch (e) {
+      throw Exception('Failed to fetch prayers: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error occurred while fetching prayers');
+    }
   }
 
   @override
   Future<PrayerModel> getPrayerDetail(int id) async {
-    final response = await _dio.get(
-      'kajian/prayers/$id',
-    );
-
-    return PrayerModel.fromJson(response.data['data']);
+    try {
+      final response = await _dio.get(
+        'kajian/prayers/$id',
+      );
+      return PrayerModel.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      throw Exception('Failed to fetch prayer detail: ${e.message}');
+    } catch (e) {
+      throw Exception('Unexpected error occurred while fetching prayer detail');
+    }
   }
 }

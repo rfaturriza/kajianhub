@@ -68,8 +68,12 @@ class _PrayerDetailContent extends StatelessWidget {
                   ].join('\n\n');
 
                   // Share implementation would go here
-                  Clipboard.setData(ClipboardData(text: shareText));
-                  context.showInfoToast(LocaleKeys.prayCopiedToClipboard.tr());
+                  try {
+                    Clipboard.setData(ClipboardData(text: shareText));
+                    context.showInfoToast(LocaleKeys.prayCopiedToClipboard.tr());
+                  } catch (e) {
+                    context.showErrorToast(LocaleKeys.defaultErrorMessage.tr());
+                  }
                 },
               );
             },

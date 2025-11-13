@@ -33,6 +33,9 @@ import '../../features/ustadz/presentation/screens/ustadz_detail_screen.dart';
 import '../../features/ustadz/presentation/screens/ustadz_list_screen.dart';
 import '../../features/ustad_ai/presentation/blocs/ustad_ai/ustad_ai_bloc.dart';
 import '../../features/ustad_ai/presentation/screens/ustad_ai_screen.dart';
+import '../../features/pray/domain/entities/prayer.codegen.dart';
+import '../../features/pray/presentation/screens/pray_screen.dart';
+import '../../features/pray/presentation/screens/prayer_detail_screen.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
@@ -303,6 +306,21 @@ GoRouter router(AuthBloc authBloc) => GoRouter(
               name: RootRouter.profileRoute.name,
               path: RootRouter.profileRoute.path,
               builder: (_, __) => ProfileScreen(),
+            ),
+            GoRoute(
+              name: RootRouter.prayRoute.name,
+              path: RootRouter.prayRoute.path,
+              builder: (_, __) => PrayScreen(),
+              routes: [
+                GoRoute(
+                  name: RootRouter.prayDetailRoute.name,
+                  path: RootRouter.prayDetailRoute.path,
+                  builder: (_, state) => PrayerDetailScreen(
+                    prayerId: int.tryParse(state.pathParameters['id'] ?? ''),
+                    prayer: state.extra as Prayer?,
+                  ),
+                ),
+              ],
             ),
             GoRoute(
               name: RootRouter.buletinRoute.name,

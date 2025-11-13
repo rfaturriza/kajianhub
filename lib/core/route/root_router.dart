@@ -130,6 +130,18 @@ class RootRouter {
     parent: rootRoute,
   );
 
+  static const RouteModel prayRoute = RouteModel(
+    name: 'pray',
+    path: '/pray',
+    parent: rootRoute,
+  );
+
+  static const RouteModel prayDetailRoute = RouteModel(
+    name: 'prayDetail',
+    path: '/detail/:id',
+    parent: prayRoute,
+  );
+
   static const RouteModel buletinRoute = RouteModel(
     name: 'buletin',
     path: '/buletin',

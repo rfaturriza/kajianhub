@@ -304,5 +304,20 @@
   "hexColorHint": "#RRGGBB",
   "hexColorExamples": "Contoh: FF0000 (Merah), 00FF00 (Hijau), 0000FF (Biru)",
   "invalidHexColorFormat": "Format kode warna hex tidak valid",
-  "pleaseEnterSixDigitHexColor": "Silakan masukkan kode warna hex 6 digit"
+  "pleaseEnterSixDigitHexColor": "Silakan masukkan kode warna hex 6 digit",
+  "buletin": "Buletin",
+  "buletinTitle": "Buletin Islam",
+  "buletinSubtitle": "Artikel dan wawasan terbaru tentang Islam",
+  "searchBuletinHint": "Cari buletin...",
+  "searchBuletinEmpty": "Tidak ada buletin yang ditemukan",
+  "errorGetBuletin": "Maaf, tidak dapat memuat buletin saat ini. Silakan coba lagi nanti",
+  "buletinDetail": "Detail Buletin",
+  "readBy": "Oleh {name}",
+  "publishedAt": "Dipublikasikan pada {date}",
+  "createdBy": "Dibuat oleh {name}",
+  "readMore": "Baca Selengkapnya",
+  "backToBuletin": "Kembali ke Buletin",
+  "increaseFontSize": "Perbesar Ukuran Font",
+  "decreaseFontSize": "Perkecil Ukuran Font",
+  "resetFontSize": "Reset Ukuran Font"
 }

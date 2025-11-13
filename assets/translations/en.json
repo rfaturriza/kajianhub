@@ -304,5 +304,20 @@
   "hexColorHint": "#RRGGBB",
   "hexColorExamples": "Examples: FF0000 (Red), 00FF00 (Green), 0000FF (Blue)",
   "invalidHexColorFormat": "Invalid hex color format",
-  "pleaseEnterSixDigitHexColor": "Please enter a 6-digit hex color"
+  "pleaseEnterSixDigitHexColor": "Please enter a 6-digit hex color",
+  "buletin": "Bulletin",
+  "buletinTitle": "Islamic Bulletin",
+  "buletinSubtitle": "Latest articles and insights about Islam",
+  "searchBuletinHint": "Search buletin...",
+  "searchBuletinEmpty": "No buletin found with your search",
+  "errorGetBuletin": "Sorry, unable to retrieve buletin at the moment. Please try again later",
+  "buletinDetail": "Bulletin Detail",
+  "readBy": "By {name}",
+  "publishedAt": "Published on {date}",
+  "createdBy": "Created by {name}",
+  "readMore": "Read More",
+  "backToBuletin": "Back to Bulletin",
+  "increaseFontSize": "Increase Font Size",
+  "decreaseFontSize": "Decrease Font Size",
+  "resetFontSize": "Reset Font Size"
 }

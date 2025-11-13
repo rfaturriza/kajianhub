@@ -64,6 +64,7 @@ dependencies:
   flutter_alice: ^2.0.1
   overlay_support: ^2.1.0
   image_picker: ^1.2.0
+  flutter_html: ^3.0.0
 
 dev_dependencies:
   flutter_test:

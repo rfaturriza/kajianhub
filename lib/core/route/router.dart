@@ -37,6 +37,8 @@ import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/profile_screen.dart';
+import '../../features/buletin/presentation/screens/buletin_screen.dart';
+import '../../features/buletin/presentation/screens/buletin_detail_screen.dart';
 import '../../injection.dart';
 import '../components/error_screen.dart';
 import 'root_router.dart';
@@ -82,7 +84,8 @@ GoRouter router(AuthBloc authBloc) => GoRouter(
         }
 
         // If user is authenticated and trying to access login, redirect to dashboard or redirectTo param
-        if (isAuthenticated && state.matchedLocation == RootRouter.loginRoute.path) {
+        if (isAuthenticated &&
+            state.matchedLocation == RootRouter.loginRoute.path) {
           final redirectTo = state.uri.queryParameters['redirectTo'];
           return redirectTo ?? RootRouter.rootRoute.path;
         }
@@ -300,6 +303,21 @@ GoRouter router(AuthBloc authBloc) => GoRouter(
               name: RootRouter.profileRoute.name,
               path: RootRouter.profileRoute.path,
               builder: (_, __) => ProfileScreen(),
+            ),
+            GoRoute(
+              name: RootRouter.buletinRoute.name,
+              path: RootRouter.buletinRoute.path,
+              builder: (_, __) => const BuletinScreen(),
+              routes: [
+                GoRoute(
+                  name: RootRouter.buletinDetailRoute.name,
+                  path: RootRouter.buletinDetailRoute.path,
+                  builder: (_, state) {
+                    final id = int.parse(state.pathParameters['id']!);
+                    return BuletinDetailScreen(buletinId: id);
+                  },
+                ),
+              ],
             ),
             GoRoute(
               name: RootRouter.error.name,

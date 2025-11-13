@@ -136,6 +136,14 @@ class _ListItemMenu extends StatelessWidget {
           },
           withDecoration: false,
         ),
+        ButtonDrawer(
+          icon: Symbols.article,
+          title: LocaleKeys.buletin.tr(),
+          onTap: () {
+            context.pushNamed(RootRouter.buletinRoute.name);
+          },
+          withDecoration: false,
+        ),
         if (ustadAiConfig.show) ...[
           ButtonDrawer(
             icon: Symbols.star_shine,

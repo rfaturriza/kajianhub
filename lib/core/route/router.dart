@@ -72,8 +72,9 @@ GoRouter router(AuthBloc authBloc) => GoRouter(
       refreshListenable: BlocListenable<AuthBloc, AuthState>(
         authBloc,
         whenListen: (previous, current) {
-          return (previous is AuthAuthenticated ? previous.token : null) !=
-              (current is AuthAuthenticated ? current.token : null);
+          // Only trigger refresh on authentication status change, not token refresh
+          return (previous is AuthAuthenticated) !=
+              (current is AuthAuthenticated);
         },
       ),
       redirect: (context, state) {

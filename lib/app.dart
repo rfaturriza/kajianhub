@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import 'package:go_router/go_router.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:provider/provider.dart';
 import 'package:quranku/core/network/networkInfo/network_info_bloc.dart';
@@ -36,10 +37,14 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> with WidgetsBindingObserver {
+  late final GoRouter _router;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Initialize router once to prevent recreation on hot reload
+    _router = router(sl<AuthBloc>());
   }
 
   @override
@@ -113,7 +118,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
                     child: BlocBuilder<AuthBloc, AuthState>(
                       builder: (context, state) {
                         return MaterialApp.router(
-                          routerConfig: router(context.read<AuthBloc>()),
+                          routerConfig: _router,
                           title: LocaleKeys.appName.tr(),
                           debugShowCheckedModeBanner: false,
                           theme: themeData(

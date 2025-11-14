@@ -90,6 +90,7 @@ class _SearchBoxState extends State<SearchBox> {
                       .withValues(alpha: 0.5),
                 ),
                 labelStyle: context.theme.textTheme.titleSmall,
+                focusedBorder: InputBorder.none,
                 border: InputBorder.none,
               ),
             ),

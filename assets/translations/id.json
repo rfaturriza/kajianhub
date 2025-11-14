@@ -274,6 +274,9 @@
   "loginSuccess": "Login berhasil",
   "loginFailed": "Login gagal",
   "logoutConfirmation": "Apakah Anda yakin ingin keluar?",
+  "dontHaveAccount": "Belum punya akun?",
+  "registerHere": "Daftar di sini",
+  "cannotOpenRegistrationPage": "Tidak dapat membuka halaman pendaftaran",
   "user": "Pengguna",
   "profileTitle": "Profil",
   "information": "Informasi",
@@ -327,5 +330,4 @@
   "errorGetPray": "Maaf, terjadi kesalahan saat memuat doa",
   "prayCopiedToClipboard": "Doa telah disalin ke clipboard",
   "watchHere": "Tonton di sini"
-
 }

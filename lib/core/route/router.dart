@@ -40,6 +40,8 @@ import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/profile_screen.dart';
+import '../../features/buletin/presentation/screens/buletin_screen.dart';
+import '../../features/buletin/presentation/screens/buletin_detail_screen.dart';
 import '../../injection.dart';
 import '../components/error_screen.dart';
 import 'root_router.dart';
@@ -70,8 +72,9 @@ GoRouter router(AuthBloc authBloc) => GoRouter(
       refreshListenable: BlocListenable<AuthBloc, AuthState>(
         authBloc,
         whenListen: (previous, current) {
-          return (previous is AuthAuthenticated ? previous.token : null) !=
-              (current is AuthAuthenticated ? current.token : null);
+          // Only trigger refresh on authentication status change, not token refresh
+          return (previous is AuthAuthenticated) !=
+              (current is AuthAuthenticated);
         },
       ),
       redirect: (context, state) {
@@ -317,6 +320,21 @@ GoRouter router(AuthBloc authBloc) => GoRouter(
                     prayerId: int.tryParse(state.pathParameters['id'] ?? ''),
                     prayer: state.extra as Prayer?,
                   ),
+                ),
+              ],
+            ),
+            GoRoute(
+              name: RootRouter.buletinRoute.name,
+              path: RootRouter.buletinRoute.path,
+              builder: (_, __) => const BuletinScreen(),
+              routes: [
+                GoRoute(
+                  name: RootRouter.buletinDetailRoute.name,
+                  path: RootRouter.buletinDetailRoute.path,
+                  builder: (_, state) {
+                    final id = int.parse(state.pathParameters['id']!);
+                    return BuletinDetailScreen(buletinId: id);
+                  },
                 ),
               ],
             ),

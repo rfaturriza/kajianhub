@@ -141,4 +141,16 @@ class RootRouter {
     path: '/detail/:id',
     parent: prayRoute,
   );
+
+  static const RouteModel buletinRoute = RouteModel(
+    name: 'buletin',
+    path: '/buletin',
+    parent: rootRoute,
+  );
+
+  static const RouteModel buletinDetailRoute = RouteModel(
+    name: 'buletinDetail',
+    path: '/:id',
+    parent: buletinRoute,
+  );
 }

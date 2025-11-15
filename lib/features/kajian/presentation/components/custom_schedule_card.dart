@@ -5,6 +5,7 @@ import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/core/utils/extension/extension.dart';
 import 'package:quranku/features/kajian/domain/entities/kajian_schedule.codegen.dart';
 import 'package:quranku/generated/locale_keys.g.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/utils/extension/string_ext.dart';
 
@@ -129,9 +130,28 @@ class ScheduleCard extends StatelessWidget {
                       icon: Icons.schedule,
                     ),
                   ),
-                  const Spacer(),
                 ],
               ),
+
+              // Row 4: watch link
+              if (schedule.link != null && schedule.link!.isNotEmpty) ...[
+                const VSpacer(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      launchUrl(Uri.parse(schedule.link!));
+                    },
+                    child: Text(
+                      LocaleKeys.watchHere.tr(),
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.theme.colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ],

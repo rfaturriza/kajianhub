@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/features/buletin/domain/entities/buletin.codegen.dart';
@@ -18,6 +19,7 @@ class BuletinTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double _fontSize = context.textTheme.bodyMedium?.fontSize ?? 14;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 2,
@@ -73,13 +75,76 @@ class BuletinTile extends StatelessWidget {
               ),
 
               // Content preview
-              Text(
-                _stripHtmlTags(buletin.content),
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: context.theme.colorScheme.onSurfaceVariant,
-                ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
+              Html(
+                data: buletin.content,
+                shrinkWrap: true,
+                onLinkTap: (url, _, __) {
+                  // Handle link tap if needed
+                },
+                extensions: [
+                  TagExtension(
+                    tagsToExtend: {
+                      "body",
+                      "p",
+                      "div",
+                      "span",
+                      "h1",
+                      "h2",
+                      "h3",
+                      "h4",
+                      "h5",
+                      "h6"
+                    },
+                    builder: (extensionContext) {
+                      return Text(
+                        extensionContext.element?.text ?? '',
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: context.theme.colorScheme.onSurfaceVariant,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+                style: {
+                  "body": Style(
+                    color: context.theme.colorScheme.onSurface,
+                    fontFamily: context.textTheme.bodyMedium?.fontFamily,
+                    fontSize: FontSize(_fontSize),
+                    lineHeight: const LineHeight(1.6),
+                  ),
+                  "p": Style(
+                    fontSize: FontSize(_fontSize),
+                    margin: Margins.only(bottom: 12),
+                  ),
+                  "h1, h2, h3, h4, h5, h6": Style(
+                    fontSize: FontSize(_fontSize + 4),
+                    fontWeight: FontWeight.bold,
+                    margin: Margins.only(top: 16, bottom: 8),
+                  ),
+                  "a": Style(
+                    color: context.theme.colorScheme.primary,
+                    textDecoration: TextDecoration.underline,
+                    fontSize: FontSize(_fontSize),
+                  ),
+                  "li": Style(
+                    fontSize: FontSize(_fontSize),
+                    margin: Margins.only(bottom: 4),
+                  ),
+                  "blockquote": Style(
+                    fontSize: FontSize(_fontSize),
+                    fontStyle: FontStyle.italic,
+                    padding:
+                        HtmlPaddings.symmetric(horizontal: 16, vertical: 8),
+                    border: Border(
+                      left: BorderSide(
+                        color: context.theme.colorScheme.primary,
+                        width: 4,
+                      ),
+                    ),
+                  ),
+                },
               ),
 
               const SizedBox(height: 12),
@@ -134,32 +199,6 @@ class BuletinTile extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _stripHtmlTags(String htmlString) {
-    // Remove HTML tags
-    final RegExp exp = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
-    String result = htmlString.replaceAll(exp, '');
-
-    // Decode common HTML entities
-    result = result
-        .replaceAll('&nbsp;', ' ')
-        .replaceAll('&amp;', '&')
-        .replaceAll('&lt;', '<')
-        .replaceAll('&gt;', '>')
-        .replaceAll('&quot;', '"')
-        .replaceAll('&#39;', "'")
-        .replaceAll('&ldquo;', '"')
-        .replaceAll('&rdquo;', '"')
-        .replaceAll('&lsquo;', "'")
-        .replaceAll('&rsquo;', "'")
-        .replaceAll('&ndash;', '–')
-        .replaceAll('&mdash;', '—');
-
-    // Clean up extra whitespace
-    result = result.replaceAll(RegExp(r'\s+'), ' ');
-
-    return result.trim();
   }
 
   String _formatDate(DateTime date) {

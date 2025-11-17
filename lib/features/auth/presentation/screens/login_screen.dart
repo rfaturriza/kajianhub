@@ -4,12 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/constants/asset_constants.dart';
+import 'package:quranku/core/network/dio_config.dart';
 import 'package:quranku/core/route/root_router.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/generated/locale_keys.g.dart';
 import 'package:quranku/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quranku/features/auth/presentation/bloc/auth_event.dart';
 import 'package:quranku/features/auth/presentation/bloc/auth_state.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? redirectTo;
@@ -227,10 +229,56 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
                 },
               ),
+              const SizedBox(height: 16),
+
+              // Registration Button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    LocaleKeys.dontHaveAccount.tr(),
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: context.theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  TextButton(
+                    onPressed: () => _launchRegistrationUrl(),
+                    child: Text(
+                      LocaleKeys.registerHere.tr(),
+                      style: TextStyle(
+                        color: context.theme.colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _launchRegistrationUrl() async {
+    final kajianhubUrl = NetworkConfig.baseUrlKajianHub;
+    final url = Uri.parse('${kajianhubUrl.split('/api').first}/register');
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(
+          url,
+          mode: LaunchMode.externalApplication,
+        );
+      } else {
+        if (mounted) {
+          context.showErrorToast(LocaleKeys.cannotOpenRegistrationPage.tr());
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        context.showErrorToast(LocaleKeys.cannotOpenRegistrationPage.tr());
+      }
+    }
   }
 }

@@ -11,7 +11,7 @@ import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/core/utils/themes/theme.dart';
 import 'package:quranku/features/quran/presentation/bloc/juz/juz_cubit.dart';
 import 'package:quranku/features/quran/presentation/bloc/lastRead/last_read_cubit.dart';
-import 'package:quranku/features/quran/presentation/screens/quran_screen.dart';
+import 'package:quranku/features/quran/presentation/screens/home_screen.dart';
 import 'package:quranku/features/shalat/presentation/bloc/shalat/shalat_bloc.dart';
 import 'package:quranku/generated/locale_keys.g.dart';
 import 'package:quranku/injection.dart';
@@ -172,7 +172,7 @@ class ScaffoldConnection extends StatelessWidget {
           return const SizedBox();
         },
       ),
-      body: const QuranScreen(),
+      body: const HomeScreen(),
     );
   }
 }

@@ -30,100 +30,113 @@ class _PrayScreenContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const VSpacer(height: 10),
-        BlocBuilder<PrayBloc, PrayState>(
-          buildWhen: (previous, current) =>
-              previous.searchQuery != current.searchQuery,
-          builder: (context, state) {
-            return SearchBox(
-              initialValue: state.searchQuery ?? emptyString,
-              hintText: LocaleKeys.searchPrayHint.tr(),
-              onClear: () {
-                context.read<PrayBloc>().add(const PrayEvent.clearSearch());
-              },
-              onSubmitted: (value) {
-                if (value != null && value.isNotEmpty) {
-                  context.read<PrayBloc>().add(PrayEvent.searchPrayers(value));
-                }
-              },
-            );
-          },
-        ),
-        const VSpacer(height: 16),
-        Expanded(
-          child: BlocBuilder<PrayBloc, PrayState>(
-            builder: (context, state) {
-              if (state.status.isInProgress && state.prayers.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (state.status.isFailure) {
-                return ErrorScreen(
-                  message: state.errorMessage ?? LocaleKeys.errorGetPray.tr(),
-                  onRefresh: () {
-                    context
-                        .read<PrayBloc>()
-                        .add(const PrayEvent.fetchPrayers());
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(LocaleKeys.pray.tr()),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const VSpacer(height: 10),
+            BlocBuilder<PrayBloc, PrayState>(
+              buildWhen: (previous, current) =>
+                  previous.searchQuery != current.searchQuery,
+              builder: (context, state) {
+                return SearchBox(
+                  initialValue: state.searchQuery ?? emptyString,
+                  hintText: LocaleKeys.searchPrayHint.tr(),
+                  onClear: () {
+                    context.read<PrayBloc>().add(const PrayEvent.clearSearch());
+                  },
+                  onSubmitted: (value) {
+                    if (value != null && value.isNotEmpty) {
+                      context
+                          .read<PrayBloc>()
+                          .add(PrayEvent.searchPrayers(value));
+                    }
                   },
                 );
-              }
-
-              if (state.prayers.isEmpty && state.status.isSuccess) {
-                return Center(
-                  child: Text(LocaleKeys.prayEmpty.tr()),
-                );
-              }
-
-              return NotificationListener<ScrollNotification>(
-                onNotification: (ScrollNotification scrollInfo) {
-                  // Load more when user is near the bottom (within 200 pixels)
-                  if (scrollInfo is ScrollUpdateNotification &&
-                      scrollInfo.metrics.pixels >=
-                          scrollInfo.metrics.maxScrollExtent - 200 &&
-                      !state.hasReachedMax &&
-                      !state.isLoadingMore &&
-                      state.status.isSuccess) {
-                    context
-                        .read<PrayBloc>()
-                        .add(const PrayEvent.loadMorePrayers());
+              },
+            ),
+            const VSpacer(height: 16),
+            Expanded(
+              child: BlocBuilder<PrayBloc, PrayState>(
+                builder: (context, state) {
+                  if (state.status.isInProgress && state.prayers.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
                   }
-                  return false;
-                },
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: state.prayers.length +
-                      (state.isLoadingMore && !state.hasReachedMax ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index == state.prayers.length && state.isLoadingMore) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        alignment: Alignment.center,
-                        child: const CircularProgressIndicator(),
-                      );
-                    }
 
-                    final prayer = state.prayers[index];
-                    return PrayerTile(
-                      prayer: prayer,
-                      onTap: () {
-                        context.pushNamed(
-                          RootRouter.prayDetailRoute.name,
-                          pathParameters: {
-                            'id': prayer.id.toString(),
-                          },
-                          extra: prayer,
-                        );
+                  if (state.status.isFailure) {
+                    return ErrorScreen(
+                      message:
+                          state.errorMessage ?? LocaleKeys.errorGetPray.tr(),
+                      onRefresh: () {
+                        context
+                            .read<PrayBloc>()
+                            .add(const PrayEvent.fetchPrayers());
                       },
                     );
-                  },
-                ),
-              );
-            },
-          ),
+                  }
+
+                  if (state.prayers.isEmpty && state.status.isSuccess) {
+                    return Center(
+                      child: Text(LocaleKeys.prayEmpty.tr()),
+                    );
+                  }
+
+                  return NotificationListener<ScrollNotification>(
+                    onNotification: (ScrollNotification scrollInfo) {
+                      // Load more when user is near the bottom (within 200 pixels)
+                      if (scrollInfo is ScrollUpdateNotification &&
+                          scrollInfo.metrics.pixels >=
+                              scrollInfo.metrics.maxScrollExtent - 200 &&
+                          !state.hasReachedMax &&
+                          !state.isLoadingMore &&
+                          state.status.isSuccess) {
+                        context
+                            .read<PrayBloc>()
+                            .add(const PrayEvent.loadMorePrayers());
+                      }
+                      return false;
+                    },
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: state.prayers.length +
+                          (state.isLoadingMore && !state.hasReachedMax ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == state.prayers.length &&
+                            state.isLoadingMore) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            alignment: Alignment.center,
+                            child: const CircularProgressIndicator(),
+                          );
+                        }
+
+                        final prayer = state.prayers[index];
+                        return PrayerTile(
+                          prayer: prayer,
+                          onTap: () {
+                            context.pushNamed(
+                              RootRouter.prayDetailRoute.name,
+                              pathParameters: {
+                                'id': prayer.id.toString(),
+                              },
+                              extra: prayer,
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

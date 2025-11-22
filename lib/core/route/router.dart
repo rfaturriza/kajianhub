@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:quranku/core/utils/bloc_listenable.dart';
 import 'package:quranku/features/kajian/domain/entities/study_location_entity.dart';
 import 'package:quranku/features/masjid/presentation/screens/study_location_detail_screen.dart';
+import 'package:quranku/features/quran/presentation/screens/quran_screen.dart';
 
 import '../../app.dart';
 import '../../features/kajian/domain/entities/kajian_schedule.codegen.dart';
@@ -127,6 +128,11 @@ GoRouter router(AuthBloc authBloc) => GoRouter(
               name: RootRouter.dashboard.name,
               path: RootRouter.dashboard.path,
               builder: (_, __) => ScaffoldConnection(),
+            ),
+            GoRoute(
+              name: RootRouter.quran.name,
+              path: RootRouter.quran.path,
+              builder: (_, __) => QuranScreen(),
             ),
             GoRoute(
               name: RootRouter.qiblaRoute.name,

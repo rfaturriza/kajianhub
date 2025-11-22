@@ -22,6 +22,12 @@ class RootRouter {
     parent: rootRoute,
   );
 
+  static const RouteModel quran = RouteModel(
+    name: 'quran',
+    path: '/quran',
+    parent: rootRoute,
+  );
+
   static const RouteModel qiblaRoute = RouteModel(
     name: 'qibla',
     path: '/qibla',

@@ -1,63 +1,39 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:quranku/core/route/root_router.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
-import 'package:quranku/features/bookmark/presentation/screen/bookmark_screen.dart';
-import 'package:quranku/features/quran/presentation/screens/components/juz_list.dart';
+import 'package:quranku/features/quran/presentation/screens/components/main_app_bar.dart';
+import 'package:quranku/features/quran/presentation/screens/components/carousel_slider_section.dart';
 
-import '../../../../generated/locale_keys.g.dart';
-import 'components/surah_list.dart';
+import 'components/category_menu_items_section.dart';
+import 'drawer_quran_screen.dart';
 
-class QuranScreen extends StatelessWidget {
-  const QuranScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final appBar = MainAppBar(
+      onPressedMenu: () {},
+      onPressedQibla: () {
+        context.pushNamed(RootRouter.qiblaRoute.name);
+      },
+      onPressedAuth: () {
+        context.pushNamed(RootRouter.profileRoute.name);
+      },
+    );
     final controller = ScrollController();
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: Text("Al-Qur'an"),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: SafeArea(
-        child: DefaultTabController(
-          length: 4,
-          child: NestedScrollView(
-            scrollBehavior: const ScrollBehavior().copyWith(
-              physics: const BouncingScrollPhysics(),
-            ),
-            controller: controller,
-            headerSliverBuilder: (
-              BuildContext context,
-              bool innerBoxIsScrolled,
-            ) {
-              return [
-                SliverPersistentHeader(
-                  key: const ValueKey('tabbar'),
-                  pinned: true,
-                  delegate: BarHeaderPersistentDelegate(
-                    TabBar(
-                      tabs: [
-                        Tab(text: LocaleKeys.surah.tr()),
-                        Tab(text: LocaleKeys.juz.tr()),
-                        Tab(text: LocaleKeys.bookmark.tr()),
-                      ],
-                    ),
-                  ),
-                ),
-              ];
-            },
-            body: TabBarView(
-              children: [
-                SurahList(),
-                JuzList(),
-                BookmarkScreen(),
-              ],
-            ),
-          ),
-        ),
+      drawer: const DrawerQuranScreen(),
+      appBar: appBar,
+      body: ListView(
+        controller: controller,
+        children: [
+          const CarouselSliderSection(),
+          const CategoryMenuItemsSection(),
+        ],
       ),
     );
   }

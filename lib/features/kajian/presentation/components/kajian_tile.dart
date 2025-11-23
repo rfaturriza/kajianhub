@@ -26,7 +26,7 @@ class KajianTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imageUrl = kajian.studyLocation.pictureUrl ?? '';
-    final prayerName = kajian.prayerSchedule;
+    final prayerName = kajian.prayerSchedule ?? '';
     final title = kajian.title;
     final ustadzName =
         kajian.ustadz.isNotEmpty ? kajian.ustadz.first.name : emptyString;

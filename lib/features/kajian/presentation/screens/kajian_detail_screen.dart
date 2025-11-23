@@ -42,13 +42,21 @@ class _KajianDetailScreenState extends State<KajianDetailScreen> {
   Widget build(BuildContext context) {
     final kajianTheme =
         widget.kajian.themes.isNotEmpty ? widget.kajian.themes.first.theme : '';
+    final isEvent = widget.kajian.typeLabel == 'Event';
     var tabs = <Widget>[
       Tab(
         text: LocaleKeys.history.tr(),
         height: 30,
       ),
     ];
-    if (widget.kajian.customSchedules.isNotEmpty) {
+    if (isEvent) {
+      tabs = [
+        Tab(
+          text: LocaleKeys.kajianDateSchedule.tr(),
+          height: 10,
+        ),
+      ];
+    } else if (widget.kajian.customSchedules.isNotEmpty) {
       tabs = [
         Tab(
           text: LocaleKeys.kajianDateSchedule.tr(),
@@ -70,77 +78,98 @@ class _KajianDetailScreenState extends State<KajianDetailScreen> {
           width: 100,
         ),
       ),
-      body: DefaultTabController(
-        length: tabs.length,
-        child: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              SliverToBoxAdapter(
-                child: _ImageSection(
-                  imageUrl: widget.kajian.studyLocation.pictureUrl ?? '',
-                  label: kajianTheme,
-                  locationName: widget.kajian.studyLocation.name ?? '',
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: _InfoSection(kajian: widget.kajian),
-                ),
-              ),
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _SliverHeaderDelegate(
-                  minHeight: kToolbarHeight,
-                  maxHeight: kToolbarHeight,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: TabBar(
-                            isScrollable: true,
-                            tabAlignment: TabAlignment.start,
-                            labelPadding: EdgeInsets.symmetric(horizontal: 8),
-                            labelStyle: context.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                            tabs: tabs,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: toggleSort,
-                          icon: Icon(
-                            _isSortedHistories || _isSortedCustomSchedules
-                                ? Symbols.arrow_downward_rounded
-                                : Symbols.arrow_upward_rounded,
-                            color:
-                                _isSortedHistories || _isSortedCustomSchedules
-                                    ? context.theme.colorScheme.primary
-                                    : null,
-                          ),
-                          tooltip:
-                              _isSortedHistories || _isSortedCustomSchedules
-                                  ? 'Sort: Oldest First'
-                                  : 'Sort: Newest First',
-                        ),
-                      ],
-                    ),
+      body: isEvent
+          ? SingleChildScrollView(
+              child: Column(
+                children: [
+                  _ImageSection(
+                    imageUrl: widget.kajian.studyLocation.pictureUrl ?? '',
+                    label: kajianTheme,
+                    locationName: widget.kajian.studyLocation.name ?? '',
+                    isEvent: true,
                   ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: _InfoSection(kajian: widget.kajian),
+                  ),
+                  VSpacer(height: 12),
+                ],
+              ),
+            )
+          : DefaultTabController(
+              length: tabs.length,
+              child: NestedScrollView(
+                headerSliverBuilder: (context, innerBoxIsScrolled) {
+                  return [
+                    SliverToBoxAdapter(
+                      child: _ImageSection(
+                        imageUrl: widget.kajian.studyLocation.pictureUrl ?? '',
+                        label: kajianTheme,
+                        locationName: widget.kajian.studyLocation.name ?? '',
+                        isEvent: false,
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: _InfoSection(kajian: widget.kajian),
+                      ),
+                    ),
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _SliverHeaderDelegate(
+                        minHeight: kToolbarHeight,
+                        maxHeight: kToolbarHeight,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: TabBar(
+                                  isScrollable: true,
+                                  tabAlignment: TabAlignment.start,
+                                  labelPadding:
+                                      EdgeInsets.symmetric(horizontal: 8),
+                                  labelStyle:
+                                      context.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  tabs: tabs,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: toggleSort,
+                                icon: Icon(
+                                  _isSortedHistories || _isSortedCustomSchedules
+                                      ? Symbols.arrow_downward_rounded
+                                      : Symbols.arrow_upward_rounded,
+                                  color: _isSortedHistories ||
+                                          _isSortedCustomSchedules
+                                      ? context.theme.colorScheme.primary
+                                      : null,
+                                ),
+                                tooltip: _isSortedHistories ||
+                                        _isSortedCustomSchedules
+                                    ? 'Sort: Oldest First'
+                                    : 'Sort: Newest First',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ];
+                },
+                body: _TabSection(
+                  isSortedHistories: _isSortedHistories,
+                  isSortedCustomSchedules: _isSortedCustomSchedules,
+                  histories: widget.kajian.histories,
+                  customSchedules: widget.kajian.customSchedules,
                 ),
               ),
-            ];
-          },
-          body: _TabSection(
-            isSortedHistories: _isSortedHistories,
-            isSortedCustomSchedules: _isSortedCustomSchedules,
-            histories: widget.kajian.histories,
-            customSchedules: widget.kajian.customSchedules,
-          ),
-        ),
-      ),
+            ),
     );
   }
 }
@@ -149,18 +178,26 @@ class _ImageSection extends StatelessWidget {
   final String locationName;
   final String imageUrl;
   final String label;
+  final bool isEvent;
 
-  const _ImageSection({
-    required this.locationName,
-    required this.imageUrl,
-    required this.label,
-  });
+  const _ImageSection(
+      {required this.locationName,
+      required this.imageUrl,
+      required this.label,
+      this.isEvent = false});
 
   @override
   Widget build(BuildContext context) {
     final imageUrl = this.imageUrl.isNotEmpty
         ? this.imageUrl
         : AssetConst.mosqueDummyImageUrl;
+    String tagName = isEvent ? 'Event' : label;
+    Color tagBackgroundColor = isEvent
+        ? context.theme.colorScheme.primaryContainer
+        : context.theme.colorScheme.tertiary;
+    Color tagForegroundColor = isEvent
+        ? context.theme.colorScheme.onPrimaryContainer
+        : context.theme.colorScheme.onTertiary;
     return GestureDetector(
       onTap: () {
         context.showFullscreenImageDialog(
@@ -207,9 +244,9 @@ class _ImageSection extends StatelessWidget {
             bottom: 12,
             right: 12,
             child: LabelTag(
-              title: label,
-              backgroundColor: context.theme.colorScheme.tertiary,
-              foregroundColor: context.theme.colorScheme.onTertiary,
+              title: tagName,
+              backgroundColor: tagBackgroundColor,
+              foregroundColor: tagForegroundColor,
             ),
           ),
         ],
@@ -227,12 +264,31 @@ class _InfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ustadzName = kajian.ustadz.isNotEmpty ? kajian.ustadz.first.name : '';
+    String ustadzName = '';
+    if (kajian.ustadz.length > 1) {
+      ustadzName = kajian.ustadz.map((e) => e.name).join(',\n');
+    } else {
+      ustadzName = kajian.ustadz.isNotEmpty ? kajian.ustadz.first.name : '';
+    }
     final ustadzPictureUrl =
         kajian.ustadz.isNotEmpty ? kajian.ustadz.first.pictureUrl : null;
-    final dayLabel = kajian.dailySchedules.isNotEmpty
+    String dayLabel = kajian.dailySchedules.isNotEmpty
         ? kajian.dailySchedules.first.dayLabel
         : '';
+
+    final isEvent = kajian.typeLabel == 'Event';
+    String eventThemes = '';
+    if (isEvent) {
+      dayLabel = kajian.event?.date != null
+          ? DateFormat('EEEE, dd MMM yyyy', context.locale.toString())
+              .format(DateTime.parse(kajian.event!.date!))
+          : '';
+      if (kajian.themes.isNotEmpty && kajian.themes.length > 1) {
+        eventThemes = kajian.themes.map((e) => e.theme).join(', ');
+      } else {
+        eventThemes = kajian.themes.isNotEmpty ? kajian.themes.first.theme : '';
+      }
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -320,7 +376,7 @@ class _InfoSection extends StatelessWidget {
             children: [
               if ((kajian.customSchedules.isEmpty) == true) ...[
                 Expanded(
-                  flex: 3,
+                  flex: isEvent ? 6 : 3,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -328,21 +384,21 @@ class _InfoSection extends StatelessWidget {
                         Text(
                           LocaleKeys.day.tr(),
                           style: context.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
                         Text(
                           dayLabel,
                           style: context.textTheme.bodyMedium,
                         ),
-                        const VSpacer(height: 8),
+                        const VSpacer(height: 12),
                       ],
                       if (kajian.timeStart.isNotEmpty == true ||
                           kajian.timeEnd.isNotEmpty == true) ...[
                         Text(
-                          LocaleKeys.time.tr(),
+                          LocaleKeys.time2.tr(),
                           style: context.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
                         Text(
@@ -404,6 +460,75 @@ class _InfoSection extends StatelessWidget {
               ),
             ],
           ),
+          if (isEvent)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const VSpacer(height: 16),
+                Text(
+                  LocaleKeys.theme.tr(),
+                  style: context.textTheme.bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w700, fontSize: 22),
+                ),
+                const VSpacer(height: 8),
+                Text(
+                  eventThemes,
+                  style: context.textTheme.bodyMedium?.copyWith(fontSize: 16),
+                ),
+                const VSpacer(height: 16),
+                if (kajian.event?.body != null &&
+                    kajian.event!.body!.isNotEmpty) ...[
+                  Text(
+                    LocaleKeys.description.tr(),
+                    style: context.textTheme.bodyMedium
+                        ?.copyWith(fontWeight: FontWeight.w700, fontSize: 22),
+                  ),
+                  const VSpacer(height: 8),
+                  Text(
+                    kajian.event!.body!,
+                    style: context.textTheme.bodyMedium?.copyWith(fontSize: 16),
+                  ),
+                ],
+                if (kajian.event?.onlineLink != null &&
+                    kajian.event!.onlineLink!.isNotEmpty) ...[
+                  const VSpacer(height: 16),
+                  Text(
+                    'Online',
+                    style: context.textTheme.bodyMedium
+                        ?.copyWith(fontWeight: FontWeight.w700, fontSize: 22),
+                  ),
+                  const VSpacer(height: 8),
+                  GestureDetector(
+                    onTap: () async {
+                      final uri =
+                          Uri.parse(kajian.event?.onlineLink ?? emptyString);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri,
+                            mode: LaunchMode.externalApplication);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: context.theme.colorScheme.onPrimary,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      width: double.infinity,
+                      child: Center(
+                        child: Text(
+                          LocaleKeys.JoinSession.tr(),
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: context.theme.colorScheme.onPrimaryContainer,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ]
+              ],
+            ),
         ],
       ),
     );

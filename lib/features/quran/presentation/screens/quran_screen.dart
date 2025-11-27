@@ -8,7 +8,11 @@ import '../../../../generated/locale_keys.g.dart';
 import 'components/surah_list.dart';
 
 class QuranScreen extends StatelessWidget {
-  const QuranScreen({super.key});
+  final int? initialTab;
+  const QuranScreen({
+    super.key,
+    this.initialTab,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +27,8 @@ class QuranScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: DefaultTabController(
-          length: 4,
+          length: 3,
+          initialIndex: initialTab ?? 0,
           child: NestedScrollView(
             scrollBehavior: const ScrollBehavior().copyWith(
               physics: const BouncingScrollPhysics(),

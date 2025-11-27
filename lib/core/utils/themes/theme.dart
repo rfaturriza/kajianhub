@@ -222,5 +222,10 @@ ThemeData themeData({
         ),
       ),
     ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: primaryColor,
+      foregroundColor:
+          isDarkMode ? darkColorScheme.onPrimary : lightColorScheme.onPrimary,
+    ),
   );
 }

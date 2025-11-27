@@ -21,6 +21,7 @@ class _CarouselSliderSectionState extends State<CarouselSliderSection> {
       CarouselSliderController();
 
   // Dummy data for carousel slides
+  // TODO: Replace with real data from API
   final List<CarouselSlideData> _carouselData = [
     CarouselSlideData(
       id: 'shalat_info',
@@ -105,7 +106,6 @@ class _CarouselSliderSectionState extends State<CarouselSliderSection> {
             autoPlay: true,
             autoPlayInterval: const Duration(seconds: 5),
             autoPlayAnimationDuration: const Duration(milliseconds: 800),
-            autoPlayCurve: Curves.fastOutSlowIn,
             enlargeCenterPage: true,
             scrollDirection: Axis.horizontal,
             onPageChanged: (index, reason) {

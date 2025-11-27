@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:provider/provider.dart';
 import 'package:quranku/core/network/networkInfo/network_info_bloc.dart';
@@ -166,7 +167,7 @@ class ScaffoldConnection extends StatelessWidget {
                   LocaleKeys.noInternetConnection.tr(),
                 );
               },
-              child: const Icon(Icons.signal_wifi_off_outlined),
+              child: const Icon(Symbols.wifi_off),
             );
           }
           return const SizedBox();

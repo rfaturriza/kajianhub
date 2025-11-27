@@ -5,6 +5,7 @@ import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/features/quran/presentation/screens/components/main_app_bar.dart';
 import 'package:quranku/features/quran/presentation/screens/components/carousel_slider_section.dart';
 
+import '../../../shalat/presentation/components/tracking_goals_section.dart';
 import 'components/category_menu_items_section.dart';
 import 'drawer_quran_screen.dart';
 
@@ -25,7 +26,6 @@ class HomeScreen extends StatelessWidget {
     final controller = ScrollController();
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       drawer: const DrawerQuranScreen(),
       appBar: appBar,
       body: ListView(
@@ -33,6 +33,7 @@ class HomeScreen extends StatelessWidget {
         children: [
           const CarouselSliderSection(),
           const CategoryMenuItemsSection(),
+          const TrackingSection(),
         ],
       ),
     );

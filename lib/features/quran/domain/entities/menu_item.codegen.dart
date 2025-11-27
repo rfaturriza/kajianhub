@@ -30,6 +30,9 @@ abstract class MenuItem with _$MenuItem {
 
   IconData get icon {
     // Map icon names to actual IconData
+    if (iconName.startsWith("0x")) {
+      return IconDataOutlined(int.parse(iconName));
+    }
     switch (iconName.toLowerCase()) {
       case 'menu_book_rounded':
       case 'quran':

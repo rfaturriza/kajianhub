@@ -1014,16 +1014,13 @@ class _TextColorSelector extends StatelessWidget {
                   Navigator.of(context).pop();
                 } catch (e) {
                   // Show error for invalid hex
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text(LocaleKeys.invalidHexColorFormat.tr())),
+                  context.showInfoToast(
+                    LocaleKeys.invalidHexColorFormat.tr(),
                   );
                 }
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content:
-                          Text(LocaleKeys.pleaseEnterSixDigitHexColor.tr())),
+                context.showInfoToast(
+                  LocaleKeys.pleaseEnterSixDigitHexColor.tr(),
                 );
               }
             },

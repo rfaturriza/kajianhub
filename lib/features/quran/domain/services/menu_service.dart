@@ -6,179 +6,84 @@ import '../entities/menu_item.codegen.dart';
 @injectable
 class MenuService {
   final FirebaseRemoteConfig _remoteConfig;
+  static const int maxRetries = 3;
+  static const Duration retryDelay = Duration(seconds: 2);
 
   MenuService(this._remoteConfig);
 
-  /// Get primary menu items (Al-Qur'an, Kajian)
+  /// Get primary menu items (Al-Qur'an, Kajian) with retry mechanism
   Future<List<MenuItem>> getPrimaryMenuItems() async {
-    try {
-      await _remoteConfig.fetchAndActivate();
-      final menuConfigString = _remoteConfig.getString('primary_menu_items');
-
-      if (menuConfigString.isEmpty) {
-        return _getDefaultPrimaryMenuItems();
-      }
-
-      final List<dynamic> menuJson = json.decode(menuConfigString);
-      final menuItems = menuJson
-          .map((item) => MenuItem.fromJson(item as Map<String, dynamic>))
-          .where((item) => item.isEnabled && item.isPrimary)
-          .toList();
-
-      // Sort by order
-      menuItems.sort((a, b) => a.order.compareTo(b.order));
-
-      return menuItems;
-    } catch (e) {
-      // Return default items if remote config fails
-      return _getDefaultPrimaryMenuItems();
-    }
+    return await _fetchMenuItemsWithRetry(
+      'primary_menu_items',
+      isPrimary: true,
+    );
   }
 
-  /// Get secondary menu items (Ustadz AI, Shalat, etc.)
+  /// Get secondary menu items (Ustadz AI, Shalat, etc.) with retry mechanism
   Future<List<MenuItem>> getSecondaryMenuItems() async {
-    try {
-      await _remoteConfig.fetchAndActivate();
-      final menuConfigString = _remoteConfig.getString('secondary_menu_items');
-
-      if (menuConfigString.isEmpty) {
-        return _getDefaultSecondaryMenuItems();
-      }
-
-      final List<dynamic> menuJson = json.decode(menuConfigString);
-      final menuItems = menuJson
-          .map((item) => MenuItem.fromJson(item as Map<String, dynamic>))
-          .where((item) => item.isEnabled && !item.isPrimary)
-          .toList();
-
-      // Sort by order
-      menuItems.sort((a, b) => a.order.compareTo(b.order));
-
-      return menuItems;
-    } catch (e) {
-      // Return default items if remote config fails
-      return _getDefaultSecondaryMenuItems();
-    }
+    return await _fetchMenuItemsWithRetry(
+      'secondary_menu_items',
+      isPrimary: false,
+    );
   }
 
-  /// Get all menu items
+  /// Get all menu items with retry mechanism
   Future<List<MenuItem>> getAllMenuItems() async {
-    try {
-      await _remoteConfig.fetchAndActivate();
-      final menuConfigString = _remoteConfig.getString('all_menu_items');
+    return await _fetchMenuItemsWithRetry('all_menu_items');
+  }
 
-      if (menuConfigString.isEmpty) {
-        // Fallback: combine primary and secondary
-        final primary = await getPrimaryMenuItems();
-        final secondary = await getSecondaryMenuItems();
-        return [...primary, ...secondary];
+  /// Fetch menu items with retry logic
+  Future<List<MenuItem>> _fetchMenuItemsWithRetry(String configKey,
+      {bool? isPrimary}) async {
+    Exception? lastException;
+
+    for (int attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        await _remoteConfig.fetchAndActivate();
+        final menuConfigString = _remoteConfig.getString(configKey);
+
+        if (menuConfigString.isEmpty) {
+          throw Exception(
+            'Remote config returned empty string for key: $configKey',
+          );
+        }
+
+        final List<dynamic> menuJson = json.decode(menuConfigString);
+        List<MenuItem> menuItems = menuJson
+            .map((item) => MenuItem.fromJson(item as Map<String, dynamic>))
+            .where((item) => item.isEnabled)
+            .toList();
+
+        // Apply primary/secondary filter if specified
+        if (isPrimary != null) {
+          menuItems = menuItems
+              .where(
+                (item) => item.isPrimary == isPrimary,
+              )
+              .toList();
+        }
+
+        // Sort by order
+        menuItems.sort((a, b) => a.order.compareTo(b.order));
+
+        if (menuItems.isEmpty) {
+          throw Exception('No enabled menu items found for key: $configKey');
+        }
+
+        return menuItems;
+      } catch (e) {
+        lastException = e is Exception ? e : Exception(e.toString());
+
+        if (attempt < maxRetries - 1) {
+          // Wait before retrying (exponential backoff)
+          await Future.delayed(retryDelay * (attempt + 1));
+        }
       }
-
-      final List<dynamic> menuJson = json.decode(menuConfigString);
-      final menuItems = menuJson
-          .map((item) => MenuItem.fromJson(item as Map<String, dynamic>))
-          .where((item) => item.isEnabled)
-          .toList();
-
-      // Sort by order
-      menuItems.sort((a, b) => a.order.compareTo(b.order));
-
-      return menuItems;
-    } catch (e) {
-      // Return combined default items if remote config fails
-      final primary = _getDefaultPrimaryMenuItems();
-      final secondary = _getDefaultSecondaryMenuItems();
-      return [...primary, ...secondary];
     }
-  }
 
-  List<MenuItem> _getDefaultPrimaryMenuItems() {
-    return [
-      const MenuItem(
-        id: 'quran',
-        label: 'Al-Qur\'an',
-        labelKey: 'quran',
-        iconName: 'menu_book_rounded',
-        colorHex: '#2D5016',
-        route: '/quran',
-        order: 1,
-        isPrimary: true,
-      ),
-      const MenuItem(
-        id: 'kajian',
-        label: 'Kajian',
-        labelKey: 'kajian',
-        iconName: 'play_circle',
-        colorHex: '#D4AF37',
-        route: '/kajian',
-        order: 2,
-        isPrimary: true,
-      ),
-    ];
-  }
-
-  List<MenuItem> _getDefaultSecondaryMenuItems() {
-    return [
-      const MenuItem(
-        id: 'ustadz_ai',
-        label: 'Ustadz AI',
-        labelKey: 'ustadz_ai',
-        iconName: 'smart_toy',
-        colorHex: '#8B4513',
-        route: '/ustadz-ai',
-        order: 1,
-        isPrimary: false,
-      ),
-      const MenuItem(
-        id: 'shalat',
-        label: 'Shalat',
-        labelKey: 'shalat',
-        iconName: 'prayer',
-        colorHex: '#4682B4',
-        route: '/shalat',
-        order: 2,
-        isPrimary: false,
-      ),
-      const MenuItem(
-        id: 'masjid',
-        label: 'Masjid',
-        labelKey: 'masjid',
-        iconName: 'mosque',
-        colorHex: '#DC143C',
-        route: '/masjid',
-        order: 3,
-        isPrimary: false,
-      ),
-      const MenuItem(
-        id: 'ustadz',
-        label: 'Ustadz',
-        labelKey: 'ustadz',
-        iconName: 'person',
-        colorHex: '#8B4513',
-        route: '/ustadz',
-        order: 4,
-        isPrimary: false,
-      ),
-      const MenuItem(
-        id: 'doa',
-        label: 'Doa',
-        labelKey: 'doa',
-        iconName: 'favorite',
-        colorHex: '#9932CC',
-        route: '/doa',
-        order: 5,
-        isPrimary: false,
-      ),
-      const MenuItem(
-        id: 'buletin',
-        label: 'Buletin',
-        labelKey: 'buletin',
-        iconName: 'article',
-        colorHex: '#FF6347',
-        route: '/buletin',
-        order: 6,
-        isPrimary: false,
-      ),
-    ];
+    // If all retries failed, throw the last exception
+    throw Exception(
+      'Failed to fetch menu items after $maxRetries attempts. Last error: ${lastException?.toString()}',
+    );
   }
 }

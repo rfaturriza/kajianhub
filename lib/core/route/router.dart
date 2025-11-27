@@ -6,8 +6,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_provider/go_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quranku/core/utils/bloc_listenable.dart';
+import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/features/kajian/domain/entities/study_location_entity.dart';
 import 'package:quranku/features/masjid/presentation/screens/study_location_detail_screen.dart';
+import 'package:quranku/features/quran/presentation/screens/home_screen.dart';
 import 'package:quranku/features/quran/presentation/screens/quran_screen.dart';
 
 import '../../app.dart';
@@ -112,27 +114,32 @@ GoRouter router(AuthBloc authBloc) => GoRouter(
                 errorDescription != null) {
               WidgetsBinding.instance.addPostFrameCallback(
                 (_) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(error),
-                    ),
+                  context.showInfoToast(
+                    "$error: $errorDescription",
                   );
                 },
               );
             }
 
-            return ScaffoldConnection();
+            return HomeScreen();
           },
           routes: [
             GoRoute(
               name: RootRouter.dashboard.name,
               path: RootRouter.dashboard.path,
-              builder: (_, __) => ScaffoldConnection(),
+              builder: (_, __) => HomeScreen(),
             ),
             GoRoute(
               name: RootRouter.quran.name,
               path: RootRouter.quran.path,
-              builder: (_, __) => QuranScreen(),
+              builder: (_, state) {
+                final initialTab = int.tryParse(
+                  state.uri.queryParameters['tab'] ?? '',
+                );
+                return QuranScreen(
+                  initialTab: initialTab,
+                );
+              },
             ),
             GoRoute(
               name: RootRouter.qiblaRoute.name,
@@ -362,6 +369,7 @@ GoRouter router(AuthBloc authBloc) => GoRouter(
       ],
       errorBuilder: (context, state) {
         return Scaffold(
+          appBar: AppBar(),
           body: ErrorScreen(
             message: state.error.toString(),
           ),

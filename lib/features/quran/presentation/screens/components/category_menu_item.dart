@@ -8,7 +8,7 @@ class CategoryMenuItem extends StatelessWidget {
   final String label;
   final Color color;
   final VoidCallback onTap;
-  final bool isLoading;
+  final bool isShimmer;
   final String? badgeText;
   final Color? badgeColor;
   final bool labelInside;
@@ -19,93 +19,32 @@ class CategoryMenuItem extends StatelessWidget {
     required this.label,
     required this.color,
     required this.onTap,
-    this.isLoading = false,
+    this.isShimmer = false,
     this.badgeText,
     this.badgeColor,
     this.labelInside = false,
   });
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      // Show shimmer placeholder when loading
-      return Shimmer.fromColors(
-        baseColor: context.theme.colorScheme.surfaceContainerHighest,
-        highlightColor: context.theme.colorScheme.surface,
-        child: Column(
-          children: [
-            Container(
-              width: width ?? 60,
-              height: labelInside ? 80 : 60,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-            if (!labelInside) ...[
-              const SizedBox(height: 8),
-              Container(
-                width: 50,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-              ),
-            ],
-          ],
-        ),
-      );
-    }
-
-    // Normal content when not loading
     return GestureDetector(
       onTap: onTap,
       child: Column(
         children: [
           Stack(
             children: [
-              Container(
-                width: width,
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: color.withAlpha(26),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: color.withAlpha(51),
-                    width: 1,
-                  ),
+              if (isShimmer) ...[
+                Shimmer.fromColors(
+                  baseColor: color.withAlpha(100),
+                  highlightColor: color,
+                  enabled: isShimmer,
+                  child: _buildContent(context),
                 ),
-                child: labelInside
-                    ? Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Icon(
-                            icon,
-                            color: color,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            label,
-                            style: context.textTheme.titleSmall?.copyWith(
-                              color: color,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      )
-                    : Icon(
-                        icon,
-                        color: color,
-                        size: 24,
-                      ),
-              ),
+              ],
+              if (!isShimmer) ...[
+                _buildContent(context),
+              ],
               // Badge
-              if (badgeText != null && badgeText!.isNotEmpty)
+              if (badgeText != null && badgeText!.isNotEmpty) ...[
                 Positioned(
                   top: -2,
                   right: -2,
@@ -133,6 +72,7 @@ class CategoryMenuItem extends StatelessWidget {
                     ),
                   ),
                 ),
+              ],
             ],
           ),
           if (!labelInside) ...[
@@ -149,6 +89,45 @@ class CategoryMenuItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    return Container(
+      width: width,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: color.withAlpha(26),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withAlpha(51),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: labelInside
+            ? MainAxisAlignment.spaceBetween
+            : MainAxisAlignment.center,
+        children: [
+          if (labelInside) ...[
+            Text(
+              label,
+              style: context.textTheme.titleSmall?.copyWith(
+                color: color,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+          Icon(
+            icon,
+            color: color,
+          ),
         ],
       ),
     );

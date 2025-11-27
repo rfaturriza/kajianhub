@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_qiblah/flutter_qiblah.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
+import 'package:jhijri/jHijri.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/services/location_permission_service.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
@@ -57,15 +58,15 @@ class ShalatInfoCard extends StatelessWidget {
             image: const CachedNetworkImageProvider(
               AssetConst.backgroundShalatTimeCardNetwork,
             ),
-            alignment: Alignment.bottomCenter,
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               context.theme.colorScheme.surfaceContainer.withAlpha(200),
               BlendMode.srcOver,
             ),
+            alignment: Alignment.bottomCenter,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
         child: Padding(
@@ -74,25 +75,27 @@ class ShalatInfoCard extends StatelessWidget {
             vertical: 17.5,
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               InkWell(
-                child: const _PrayTimeInfo(),
+                child: _PrayTimeInfo(),
                 onTap: () {
                   context.pushNamed(RootRouter.prayerTimeRoute.name);
                 },
               ),
               BlocBuilder<LastReadCubit, LastReadState>(
-                  builder: (context, state) {
-                if (state.lastReadSurah.isEmpty && state.lastReadJuz.isEmpty) {
-                  return const SizedBox();
-                }
-                return Divider(
-                  thickness: 2,
-                  color: context.theme.colorScheme.onPrimaryContainer,
-                );
-              }),
+                builder: (context, state) {
+                  if (state.lastReadSurah.isEmpty &&
+                      state.lastReadJuz.isEmpty) {
+                    return const SizedBox();
+                  }
+                  return Divider(
+                    thickness: 2,
+                    color: context.theme.colorScheme.onPrimaryContainer,
+                  );
+                },
+              ),
               const _LastReadInfo(),
             ],
           ),
@@ -108,6 +111,16 @@ class _PrayTimeInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final shalatBloc = context.read<ShalatBloc>();
+
+    final dateNow = DateTime.now();
+    final dateString = DateFormat(
+      'EEEE, dd MMMM yyyy',
+      context.locale.languageCode,
+    ).format(dateNow);
+    final hijriDate = JHijri.now();
+    final hijriDateString =
+        '${hijriDate.day} ${englishHMonth(hijriDate.month)} ${hijriDate.year}';
+
     return BlocBuilder<LanguageSettingBloc, LanguageSettingState>(
       buildWhen: (p, c) => p.languagePrayerTime != c.languagePrayerTime,
       builder: (context, languageSettingState) {
@@ -140,18 +153,18 @@ class _PrayTimeInfo extends StatelessWidget {
             }
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   flex: 1,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (state.scheduleByDay?.isRight() == true) ...[
                         Text(
                           shalat.capitalize(),
-                          style: context.textTheme.titleSmall?.copyWith(
+                          style: context.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: context.theme.colorScheme.onSurface,
                           ),
@@ -171,7 +184,7 @@ class _PrayTimeInfo extends StatelessWidget {
                                       .getShalatScheduleByDayEvent(),
                                 );
                           },
-                          icon: const Icon(Icons.refresh),
+                          icon: const Icon(Symbols.refresh),
                         ),
                       ],
                       if (state.locationStatus?.enabled == false) ...[
@@ -201,7 +214,7 @@ class _PrayTimeInfo extends StatelessWidget {
                               ),
                             );
                           },
-                          icon: const Icon(Icons.autorenew_rounded),
+                          icon: const Icon(Symbols.autorenew_rounded),
                         ),
                       ],
                     ],
@@ -210,7 +223,7 @@ class _PrayTimeInfo extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       if (state.scheduleByDay?.isLeft() == true) ...[
@@ -223,13 +236,29 @@ class _PrayTimeInfo extends StatelessWidget {
                         ),
                       ],
                       if (state.scheduleByDay?.isRight() == true) ...[
-                        Text(
-                          place,
-                          style: context.textTheme.titleSmall?.copyWith(
-                            color: context.theme.colorScheme.onSurface,
-                          ),
-                          textAlign: TextAlign.end,
-                          overflow: TextOverflow.clip,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              place,
+                              style: context.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: context.theme.colorScheme.onSurface,
+                              ),
+                            ),
+                            Text(
+                              dateString,
+                              style: context.textTheme.titleSmall?.copyWith(
+                                color: context.theme.colorScheme.onSurface,
+                              ),
+                            ),
+                            Text(
+                              hijriDateString,
+                              style: context.textTheme.titleSmall?.copyWith(
+                                color: context.theme.colorScheme.onSurface,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                       if (state.locationStatus?.enabled == false) ...[
@@ -271,9 +300,6 @@ class _LastReadInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<LastReadCubit, LastReadState>(
       builder: (context, state) {
-        if (state.lastReadSurah.isEmpty && state.lastReadJuz.isEmpty) {
-          return const SizedBox();
-        }
         var lastReadSurah =
             state.lastReadSurah.isEmpty ? null : state.lastReadSurah.last;
         var lastReadJuz =
@@ -334,7 +360,7 @@ class _LastReadInfo extends StatelessWidget {
                   overflow: TextOverflow.clip,
                 ),
                 Text(
-                  lastReadText.split(':').last,
+                  lastReadText.split(':').last.trim(),
                   style: context.textTheme.titleSmall?.copyWith(
                     color: context.theme.colorScheme.onSurface,
                   ),
@@ -353,7 +379,7 @@ class _LastReadInfo extends StatelessWidget {
                     context.pushNamed(RootRouter.historyRoute.name);
                   },
                   icon: const Icon(
-                    Icons.list_alt_rounded,
+                    Symbols.list_alt_rounded,
                   ),
                   color: context.theme.colorScheme.onSurface,
                 ),
@@ -390,7 +416,7 @@ class _LastReadInfo extends StatelessWidget {
                         ),
                         onPressed: () {},
                         icon: const Icon(
-                          Icons.arrow_forward,
+                          Symbols.arrow_forward,
                         ),
                       ),
                       CircularProgressIndicator(

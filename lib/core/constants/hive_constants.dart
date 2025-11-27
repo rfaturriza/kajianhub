@@ -35,6 +35,8 @@ class HiveConst {
   static const String prayerAlarmScheduleKey = 'prayerAlarmScheduleKey';
   static const String locationPrayerKey = 'locationPrayerKey';
   static const String authTokenKey = 'authTokenKey';
+  static const String dailyTrackingBox = 'dailyTrackingBox';
+  static const String trackingSettingsBox = 'trackingSettingsBox';
 }
 
 class HiveTypeConst {
@@ -47,4 +49,6 @@ class HiveTypeConst {
   static const int prayerScheduleSettingModel = 7;
   static const int geoLocation = 8;
   static const int coordinate = 9;
+  static const int dailyTrackingModel = 10;
+  static const int trackingSettings = 11;
 }

@@ -6,6 +6,8 @@ import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quranku/features/auth/presentation/bloc/auth_state.dart';
 
+import '../../../../../core/constants/asset_constants.dart';
+
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({
     super.key,
@@ -21,7 +23,13 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      centerTitle: false,
+      centerTitle: true,
+      title: Image.asset(
+        context.isDarkMode
+            ? AssetConst.kajianHubTextLogoLight
+            : AssetConst.kajianHubTextLogoDark,
+        width: 100,
+      ),
       elevation: 0,
       actions: [
         IconButton(

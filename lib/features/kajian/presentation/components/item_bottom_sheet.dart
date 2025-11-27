@@ -105,7 +105,7 @@ class ItemOnBottomSheet extends StatelessWidget {
     return FilterChip(
       label: Text(item.first),
       backgroundColor: context.theme.colorScheme.surfaceContainer,
-      selectedColor: context.theme.colorScheme.surfaceContainerHighest,
+      selectedColor: context.theme.colorScheme.primaryContainer,
       elevation: 0,
       side: BorderSide(
         width: 0.5,

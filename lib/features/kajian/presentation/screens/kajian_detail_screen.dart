@@ -43,6 +43,7 @@ class _KajianDetailScreenState extends State<KajianDetailScreen> {
     final kajianTheme =
         widget.kajian.themes.isNotEmpty ? widget.kajian.themes.first.theme : '';
     final isEvent = widget.kajian.typeLabel == 'Event';
+    EventKajian? kajian = widget.kajian.event;
     var tabs = <Widget>[
       Tab(
         text: LocaleKeys.history.tr(),
@@ -69,108 +70,148 @@ class _KajianDetailScreenState extends State<KajianDetailScreen> {
       ];
     }
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Image.asset(
-          context.isDarkMode
-              ? AssetConst.kajianHubTextLogoLight
-              : AssetConst.kajianHubTextLogoDark,
-          width: 100,
+        appBar: AppBar(
+          centerTitle: true,
+          title: Image.asset(
+            context.isDarkMode
+                ? AssetConst.kajianHubTextLogoLight
+                : AssetConst.kajianHubTextLogoDark,
+            width: 100,
+          ),
         ),
-      ),
-      body: isEvent
-          ? SingleChildScrollView(
-              child: Column(
-                children: [
-                  _ImageSection(
-                    imageUrl: widget.kajian.studyLocation.pictureUrl ?? '',
-                    label: kajianTheme,
-                    locationName: widget.kajian.studyLocation.name ?? '',
-                    isEvent: true,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: _InfoSection(kajian: widget.kajian),
-                  ),
-                  VSpacer(height: 12),
-                ],
-              ),
-            )
-          : DefaultTabController(
-              length: tabs.length,
-              child: NestedScrollView(
-                headerSliverBuilder: (context, innerBoxIsScrolled) {
-                  return [
-                    SliverToBoxAdapter(
-                      child: _ImageSection(
-                        imageUrl: widget.kajian.studyLocation.pictureUrl ?? '',
-                        label: kajianTheme,
-                        locationName: widget.kajian.studyLocation.name ?? '',
-                        isEvent: false,
-                      ),
+        body: isEvent
+            ? SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _ImageSection(
+                      imageUrl: widget.kajian.studyLocation.pictureUrl ?? '',
+                      label: kajianTheme,
+                      locationName: widget.kajian.studyLocation.name ?? '',
+                      isEvent: true,
                     ),
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: _InfoSection(kajian: widget.kajian),
-                      ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: _InfoSection(kajian: widget.kajian),
                     ),
-                    SliverPersistentHeader(
-                      pinned: true,
-                      delegate: _SliverHeaderDelegate(
-                        minHeight: kToolbarHeight,
-                        maxHeight: kToolbarHeight,
+                    VSpacer(height: 12),
+                  ],
+                ),
+              )
+            : DefaultTabController(
+                length: tabs.length,
+                child: NestedScrollView(
+                  headerSliverBuilder: (context, innerBoxIsScrolled) {
+                    return [
+                      SliverToBoxAdapter(
+                        child: _ImageSection(
+                          imageUrl:
+                              widget.kajian.studyLocation.pictureUrl ?? '',
+                          label: kajianTheme,
+                          locationName: widget.kajian.studyLocation.name ?? '',
+                          isEvent: false,
+                        ),
+                      ),
+                      SliverToBoxAdapter(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                flex: 1,
-                                child: TabBar(
-                                  isScrollable: true,
-                                  tabAlignment: TabAlignment.start,
-                                  labelPadding:
-                                      EdgeInsets.symmetric(horizontal: 8),
-                                  labelStyle:
-                                      context.textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: _InfoSection(kajian: widget.kajian),
+                        ),
+                      ),
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: _SliverHeaderDelegate(
+                          minHeight: kToolbarHeight,
+                          maxHeight: kToolbarHeight,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: TabBar(
+                                    isScrollable: true,
+                                    tabAlignment: TabAlignment.start,
+                                    labelPadding:
+                                        EdgeInsets.symmetric(horizontal: 8),
+                                    labelStyle:
+                                        context.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    tabs: tabs,
                                   ),
-                                  tabs: tabs,
                                 ),
-                              ),
-                              IconButton(
-                                onPressed: toggleSort,
-                                icon: Icon(
-                                  _isSortedHistories || _isSortedCustomSchedules
-                                      ? Symbols.arrow_downward_rounded
-                                      : Symbols.arrow_upward_rounded,
-                                  color: _isSortedHistories ||
+                                IconButton(
+                                  onPressed: toggleSort,
+                                  icon: Icon(
+                                    _isSortedHistories ||
+                                            _isSortedCustomSchedules
+                                        ? Symbols.arrow_downward_rounded
+                                        : Symbols.arrow_upward_rounded,
+                                    color: _isSortedHistories ||
+                                            _isSortedCustomSchedules
+                                        ? context.theme.colorScheme.primary
+                                        : null,
+                                  ),
+                                  tooltip: _isSortedHistories ||
                                           _isSortedCustomSchedules
-                                      ? context.theme.colorScheme.primary
-                                      : null,
+                                      ? 'Sort: Oldest First'
+                                      : 'Sort: Newest First',
                                 ),
-                                tooltip: _isSortedHistories ||
-                                        _isSortedCustomSchedules
-                                    ? 'Sort: Oldest First'
-                                    : 'Sort: Newest First',
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ];
-                },
-                body: _TabSection(
-                  isSortedHistories: _isSortedHistories,
-                  isSortedCustomSchedules: _isSortedCustomSchedules,
-                  histories: widget.kajian.histories,
-                  customSchedules: widget.kajian.customSchedules,
+                    ];
+                  },
+                  body: _TabSection(
+                    isSortedHistories: _isSortedHistories,
+                    isSortedCustomSchedules: _isSortedCustomSchedules,
+                    histories: widget.kajian.histories,
+                    customSchedules: widget.kajian.customSchedules,
+                  ),
                 ),
               ),
-            ),
-    );
+        bottomNavigationBar: isEvent &&
+                (kajian?.onlineLink != null && kajian!.onlineLink!.isNotEmpty)
+            ? Container(
+                margin: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).padding.bottom),
+                height: 64,
+                padding: EdgeInsets.symmetric(horizontal: 14),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          final uri =
+                              Uri.parse(kajian.onlineLink ?? emptyString);
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri,
+                                mode: LaunchMode.externalApplication);
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: context.theme.colorScheme.onPrimary,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          width: double.infinity,
+                          height: 36,
+                          child: Center(
+                            child: Text(
+                              LocaleKeys.register.tr(),
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
+              )
+            : null);
   }
 }
 
@@ -489,11 +530,12 @@ class _InfoSection extends StatelessWidget {
                     style: context.textTheme.bodyMedium?.copyWith(fontSize: 16),
                   ),
                 ],
-                if (kajian.event?.onlineLink != null &&
-                    kajian.event!.onlineLink!.isNotEmpty) ...[
+                /* if (kajian.event?.onlineLink != null &&
+                    kajian.event!.onlineLink!.isNotEmpty) */
+                ...[
                   const VSpacer(height: 16),
                   Text(
-                    'Online',
+                    LocaleKeys.online.tr(),
                     style: context.textTheme.bodyMedium
                         ?.copyWith(fontWeight: FontWeight.w700, fontSize: 22),
                   ),
@@ -508,24 +550,23 @@ class _InfoSection extends StatelessWidget {
                       }
                     },
                     child: Container(
-                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: context.theme.colorScheme.onPrimary,
                         borderRadius: BorderRadius.circular(6),
                       ),
+                      height: 36,
                       width: double.infinity,
                       child: Center(
                         child: Text(
                           LocaleKeys.JoinSession.tr(),
                           style: context.textTheme.bodyMedium?.copyWith(
                             fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: context.theme.colorScheme.onPrimaryContainer,
                           ),
                         ),
                       ),
                     ),
                   ),
+                  VSpacer(height: MediaQuery.of(context).padding.bottom),
                 ]
               ],
             ),

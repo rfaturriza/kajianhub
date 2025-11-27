@@ -15,6 +15,9 @@ abstract class FilterKajianSchedule with _$FilterKajianSchedule {
 
     /// can multiple week id
     Pair<String, String>? weeklySchedulesWeekId,
+
+    /// can multiple kajian type id
+    Pair<String, String>? kajianTypeId,
     Pair<String, String>? prayerSchedule,
 
     /// can multiple theme id

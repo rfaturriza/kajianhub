@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/features/kajian/presentation/components/label_tag.dart';
+import 'package:quranku/generated/locale_keys.g.dart';
 
 import '../../../../core/components/fullscreen_image_dialog.dart';
 import '../../../../core/components/spacer.dart';
@@ -36,6 +37,7 @@ class KajianTile extends StatelessWidget {
         ? '${kajian.timeStart} - ${kajian.timeEnd}'
         : kajian.timeStart;
     final place = kajian.studyLocation.name;
+    final EventKajian? event = kajian.event;
     final schedule = () {
       if (kajian.dailySchedules.isEmpty && kajian.customSchedules.isNotEmpty) {
         if (kajian.customSchedules.first.date != null) {
@@ -121,11 +123,45 @@ class KajianTile extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (prayerName.isNotEmpty) ...[
-                            LabelTag(
-                              title: prayerName.capitalize(),
-                              backgroundColor: prayerColor.first,
-                              foregroundColor: prayerColor.second,
+                            Row(
+                              children: [
+                                LabelTag(
+                                  title: prayerName.capitalize(),
+                                  backgroundColor: prayerColor.first,
+                                  foregroundColor: prayerColor.second,
+                                ),
+                                if (kajian.typeLabel.isNotEmpty) ...[
+                                  LabelTag(
+                                    title: kajian.typeLabel.capitalize(),
+                                    backgroundColor: prayerColor.first,
+                                    foregroundColor: prayerColor.second,
+                                  ),
+                                ],
+                              ],
                             ),
+                            const VSpacer(height: 2),
+                          ],
+                          if (event?.type != null &&
+                              event!.type!.isNotEmpty) ...[
+                            Row(
+                              children: [
+                                LabelTag(
+                                  title: LocaleKeys.Event.tr().capitalize(),
+                                  backgroundColor:
+                                      context.theme.colorScheme.primary,
+                                  foregroundColor:
+                                      context.theme.colorScheme.onPrimary,
+                                ),
+                                LabelTag(
+                                  title: event.type!.capitalize(),
+                                  backgroundColor:
+                                      context.theme.colorScheme.primary,
+                                  foregroundColor:
+                                      context.theme.colorScheme.onPrimary,
+                                ),
+                              ],
+                            ),
+                            const VSpacer(height: 2),
                           ],
                           Text(
                             title,

@@ -8,6 +8,7 @@ import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/core/utils/extension/extension.dart';
 import 'package:quranku/core/utils/extension/string_ext.dart';
 import 'package:quranku/features/kajian/domain/entities/day_kajian.codegen.dart';
+import 'package:quranku/features/kajian/domain/entities/kajian_type.codegen.dart';
 import 'package:quranku/features/kajian/domain/entities/prayer_kajian.codegen.dart';
 import 'package:quranku/generated/locale_keys.g.dart';
 
@@ -448,10 +449,23 @@ class _KajianBottomSheetFilter extends StatelessWidget {
                               );
                           context.pop();
                         },
-                        child: Text(
-                          LocaleKeys.reset.tr(),
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: context.theme.colorScheme.primary,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: context.theme.colorScheme.primaryContainer,
+                              width: 1,
+                            ),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(4),
+                            ),
+                          ),
+                          child: Text(
+                            LocaleKeys.removeAll.tr(),
+                            style: context.textTheme.bodySmall?.copyWith(
+                              color: context.theme.colorScheme.primary,
+                            ),
                           ),
                         ),
                       ),
@@ -459,6 +473,8 @@ class _KajianBottomSheetFilter extends StatelessWidget {
                   ],
                 ),
                 const _DatePickerSection(),
+                const VSpacer(height: 10),
+                const _KajianTypeSection(),
                 const VSpacer(height: 10),
                 const _ProvinceFilterSection(),
                 const VSpacer(height: 10),
@@ -773,6 +789,34 @@ class _DayFilterSection extends StatelessWidget {
           onSelected: (value) {
             context.read<KajianBloc>().add(
                   KajianEvent.onChangeDailySchedulesDayId(
+                    value,
+                  ),
+                );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _KajianTypeSection extends StatelessWidget {
+  const _KajianTypeSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<KajianBloc, KajianState>(
+      buildWhen: (previous, current) {
+        return previous.filter.kajianTypeId != current.filter.kajianTypeId;
+      },
+      builder: (context, state) {
+        return ItemOnBottomSheet(
+          title: LocaleKeys.kajianType.tr(),
+          isShowAllButton: false,
+          selected: state.filter.kajianTypeId,
+          items: KajianType.types.map((e) => Pair(e.name, e.id)).toList(),
+          onSelected: (value) {
+            context.read<KajianBloc>().add(
+                  KajianEvent.onChangeKajianTypeId(
                     value,
                   ),
                 );

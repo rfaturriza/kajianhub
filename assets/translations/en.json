@@ -137,11 +137,15 @@
   "khatib": "Khatib",
   "mosque": "Mosque",
   "week": "Week",
+  "kajianType": "Kajian Type",
+  "Routine": "Routine",
+  "NonRoutine": "Non Routine",
   "theme": "Theme",
   "apply": "Apply",
   "prayerSchedule": "Prayer Schedule",
   "seeAll": "See All",
   "reset": "Reset",
+  "removeAll": "Remove All",
   "monday": "Monday",
   "tuesday": "Tuesday",
   "wednesday": "Wednesday",
@@ -333,5 +337,6 @@
   "increaseFontSize": "Increase Font Size",
   "decreaseFontSize": "Decrease Font Size",
   "resetFontSize": "Reset Font Size",
-  "watchHere": "Watch here"
+  "watchHere": "Watch here",
+  "online": "Online"
 }

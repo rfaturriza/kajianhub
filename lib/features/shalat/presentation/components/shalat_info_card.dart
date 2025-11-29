@@ -6,7 +6,7 @@ import 'package:flutter_qiblah/flutter_qiblah.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:quranku/core/components/dialog.dart';
+import 'package:quranku/core/services/location_permission_service.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/core/utils/extension/dartz_ext.dart';
 import 'package:quranku/core/utils/extension/extension.dart';
@@ -34,26 +34,20 @@ class ShalatInfoCard extends StatelessWidget {
         if (state.locationStatus?.status.isNotGranted == true &&
             state.hasShownPermissionDialog == false) {
           // Use post frame callback to avoid setState during build
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            AppDialog.showPermissionDialog(
-              context,
-              content: LocaleKeys.permissionMessageLocation.tr(),
-              onOk: () async {
-                final p = await Geolocator.requestPermission();
-                shalatBloc.add(
-                  ShalatEvent.onChangedLocationStatusEvent(
-                    status: LocationStatus(
-                      true,
-                      p,
-                    ),
-                  ),
-                );
-              },
-            ).whenComplete(() {
-              shalatBloc.add(
-                const ShalatEvent.onChangedPermissionDialogEvent(true),
-              );
-            });
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            final p = await LocationPermissionService.requestLocationPermission(
+                context);
+            shalatBloc.add(
+              ShalatEvent.onChangedLocationStatusEvent(
+                status: LocationStatus(
+                  true,
+                  p,
+                ),
+              ),
+            );
+            shalatBloc.add(
+              const ShalatEvent.onChangedPermissionDialogEvent(true),
+            );
           });
         }
       },
@@ -200,7 +194,8 @@ class _PrayTimeInfo extends StatelessWidget {
                           true) ...[
                         IconButton(
                           onPressed: () async {
-                            final p = await Geolocator.requestPermission();
+                            final p = await LocationPermissionService
+                                .requestLocationPermission(context);
                             shalatBloc.add(
                               ShalatEvent.onChangedLocationStatusEvent(
                                 status: LocationStatus(

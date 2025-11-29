@@ -425,21 +425,21 @@ class _InfoSection extends StatelessWidget {
                         Text(
                           LocaleKeys.day.tr(),
                           style: context.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w900,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
                           dayLabel,
                           style: context.textTheme.bodyMedium,
                         ),
-                        const VSpacer(height: 12),
+                        const VSpacer(height: 8),
                       ],
                       if (kajian.timeStart.isNotEmpty == true ||
                           kajian.timeEnd.isNotEmpty == true) ...[
                         Text(
-                          LocaleKeys.time2.tr(),
+                          LocaleKeys.time.tr(),
                           style: context.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w900,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(

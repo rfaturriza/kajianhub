@@ -449,23 +449,10 @@ class _KajianBottomSheetFilter extends StatelessWidget {
                               );
                           context.pop();
                         },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: context.theme.colorScheme.primaryContainer,
-                              width: 1,
-                            ),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(4),
-                            ),
-                          ),
-                          child: Text(
-                            LocaleKeys.removeAll.tr(),
-                            style: context.textTheme.bodySmall?.copyWith(
-                              color: context.theme.colorScheme.primary,
-                            ),
+                        child: Text(
+                          LocaleKeys.reset.tr(),
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            color: context.theme.colorScheme.primary,
                           ),
                         ),
                       ),

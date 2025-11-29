@@ -189,6 +189,19 @@ class _FilterRowSection extends StatelessWidget {
                               },
                             ),
                           ],
+                          if (state.filter.kajianTypeId != null) ...[
+                            _filterChip(
+                              context: context,
+                              label: state.filter.kajianTypeId!.first,
+                              onSelected: (_) {
+                                context.read<KajianBloc>().add(
+                                      const KajianEvent.onChangeKajianTypeId(
+                                        null,
+                                      ),
+                                    );
+                              },
+                            ),
+                          ],
                           if (state.filter.studyLocationProvinceId != null) ...[
                             _filterChip(
                               context: context,
@@ -388,7 +401,7 @@ class _FilterRowSection extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: FilterChip(
-        label: Text(label),
+        label: Text(label.splitMapJoin('|', onMatch: (m) => ', ')),
         selected: selected,
         onSelected: (bool value) {
           onSelected(value);

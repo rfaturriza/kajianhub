@@ -226,7 +226,7 @@ class _RecitationInfo extends StatelessWidget {
         }
         final imageUrl = state.recommendedKajian?.studyLocation.pictureUrl ??
             AssetConst.mosqueDummyImageUrl;
-        final isEvent = state.recommendedKajian?.typeLabel == 'Event';
+        final isEvent = state.recommendedKajian?.typeLabel.toUpperCase()== 'EVENT';
         final EventKajian? kajianEvent = state.recommendedKajian?.event;
         return Row(
           children: [
@@ -253,7 +253,7 @@ class _RecitationInfo extends StatelessWidget {
                             (kajianEvent?.type != null &&
                                 kajianEvent!.type!.isNotEmpty)) ...[
                           LabelTag(
-                            title: LocaleKeys.Event.tr().capitalize(),
+                            title: LocaleKeys.event.tr().capitalize(),
                             backgroundColor: context.theme.colorScheme.primary,
                             foregroundColor:
                                 context.theme.colorScheme.onPrimary,

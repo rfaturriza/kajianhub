@@ -37,7 +37,7 @@ class KajianTile extends StatelessWidget {
         ? '${kajian.timeStart} - ${kajian.timeEnd}'
         : kajian.timeStart;
     final place = kajian.studyLocation.name;
-    final EventKajian? event = kajian.event;
+    final event = kajian.event;
     final schedule = () {
       if (kajian.dailySchedules.isEmpty && kajian.customSchedules.isNotEmpty) {
         if (kajian.customSchedules.first.date != null) {
@@ -48,6 +48,10 @@ class KajianTile extends StatelessWidget {
       }
       if (kajian.dailySchedules.isNotEmpty && kajian.customSchedules.isEmpty) {
         return kajian.dailySchedules.first.dayLabel;
+      }
+      if (kajian.event != null && kajian.event!.date != null) {
+        return DateFormat('EEEE, dd MMMM yyyy', context.locale.toString())
+            .format(DateTime.parse(kajian.event!.date!).toLocal());
       }
       return emptyString;
     }();
@@ -110,6 +114,7 @@ class KajianTile extends StatelessWidget {
               distanceInKm:
                   kajian.distanceInKm ?? kajian.studyLocation.distanceInKm,
               imageUrl: imageUrl,
+              height: 120,
             ),
             Expanded(
               child: Padding(
@@ -141,19 +146,18 @@ class KajianTile extends StatelessWidget {
                             ),
                             const VSpacer(height: 2),
                           ],
-                          if (event?.type != null &&
-                              event!.type!.isNotEmpty) ...[
+                          if (event?.type?.isNotEmpty == true) ...[
                             Row(
                               children: [
                                 LabelTag(
-                                  title: LocaleKeys.Event.tr().capitalize(),
+                                  title: LocaleKeys.event.tr().capitalize(),
                                   backgroundColor:
                                       context.theme.colorScheme.primary,
                                   foregroundColor:
                                       context.theme.colorScheme.onPrimary,
                                 ),
                                 LabelTag(
-                                  title: event.type!.capitalize(),
+                                  title: event?.type?.capitalize() ?? '',
                                   backgroundColor:
                                       context.theme.colorScheme.primary,
                                   foregroundColor:
@@ -223,9 +227,9 @@ class KajianTile extends StatelessWidget {
                                     text: schedule,
                                   ),
                                 ),
+                                const HSpacer(width: 5),
                               ],
                               if (time.isNotEmpty) ...[
-                                const HSpacer(width: 5),
                                 Expanded(
                                   flex: 1,
                                   child: ScheduleIconText(

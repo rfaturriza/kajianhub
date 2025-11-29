@@ -42,8 +42,8 @@ class _KajianDetailScreenState extends State<KajianDetailScreen> {
   Widget build(BuildContext context) {
     final kajianTheme =
         widget.kajian.themes.isNotEmpty ? widget.kajian.themes.first.theme : '';
-    final isEvent = widget.kajian.typeLabel == 'Event';
-    EventKajian? kajian = widget.kajian.event;
+    final isEvent = widget.kajian.typeLabel.toUpperCase() == 'EVENT';
+    var kajian = widget.kajian.event;
     var tabs = <Widget>[
       Tab(
         text: LocaleKeys.history.tr(),
@@ -51,12 +51,7 @@ class _KajianDetailScreenState extends State<KajianDetailScreen> {
       ),
     ];
     if (isEvent) {
-      tabs = [
-        Tab(
-          text: LocaleKeys.kajianDateSchedule.tr(),
-          height: 10,
-        ),
-      ];
+      tabs = [];
     } else if (widget.kajian.customSchedules.isNotEmpty) {
       tabs = [
         Tab(
@@ -70,148 +65,118 @@ class _KajianDetailScreenState extends State<KajianDetailScreen> {
       ];
     }
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Image.asset(
-            context.isDarkMode
-                ? AssetConst.kajianHubTextLogoLight
-                : AssetConst.kajianHubTextLogoDark,
-            width: 100,
-          ),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Image.asset(
+          context.isDarkMode
+              ? AssetConst.kajianHubTextLogoLight
+              : AssetConst.kajianHubTextLogoDark,
+          width: 100,
         ),
-        body: isEvent
-            ? SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _ImageSection(
-                      imageUrl: widget.kajian.studyLocation.pictureUrl ?? '',
-                      label: kajianTheme,
-                      locationName: widget.kajian.studyLocation.name ?? '',
-                      isEvent: true,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: _InfoSection(kajian: widget.kajian),
-                    ),
-                    VSpacer(height: 12),
-                  ],
-                ),
-              )
-            : DefaultTabController(
-                length: tabs.length,
-                child: NestedScrollView(
-                  headerSliverBuilder: (context, innerBoxIsScrolled) {
-                    return [
-                      SliverToBoxAdapter(
-                        child: _ImageSection(
-                          imageUrl:
-                              widget.kajian.studyLocation.pictureUrl ?? '',
-                          label: kajianTheme,
-                          locationName: widget.kajian.studyLocation.name ?? '',
-                          isEvent: false,
-                        ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          child: _InfoSection(kajian: widget.kajian),
-                        ),
-                      ),
-                      SliverPersistentHeader(
-                        pinned: true,
-                        delegate: _SliverHeaderDelegate(
-                          minHeight: kToolbarHeight,
-                          maxHeight: kToolbarHeight,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: TabBar(
-                                    isScrollable: true,
-                                    tabAlignment: TabAlignment.start,
-                                    labelPadding:
-                                        EdgeInsets.symmetric(horizontal: 8),
-                                    labelStyle:
-                                        context.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    tabs: tabs,
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: toggleSort,
-                                  icon: Icon(
-                                    _isSortedHistories ||
-                                            _isSortedCustomSchedules
-                                        ? Symbols.arrow_downward_rounded
-                                        : Symbols.arrow_upward_rounded,
-                                    color: _isSortedHistories ||
-                                            _isSortedCustomSchedules
-                                        ? context.theme.colorScheme.primary
-                                        : null,
-                                  ),
-                                  tooltip: _isSortedHistories ||
-                                          _isSortedCustomSchedules
-                                      ? 'Sort: Oldest First'
-                                      : 'Sort: Newest First',
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ];
-                  },
-                  body: _TabSection(
-                    isSortedHistories: _isSortedHistories,
-                    isSortedCustomSchedules: _isSortedCustomSchedules,
-                    histories: widget.kajian.histories,
-                    customSchedules: widget.kajian.customSchedules,
-                  ),
+      ),
+      body: DefaultTabController(
+        length: tabs.length,
+        child: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) {
+            return [
+              SliverToBoxAdapter(
+                child: _ImageSection(
+                  imageUrl: widget.kajian.studyLocation.pictureUrl ?? '',
+                  label: isEvent ? widget.kajian.typeLabel : kajianTheme,
+                  locationName: widget.kajian.studyLocation.name ?? '',
                 ),
               ),
-        bottomNavigationBar: isEvent &&
-                (kajian?.onlineLink != null && kajian!.onlineLink!.isNotEmpty)
-            ? Container(
-                margin: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).padding.bottom),
-                height: 64,
-                padding: EdgeInsets.symmetric(horizontal: 14),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          final uri =
-                              Uri.parse(kajian.onlineLink ?? emptyString);
-                          if (await canLaunchUrl(uri)) {
-                            await launchUrl(uri,
-                                mode: LaunchMode.externalApplication);
-                          }
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: context.theme.colorScheme.onPrimary,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          width: double.infinity,
-                          height: 36,
-                          child: Center(
-                            child: Text(
-                              LocaleKeys.register.tr(),
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                fontSize: 16,
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: _InfoSection(kajian: widget.kajian),
+                ),
+              ),
+              if (tabs.isNotEmpty) ...[
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _SliverHeaderDelegate(
+                    minHeight: kToolbarHeight,
+                    maxHeight: kToolbarHeight,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: TabBar(
+                              isScrollable: true,
+                              tabAlignment: TabAlignment.start,
+                              labelPadding: EdgeInsets.symmetric(horizontal: 8),
+                              labelStyle:
+                                  context.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
                               ),
+                              tabs: tabs,
                             ),
                           ),
-                        ),
+                          IconButton(
+                            onPressed: toggleSort,
+                            icon: Icon(
+                              _isSortedHistories || _isSortedCustomSchedules
+                                  ? Symbols.arrow_downward_rounded
+                                  : Symbols.arrow_upward_rounded,
+                              color:
+                                  _isSortedHistories || _isSortedCustomSchedules
+                                      ? context.theme.colorScheme.primary
+                                      : null,
+                            ),
+                            tooltip:
+                                _isSortedHistories || _isSortedCustomSchedules
+                                    ? 'Sort: Oldest First'
+                                    : 'Sort: Newest First',
+                          ),
+                        ],
                       ),
-                    ]),
-              )
-            : null);
+                    ),
+                  ),
+                ),
+              ],
+            ];
+          },
+          body: (tabs.isNotEmpty)
+              ? _TabSection(
+                  isSortedHistories: _isSortedHistories,
+                  isSortedCustomSchedules: _isSortedCustomSchedules,
+                  histories: widget.kajian.histories,
+                  customSchedules: widget.kajian.customSchedules,
+                )
+              : const SizedBox.shrink(),
+        ),
+      ),
+      bottomNavigationBar: Builder(
+        builder: (context) {
+          final isEventValid =
+              isEvent && kajian?.registrationLink?.isNotEmpty == true;
+          if (!isEventValid) {
+            return const SizedBox.shrink();
+          }
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: FilledButton.icon(
+                icon: const Icon(Symbols.app_registration_rounded),
+                onPressed: () async {
+                  final uri = Uri.parse(
+                    kajian?.registrationLink ?? emptyString,
+                  );
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  }
+                },
+                label: Text(LocaleKeys.register.tr()),
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 }
 
@@ -219,26 +184,18 @@ class _ImageSection extends StatelessWidget {
   final String locationName;
   final String imageUrl;
   final String label;
-  final bool isEvent;
 
-  const _ImageSection(
-      {required this.locationName,
-      required this.imageUrl,
-      required this.label,
-      this.isEvent = false});
+  const _ImageSection({
+    required this.locationName,
+    required this.imageUrl,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
     final imageUrl = this.imageUrl.isNotEmpty
         ? this.imageUrl
         : AssetConst.mosqueDummyImageUrl;
-    String tagName = isEvent ? 'Event' : label;
-    Color tagBackgroundColor = isEvent
-        ? context.theme.colorScheme.primaryContainer
-        : context.theme.colorScheme.tertiary;
-    Color tagForegroundColor = isEvent
-        ? context.theme.colorScheme.onPrimaryContainer
-        : context.theme.colorScheme.onTertiary;
     return GestureDetector(
       onTap: () {
         context.showFullscreenImageDialog(
@@ -285,9 +242,9 @@ class _ImageSection extends StatelessWidget {
             bottom: 12,
             right: 12,
             child: LabelTag(
-              title: tagName,
-              backgroundColor: tagBackgroundColor,
-              foregroundColor: tagForegroundColor,
+              title: label,
+              backgroundColor: context.theme.colorScheme.tertiary,
+              foregroundColor: context.theme.colorScheme.onTertiary,
             ),
           ),
         ],
@@ -305,7 +262,7 @@ class _InfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String ustadzName = '';
+    var ustadzName = '';
     if (kajian.ustadz.length > 1) {
       ustadzName = kajian.ustadz.map((e) => e.name).join(',\n');
     } else {
@@ -313,12 +270,12 @@ class _InfoSection extends StatelessWidget {
     }
     final ustadzPictureUrl =
         kajian.ustadz.isNotEmpty ? kajian.ustadz.first.pictureUrl : null;
-    String dayLabel = kajian.dailySchedules.isNotEmpty
+    var dayLabel = kajian.dailySchedules.isNotEmpty
         ? kajian.dailySchedules.first.dayLabel
         : '';
 
-    final isEvent = kajian.typeLabel == 'Event';
-    String eventThemes = '';
+    final isEvent = kajian.typeLabel.toUpperCase() == 'EVENT';
+    var eventThemes = '';
     if (isEvent) {
       dayLabel = kajian.event?.date != null
           ? DateFormat('EEEE, dd MMM yyyy', context.locale.toString())
@@ -402,8 +359,8 @@ class _InfoSection extends StatelessWidget {
                     ),
                     Text(
                       ustadzName,
-                      style: context.textTheme.bodyLarge?.copyWith(
-                        color: context.theme.colorScheme.onSurfaceVariant,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.theme.colorScheme.onSurface,
                       ),
                     ),
                   ],
@@ -417,7 +374,7 @@ class _InfoSection extends StatelessWidget {
             children: [
               if ((kajian.customSchedules.isEmpty) == true) ...[
                 Expanded(
-                  flex: isEvent ? 6 : 3,
+                  flex: 3,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -451,54 +408,57 @@ class _InfoSection extends StatelessWidget {
                   ),
                 ),
               ],
-              Expanded(
-                flex: 7,
-                child: GestureDetector(
-                  onTap: () async {
-                    final uri =
-                        Uri.parse(kajian.studyLocation.googleMaps ?? '');
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri);
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: context.theme.colorScheme.primaryContainer
-                          .withAlpha(100),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Icon(
-                              Symbols.map_rounded,
-                              size: 20,
-                              color: context.theme.colorScheme.primary,
-                            ),
-                            const HSpacer(width: 4),
-                            Text(
-                              LocaleKeys.location.tr(),
-                              textAlign: TextAlign.end,
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
+              if (kajian.studyLocation.address?.isNotEmpty == true &&
+                  kajian.studyLocation.address != '-') ...[
+                Expanded(
+                  flex: 7,
+                  child: GestureDetector(
+                    onTap: () async {
+                      final uri =
+                          Uri.parse(kajian.studyLocation.googleMaps ?? '');
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: context.theme.colorScheme.primaryContainer
+                            .withAlpha(100),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Icon(
+                                Symbols.map_rounded,
+                                size: 20,
+                                color: context.theme.colorScheme.primary,
                               ),
-                            ),
-                          ],
-                        ),
-                        const VSpacer(height: 8),
-                        Text(
-                          kajian.studyLocation.address ?? emptyString,
-                          style: context.textTheme.bodyMedium,
-                        ),
-                      ],
+                              const HSpacer(width: 4),
+                              Text(
+                                LocaleKeys.location.tr(),
+                                textAlign: TextAlign.end,
+                                style: context.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const VSpacer(height: 8),
+                          Text(
+                            kajian.studyLocation.address ?? emptyString,
+                            style: context.textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
           if (isEvent)
@@ -508,65 +468,54 @@ class _InfoSection extends StatelessWidget {
                 const VSpacer(height: 16),
                 Text(
                   LocaleKeys.theme.tr(),
-                  style: context.textTheme.bodyMedium
-                      ?.copyWith(fontWeight: FontWeight.w700, fontSize: 22),
+                  style: context.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const VSpacer(height: 8),
                 Text(
                   eventThemes,
-                  style: context.textTheme.bodyMedium?.copyWith(fontSize: 16),
+                  style: context.textTheme.bodyMedium,
                 ),
                 const VSpacer(height: 16),
-                if (kajian.event?.body != null &&
-                    kajian.event!.body!.isNotEmpty) ...[
+                if (kajian.event?.body?.isNotEmpty == true) ...[
                   Text(
                     LocaleKeys.description.tr(),
-                    style: context.textTheme.bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.w700, fontSize: 22),
+                    style: context.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const VSpacer(height: 8),
                   Text(
                     kajian.event!.body!,
-                    style: context.textTheme.bodyMedium?.copyWith(fontSize: 16),
+                    style: context.textTheme.bodyMedium,
                   ),
                 ],
-                /* if (kajian.event?.onlineLink != null &&
-                    kajian.event!.onlineLink!.isNotEmpty) */
-                ...[
+                if (kajian.event?.onlineLink?.isNotEmpty == true) ...[
                   const VSpacer(height: 16),
                   Text(
                     LocaleKeys.online.tr(),
-                    style: context.textTheme.bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.w700, fontSize: 22),
+                    style: context.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const VSpacer(height: 8),
-                  GestureDetector(
-                    onTap: () async {
-                      final uri =
-                          Uri.parse(kajian.event?.onlineLink ?? emptyString);
+                  FilledButton.icon(
+                    icon: const Icon(Symbols.video_call),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(40),
+                    ),
+                    onPressed: () async {
+                      final uri = Uri.parse(
+                        kajian.event?.onlineLink ?? emptyString,
+                      );
                       if (await canLaunchUrl(uri)) {
                         await launchUrl(uri,
                             mode: LaunchMode.externalApplication);
                       }
                     },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: context.theme.colorScheme.onPrimary,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      height: 36,
-                      width: double.infinity,
-                      child: Center(
-                        child: Text(
-                          LocaleKeys.JoinSession.tr(),
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ),
+                    label: Text(LocaleKeys.joinSession.tr()),
                   ),
-                  VSpacer(height: MediaQuery.of(context).padding.bottom),
                 ]
               ],
             ),

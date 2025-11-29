@@ -227,5 +227,16 @@ ThemeData themeData({
       foregroundColor:
           isDarkMode ? darkColorScheme.onPrimary : lightColorScheme.onPrimary,
     ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: isDarkMode
+          ? darkColorScheme.surfaceContainer
+          : lightColorScheme.surfaceContainer,
+      textStyle: textTheme.titleSmall,
+      iconColor: primaryColor,
+      iconSize: 24,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+    ),
   );
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hive_ce/hive.dart';
 
@@ -18,6 +19,11 @@ abstract class TrackingSettings with _$TrackingSettings {
     @HiveField(3) @Default(true) bool showProgress,
     @HiveField(4) required DateTime createdAt,
     @HiveField(5) DateTime? updatedAt,
+    @HiveField(6) @Default(true) bool prayerRemindersEnabled,
+    @HiveField(7) @Default(30) int prayerReminderDelayMinutes,
+    @HiveField(8) @Default(true) bool progressCheckReminderEnabled,
+    @HiveField(9) @Default(20) int progressCheckReminderHour,
+    @HiveField(10) @Default(0) int progressCheckReminderMinute,
   }) = _TrackingSettings;
 
   factory TrackingSettings.fromJson(Map<String, dynamic> json) =>
@@ -25,5 +31,17 @@ abstract class TrackingSettings with _$TrackingSettings {
 
   factory TrackingSettings.defaultSettings() => TrackingSettings(
         createdAt: DateTime.now(),
+      );
+
+  // Helper methods for TimeOfDay conversion
+  TimeOfDay get progressCheckReminderTimeOfDay => TimeOfDay(
+        hour: progressCheckReminderHour,
+        minute: progressCheckReminderMinute,
+      );
+
+  TrackingSettings copyWithProgressCheckReminderTime(TimeOfDay timeOfDay) =>
+      copyWith(
+        progressCheckReminderHour: timeOfDay.hour,
+        progressCheckReminderMinute: timeOfDay.minute,
       );
 }

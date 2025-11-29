@@ -3,13 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
+import 'package:quranku/core/utils/extension/string_ext.dart';
+import 'package:quranku/features/shalat/domain/entities/prayer_in_app.dart';
 import 'package:quranku/injection.dart';
 import '../../../../generated/locale_keys.g.dart';
 import '../../data/models/daily_tracking_model.codegen.dart';
 import '../../data/dataSources/local/tracking_local_data_source.dart';
 import '../../data/dataSources/local/tracking_settings_local_data_source.dart';
 import '../../domain/entities/tracking_settings.codegen.dart';
+import '../../domain/services/goals_notification_service.dart';
 import '../components/quick_goals_dialog.dart';
+import '../components/notification_settings_dialog.dart';
 
 class TrackingHistoryScreen extends StatefulWidget {
   const TrackingHistoryScreen({super.key});
@@ -21,6 +25,7 @@ class TrackingHistoryScreen extends StatefulWidget {
 class _TrackingHistoryScreenState extends State<TrackingHistoryScreen> {
   late TrackingLocalDataSource trackingDataSource;
   late TrackingSettingsLocalDataSource settingsDataSource;
+  late GoalsNotificationService goalsNotificationService;
   List<DailyTrackingModel> trackingHistory = [];
   Map<String, dynamic>? statistics;
   bool isLoading = true;
@@ -30,6 +35,7 @@ class _TrackingHistoryScreenState extends State<TrackingHistoryScreen> {
     super.initState();
     trackingDataSource = sl<TrackingLocalDataSource>();
     settingsDataSource = sl<TrackingSettingsLocalDataSource>();
+    goalsNotificationService = sl<GoalsNotificationService>();
     _loadTrackingData();
   }
 
@@ -80,6 +86,13 @@ class _TrackingHistoryScreenState extends State<TrackingHistoryScreen> {
     );
   }
 
+  void _showNotificationSettingsDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => const NotificationSettingsDialog(),
+    );
+  }
+
   Future<void> _updateDefaultGoals(int ayahGoal, int minuteGoal) async {
     try {
       // Get current settings or create new ones
@@ -116,15 +129,28 @@ class _TrackingHistoryScreenState extends State<TrackingHistoryScreen> {
             LocaleKeys.defaultErrorMessage.tr(),
           );
         },
-        (_) {
-          context.showInfoToast(
-            LocaleKeys.dailyGoalsUpdated.tr(
-              namedArgs: {
-                'ayahGoal': ayahGoal.toString(),
-                'minuteGoal': minuteGoal.toString(),
-              },
-            ),
-            // 'Default goals updated: $ayahGoal ayahs, $minuteGoal minutes\nNew tracking entries will use these goals.',
+        (_) async {
+          // Update notification settings after saving
+          final notificationResult =
+              await goalsNotificationService.updateNotificationSettings();
+
+          notificationResult.fold(
+            (failure) {
+              // Show warning about notification failure but still show success for goals update
+              context.showInfoToast(
+                LocaleKeys.dailyGoalsUpdatedButNotificationFailed.tr(),
+              );
+            },
+            (_) {
+              context.showInfoToast(
+                LocaleKeys.dailyGoalsUpdated.tr(
+                  namedArgs: {
+                    'ayahGoal': ayahGoal.toString(),
+                    'minuteGoal': minuteGoal.toString(),
+                  },
+                ),
+              );
+            },
           );
         },
       );
@@ -146,9 +172,46 @@ class _TrackingHistoryScreenState extends State<TrackingHistoryScreen> {
           onPressed: () => context.pop(),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Symbols.settings),
-            onPressed: () => _showGoalsDialog(),
+          PopupMenuButton<String>(
+            icon: const Icon(Symbols.more_vert),
+            onSelected: (value) {
+              switch (value) {
+                case 'goals':
+                  _showGoalsDialog();
+                  break;
+                case 'notifications':
+                  _showNotificationSettingsDialog();
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'goals',
+                child: Row(
+                  children: [
+                    const Icon(Symbols.flag),
+                    const SizedBox(width: 8),
+                    Text(
+                      LocaleKeys.setDailyGoals.tr(),
+                      style: context.textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'notifications',
+                child: Row(
+                  children: [
+                    const Icon(Symbols.notifications),
+                    const SizedBox(width: 8),
+                    Text(
+                      LocaleKeys.notificationSettings.tr(),
+                      style: context.textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -169,14 +232,15 @@ class _TrackingHistoryScreenState extends State<TrackingHistoryScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No tracking history yet',
+                    LocaleKeys.noTrackingData.tr(),
                     style: context.textTheme.titleMedium?.copyWith(
                       color: context.theme.colorScheme.outline,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Start tracking your prayers and Quran reading!',
+                    // 'Start tracking your prayers and Quran reading!',
+                    LocaleKeys.startTrackingPrompt.tr(),
                     style: context.textTheme.bodyMedium?.copyWith(
                       color: context.theme.colorScheme.onSurfaceVariant,
                     ),
@@ -185,21 +249,14 @@ class _TrackingHistoryScreenState extends State<TrackingHistoryScreen> {
               ),
             );
           }
-          return Column(
+          return ListView(
+            padding: const EdgeInsets.all(16),
             children: [
               // Statistics Section
               if (statistics != null) _buildStatisticsSection(),
               // History List
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: trackingHistory.length,
-                  itemBuilder: (context, index) {
-                    final tracking = trackingHistory[index];
-                    return _buildTrackingItem(tracking);
-                  },
-                ),
-              ),
+              ...trackingHistory
+                  .map((tracking) => _buildTrackingItem(tracking)),
             ],
           );
         },
@@ -210,7 +267,7 @@ class _TrackingHistoryScreenState extends State<TrackingHistoryScreen> {
   Widget _buildStatisticsSection() {
     final stats = statistics!;
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(vertical: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: context.theme.colorScheme.surfaceContainer,
@@ -238,7 +295,7 @@ class _TrackingHistoryScreenState extends State<TrackingHistoryScreen> {
           GridView.count(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
+            crossAxisCount: context.isPortrait ? 2 : 4,
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
             childAspectRatio: 1.5,
@@ -386,15 +443,30 @@ class _TrackingHistoryScreenState extends State<TrackingHistoryScreen> {
               // Prayer dots
               Row(
                 children: [
-                  _buildPrayerDot(tracking.fajr, 'F'),
+                  _buildPrayerDot(
+                    tracking.fajr,
+                    PrayerInApp.subuh.name.capitalize(),
+                  ),
                   const SizedBox(width: 4),
-                  _buildPrayerDot(tracking.dhuhr, 'D'),
+                  _buildPrayerDot(
+                    tracking.dhuhr,
+                    PrayerInApp.dzuhur.name.capitalize(),
+                  ),
                   const SizedBox(width: 4),
-                  _buildPrayerDot(tracking.asr, 'A'),
+                  _buildPrayerDot(
+                    tracking.asr,
+                    PrayerInApp.ashar.name.capitalize(),
+                  ),
                   const SizedBox(width: 4),
-                  _buildPrayerDot(tracking.maghrib, 'M'),
+                  _buildPrayerDot(
+                    tracking.maghrib,
+                    PrayerInApp.maghrib.name.capitalize(),
+                  ),
                   const SizedBox(width: 4),
-                  _buildPrayerDot(tracking.isha, 'I'),
+                  _buildPrayerDot(
+                    tracking.isha,
+                    PrayerInApp.isya.name.capitalize(),
+                  ),
                 ],
               ),
             ],
@@ -485,33 +557,44 @@ class _TrackingHistoryScreenState extends State<TrackingHistoryScreen> {
 
   Widget _buildPrayerDot(bool completed, String letter) {
     return Container(
-      width: 16,
-      height: 16,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: ShapeDecoration(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+          side: BorderSide(
+            color: completed
+                ? context.theme.colorScheme.primary
+                : context.theme.colorScheme.onSurfaceVariant,
+            width: 1,
+          ),
+        ),
         color: completed
             ? context.theme.colorScheme.primary
             : context.theme.colorScheme.outline.withAlpha(50),
-        border: Border.all(
-          color: context.theme.colorScheme.primary,
-          width: completed ? 0 : 1,
-        ),
       ),
-      child: Center(
-        child: completed
-            ? Icon(
-                Icons.check,
-                size: 10,
-                color: context.theme.colorScheme.onPrimary,
-              )
-            : Text(
-                letter,
-                style: TextStyle(
-                  fontSize: 8,
-                  fontWeight: FontWeight.bold,
-                  color: context.theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
+      child: Row(
+        children: [
+          if (completed) ...[
+            Icon(
+              Symbols.check,
+              size: 10,
+              color: completed
+                  ? context.theme.colorScheme.onPrimary
+                  : context.theme.colorScheme.onSurfaceVariant,
+            ),
+          ],
+          const SizedBox(width: 2),
+          Text(
+            letter,
+            style: TextStyle(
+              fontSize: 8,
+              fontWeight: FontWeight.bold,
+              color: completed
+                  ? context.theme.colorScheme.onPrimary
+                  : context.theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
       ),
     );
   }

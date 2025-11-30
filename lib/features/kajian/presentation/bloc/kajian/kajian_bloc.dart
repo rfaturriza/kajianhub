@@ -74,6 +74,7 @@ class KajianBloc extends Bloc<KajianEvent, KajianState> {
     on<_OnChangePrayerSchedule>(_onChangePrayerSchedule);
     on<_OnChangeDailySchedulesDayId>(_onChangeDailySchedulesDayId);
     on<_OnChangeWeeklySchedulesWeekId>(_onChangeWeeklySchedulesWeekId);
+    on<_OnChangeKajianTypeId>(_onChangeKajianTypeId);
     on<_OnChangeFilterDate>(_onChangeFilterDate);
     on<_ResetFilter>(_onResetFilter);
   }
@@ -128,6 +129,15 @@ class KajianBloc extends Bloc<KajianEvent, KajianState> {
           options: [
             ...?request.options,
             'filter,weeklySchedules.week_id,in,${state.filter.weeklySchedulesWeekId!.second}',
+          ],
+        );
+      }
+
+      if (state.filter.kajianTypeId != null) {
+        request = request.copyWith(
+          options: [
+            ...?request.options,
+            'filter,type,equal,${state.filter.kajianTypeId!.second}',
           ],
         );
       }
@@ -693,6 +703,51 @@ class KajianBloc extends Bloc<KajianEvent, KajianState> {
     }
     final filter = state.filter.copyWith(
       weeklySchedulesWeekId: event.weeklySchedulesWeekId,
+    );
+    emit(state.copyWith(filter: filter));
+  }
+
+  void _onChangeKajianTypeId(
+    _OnChangeKajianTypeId event,
+    Emitter<KajianState> emit,
+  ) {
+    if (event.kajianTypeId == null) {
+      emit(state.copyWith(filter: state.filter.copyWith(kajianTypeId: null)));
+      return;
+    }
+
+    final currentFilter = state.filter.kajianTypeId;
+    if (currentFilter != null) {
+      final typeName = currentFilter.first.split('|');
+      final typeId = currentFilter.second.split('|');
+      if (typeId.contains(event.kajianTypeId?.second)) {
+        typeName.remove(event.kajianTypeId?.first);
+        typeId.remove(event.kajianTypeId?.second);
+      } else {
+        typeName.add(event.kajianTypeId!.first);
+        typeId.add(event.kajianTypeId!.second);
+      }
+      if (typeName.isEmpty) {
+        emit(
+          state.copyWith(
+            filter: state.filter.copyWith(
+              kajianTypeId: null,
+            ),
+          ),
+        );
+        return;
+      }
+      final filter = state.filter.copyWith(
+        kajianTypeId: Pair(
+          typeName.join('|'),
+          typeId.join('|'),
+        ),
+      );
+      emit(state.copyWith(filter: filter));
+      return;
+    }
+    final filter = state.filter.copyWith(
+      kajianTypeId: event.kajianTypeId,
     );
     emit(state.copyWith(filter: filter));
   }

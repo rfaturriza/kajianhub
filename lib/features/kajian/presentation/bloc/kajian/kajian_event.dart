@@ -55,6 +55,10 @@ abstract class KajianEvent with _$KajianEvent {
           Pair<String, String>? weeklySchedulesWeekId) =
       _OnChangeWeeklySchedulesWeekId;
 
+  /// can multiple kajian type id
+  const factory KajianEvent.onChangeKajianTypeId(
+      Pair<String, String>? kajianTypeId) = _OnChangeKajianTypeId;
+
   const factory KajianEvent.onChangeFilterDate(DateTime? date) =
       _OnChangeFilterDate;
 

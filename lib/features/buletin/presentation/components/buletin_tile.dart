@@ -19,7 +19,7 @@ class BuletinTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double _fontSize = context.textTheme.bodyMedium?.fontSize ?? 14;
+    final double fontSize = context.textTheme.bodyMedium?.fontSize ?? 14;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: 2,
@@ -111,29 +111,29 @@ class BuletinTile extends StatelessWidget {
                   "body": Style(
                     color: context.theme.colorScheme.onSurface,
                     fontFamily: context.textTheme.bodyMedium?.fontFamily,
-                    fontSize: FontSize(_fontSize),
+                    fontSize: FontSize(fontSize),
                     lineHeight: const LineHeight(1.6),
                   ),
                   "p": Style(
-                    fontSize: FontSize(_fontSize),
+                    fontSize: FontSize(fontSize),
                     margin: Margins.only(bottom: 12),
                   ),
                   "h1, h2, h3, h4, h5, h6": Style(
-                    fontSize: FontSize(_fontSize + 4),
+                    fontSize: FontSize(fontSize + 4),
                     fontWeight: FontWeight.bold,
                     margin: Margins.only(top: 16, bottom: 8),
                   ),
                   "a": Style(
                     color: context.theme.colorScheme.primary,
                     textDecoration: TextDecoration.underline,
-                    fontSize: FontSize(_fontSize),
+                    fontSize: FontSize(fontSize),
                   ),
                   "li": Style(
-                    fontSize: FontSize(_fontSize),
+                    fontSize: FontSize(fontSize),
                     margin: Margins.only(bottom: 4),
                   ),
                   "blockquote": Style(
-                    fontSize: FontSize(_fontSize),
+                    fontSize: FontSize(fontSize),
                     fontStyle: FontStyle.italic,
                     padding:
                         HtmlPaddings.symmetric(horizontal: 16, vertical: 8),

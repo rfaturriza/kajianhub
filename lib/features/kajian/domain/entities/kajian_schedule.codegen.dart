@@ -18,21 +18,29 @@ abstract class KajianSchedules with _$KajianSchedules {
 abstract class DataKajianSchedule with _$DataKajianSchedule {
   const factory DataKajianSchedule({
     required int id,
-    required String title,
     required String type,
     required String typeLabel,
-    required String book,
+    required String title,
+    String? book,
+    String? prayerSchedule,
     required String timeStart,
     required String timeEnd,
-    required String prayerSchedule,
     required String locationId,
     required StudyLocationEntity studyLocation,
-    required List<UstadzEntity> ustadz,
-    required List<KajianTheme> themes,
-    required List<DailySchedule> dailySchedules,
-    required List<HistoryKajian> histories,
-    required List<CustomSchedule> customSchedules,
-    String? distanceInKm,
+    @Default([]) List<UstadzEntity> ustadz,
+    @Default([]) List<KajianTheme> themes,
+    @Default([]) List<DailySchedule> dailySchedules,
+    @Default([]) List<HistoryKajian> histories,
+    @Default([]) List<CustomSchedule> customSchedules,
+    dynamic distanceInKm,
+    dynamic historiesCount,
+    EventKajian? event,
+    String? createdAt,
+    String? updatedAt,
+    String? deletedAt,
+    String? createdBy,
+    String? updatedBy,
+    String? deletedBy,
   }) = _DataKajianSchedule;
 
   const DataKajianSchedule._();
@@ -49,11 +57,20 @@ abstract class DataKajianSchedule with _$DataKajianSchedule {
       prayerSchedule: '',
       locationId: '',
       studyLocation: StudyLocationEntity(),
-      ustadz: [],
-      themes: [],
-      dailySchedules: [],
-      histories: [],
-      customSchedules: [],
+      ustadz: const [],
+      themes: const [],
+      dailySchedules: const [],
+      histories: const [],
+      customSchedules: const [],
+      distanceInKm: null,
+      historiesCount: null,
+      event: null,
+      createdAt: null,
+      updatedAt: null,
+      deletedAt: null,
+      createdBy: null,
+      updatedBy: null,
+      deletedBy: null,
     );
   }
 }
@@ -164,4 +181,29 @@ abstract class LinksMeta with _$LinksMeta {
     String? label,
     bool? active,
   }) = _LinksMeta;
+}
+
+@freezed
+abstract class EventKajian with _$EventKajian {
+  const factory EventKajian({
+    required int id,
+    String? scheduleId,
+    String? organiserId,
+    String? type,
+    String? title,
+    String? body,
+    String? themeId,
+    String? ustadzId,
+    String? date,
+    String? timeStart,
+    String? timeEnd,
+    String? locationId,
+    String? onlineLink,
+    String? registrationLink,
+    dynamic price,
+    dynamic quota,
+    String? status,
+    String? createdAt,
+    String? updatedAt,
+  }) = _EventKajian;
 }

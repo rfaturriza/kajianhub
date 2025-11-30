@@ -123,6 +123,8 @@
   "day": "Day",
   "time": "Time",
   "location": "Location",
+  "event": "Event",
+  "joinSession": "Join Session",
   "searchKajianHint": "Search Study...",
   "searchKajianEmpty": "Sorry, no study resources were found.",
   "nearbyKajianEmptyToday": "Sorry, there are no study resources nearby today.",
@@ -138,6 +140,9 @@
   "khatib": "Khatib",
   "mosque": "Mosque",
   "week": "Week",
+  "kajianType": "Kajian Type",
+  "routine": "Routine",
+  "nonRoutine": "Non Routine",
   "theme": "Theme",
   "apply": "Apply",
   "prayerSchedule": "Prayer Schedule",
@@ -280,6 +285,7 @@
   "logoutConfirmation": "Are you sure you want to logout?",
   "dontHaveAccount": "Don't have an account?",
   "registerHere": "Register here",
+  "register": "Register",
   "cannotOpenRegistrationPage": "Cannot open registration page",
   "user": "User",
   "profileTitle": "Profile",
@@ -333,5 +339,6 @@
   "increaseFontSize": "Increase Font Size",
   "decreaseFontSize": "Decrease Font Size",
   "resetFontSize": "Reset Font Size",
-  "watchHere": "Watch here"
+  "watchHere": "Watch here",
+  "online": "Online"
 }

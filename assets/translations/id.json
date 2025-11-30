@@ -123,6 +123,8 @@
   "day": "Hari",
   "time": "Waktu",
   "location": "Lokasi",
+  "event": "Event",
+  "joinSession": "Gabung Sesi",
   "searchKajianHint": "Cari Kajian...",
   "searchKajianEmpty": "Maaf, tidak ada kajian yang tersedia.",
   "nearbyKajianEmptyToday": "Tidak ada kajian terdekat yang ditemukan hari ini.",
@@ -138,6 +140,9 @@
   "khatib": "Khatib",
   "mosque": "Masjid",
   "week": "Minggu",
+  "kajianType": "Tipe Kajian",
+  "routine": "Rutin",
+  "nonRoutine": "Tidak Rutin",
   "theme": "Tema",
   "apply": "Terapkan",
   "prayerSchedule": "Jadwal Sholat",
@@ -280,6 +285,7 @@
   "logoutConfirmation": "Apakah Anda yakin ingin keluar?",
   "dontHaveAccount": "Belum punya akun?",
   "registerHere": "Daftar di sini",
+  "register": "Daftar",
   "cannotOpenRegistrationPage": "Tidak dapat membuka halaman pendaftaran",
   "user": "Pengguna",
   "profileTitle": "Profil",
@@ -333,5 +339,6 @@
   "prayEmpty": "Maaf, tidak ada doa yang tersedia.",
   "errorGetPray": "Maaf, terjadi kesalahan saat memuat doa",
   "prayCopiedToClipboard": "Doa telah disalin ke clipboard",
-  "watchHere": "Tonton di sini"
+  "watchHere": "Tonton di sini",
+  "online": "Online"
 }

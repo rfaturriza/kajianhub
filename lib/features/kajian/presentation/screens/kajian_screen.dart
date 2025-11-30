@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/components/search_box.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/core/utils/extension/extension.dart';
@@ -495,15 +496,13 @@ class _KajianBottomSheetFilter extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            color: context.theme.colorScheme.surface,
+          Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 40),
-                backgroundColor: context.theme.colorScheme.onPrimary,
-                foregroundColor: context.theme.colorScheme.primary,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(40),
               ),
+              icon: const Icon(Symbols.tune),
               onPressed: () {
                 context.read<KajianBloc>().add(
                       KajianEvent.fetchKajian(
@@ -513,7 +512,9 @@ class _KajianBottomSheetFilter extends StatelessWidget {
                     );
                 context.pop();
               },
-              child: Text(LocaleKeys.apply.tr()),
+              label: Text(
+                LocaleKeys.apply.tr(),
+              ),
             ),
           ),
         ],

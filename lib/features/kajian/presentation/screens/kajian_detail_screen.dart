@@ -170,7 +170,7 @@ class _KajianDetailScreenState extends State<KajianDetailScreen> {
                     await launchUrl(uri, mode: LaunchMode.externalApplication);
                   }
                 },
-                label: Text(LocaleKeys.register.tr()),
+                label: Text(LocaleKeys.registerHere.tr()),
               ),
             ),
           );
@@ -468,7 +468,7 @@ class _InfoSection extends StatelessWidget {
                 const VSpacer(height: 16),
                 Text(
                   LocaleKeys.theme.tr(),
-                  style: context.textTheme.titleMedium?.copyWith(
+                  style: context.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -481,7 +481,7 @@ class _InfoSection extends StatelessWidget {
                 if (kajian.event?.body?.isNotEmpty == true) ...[
                   Text(
                     LocaleKeys.description.tr(),
-                    style: context.textTheme.titleMedium?.copyWith(
+                    style: context.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -495,7 +495,7 @@ class _InfoSection extends StatelessWidget {
                   const VSpacer(height: 16),
                   Text(
                     LocaleKeys.online.tr(),
-                    style: context.textTheme.titleMedium?.copyWith(
+                    style: context.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),

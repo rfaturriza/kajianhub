@@ -10,7 +10,6 @@ import 'package:quranku/core/utils/extension/dartz_ext.dart';
 import 'package:quranku/core/utils/extension/extension.dart';
 import 'package:quranku/features/kajian/domain/entities/filter_kajian_schedule.codegen.dart';
 import 'package:quranku/features/kajian/domain/entities/kajian_schedule.codegen.dart';
-import 'package:quranku/features/kajian/domain/entities/kajian_type.codegen.dart';
 import 'package:quranku/features/kajian/domain/usecases/get_ustadz_list_usecase.dart';
 import 'package:quranku/features/ustadz/domain/entities/ustadz_entity.codegen.dart';
 
@@ -56,7 +55,6 @@ class KajianBloc extends Bloc<KajianEvent, KajianState> {
           filter: FilterKajianSchedule(
             date: DateTime.now(),
             isNearby: true,
-            kajianTypeId: KajianType.typesPairs,
           ),
         )) {
     _firebaseAnalytics.logScreenView(screenName: 'Kajian Screen');

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/features/kajian/presentation/components/label_tag.dart';
+import 'package:quranku/generated/locale_keys.g.dart';
 
 import '../../../../core/components/fullscreen_image_dialog.dart';
 import '../../../../core/components/spacer.dart';
@@ -26,7 +27,7 @@ class KajianTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final imageUrl = kajian.studyLocation.pictureUrl ?? '';
-    final prayerName = kajian.prayerSchedule;
+    final prayerName = kajian.prayerSchedule ?? '';
     final title = kajian.title;
     final ustadzName =
         kajian.ustadz.isNotEmpty ? kajian.ustadz.first.name : emptyString;
@@ -36,6 +37,7 @@ class KajianTile extends StatelessWidget {
         ? '${kajian.timeStart} - ${kajian.timeEnd}'
         : kajian.timeStart;
     final place = kajian.studyLocation.name;
+    final event = kajian.event;
     final schedule = () {
       if (kajian.dailySchedules.isEmpty && kajian.customSchedules.isNotEmpty) {
         if (kajian.customSchedules.first.date != null) {
@@ -46,6 +48,10 @@ class KajianTile extends StatelessWidget {
       }
       if (kajian.dailySchedules.isNotEmpty && kajian.customSchedules.isEmpty) {
         return kajian.dailySchedules.first.dayLabel;
+      }
+      if (kajian.event != null && kajian.event!.date != null) {
+        return DateFormat('EEEE, dd MMMM yyyy', context.locale.toString())
+            .format(DateTime.parse(kajian.event!.date!).toLocal());
       }
       return emptyString;
     }();
@@ -108,6 +114,7 @@ class KajianTile extends StatelessWidget {
               distanceInKm:
                   kajian.distanceInKm ?? kajian.studyLocation.distanceInKm,
               imageUrl: imageUrl,
+              height: 120,
             ),
             Expanded(
               child: Padding(
@@ -121,11 +128,44 @@ class KajianTile extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (prayerName.isNotEmpty) ...[
-                            LabelTag(
-                              title: prayerName.capitalize(),
-                              backgroundColor: prayerColor.first,
-                              foregroundColor: prayerColor.second,
+                            Row(
+                              children: [
+                                LabelTag(
+                                  title: prayerName.capitalize(),
+                                  backgroundColor: prayerColor.first,
+                                  foregroundColor: prayerColor.second,
+                                ),
+                                if (kajian.typeLabel.isNotEmpty) ...[
+                                  LabelTag(
+                                    title: kajian.typeLabel.capitalize(),
+                                    backgroundColor: prayerColor.first,
+                                    foregroundColor: prayerColor.second,
+                                  ),
+                                ],
+                              ],
                             ),
+                            const VSpacer(height: 2),
+                          ],
+                          if (event?.type?.isNotEmpty == true) ...[
+                            Row(
+                              children: [
+                                LabelTag(
+                                  title: LocaleKeys.event.tr().capitalize(),
+                                  backgroundColor:
+                                      context.theme.colorScheme.primary,
+                                  foregroundColor:
+                                      context.theme.colorScheme.onPrimary,
+                                ),
+                                LabelTag(
+                                  title: event?.type?.capitalize() ?? '',
+                                  backgroundColor:
+                                      context.theme.colorScheme.primary,
+                                  foregroundColor:
+                                      context.theme.colorScheme.onPrimary,
+                                ),
+                              ],
+                            ),
+                            const VSpacer(height: 2),
                           ],
                           Text(
                             title,
@@ -187,9 +227,9 @@ class KajianTile extends StatelessWidget {
                                     text: schedule,
                                   ),
                                 ),
+                                const HSpacer(width: 5),
                               ],
                               if (time.isNotEmpty) ...[
-                                const HSpacer(width: 5),
                                 Expanded(
                                   flex: 1,
                                   child: ScheduleIconText(

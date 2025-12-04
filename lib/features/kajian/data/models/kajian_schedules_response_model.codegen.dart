@@ -67,6 +67,7 @@ abstract class DataKajianScheduleModel with _$DataKajianScheduleModel {
     @JsonKey(name: 'created_by') String? createdBy,
     @JsonKey(name: 'updated_by') String? updatedBy,
     @JsonKey(name: 'deleted_by') String? deletedBy,
+    @JsonKey(name: 'event') EventKajianModel? event,
   }) = _DataKajianScheduleModel;
 
   const DataKajianScheduleModel._();
@@ -100,6 +101,9 @@ abstract class DataKajianScheduleModel with _$DataKajianScheduleModel {
       distanceInKm: entity.distanceInKm != null
           ? double.tryParse(entity.distanceInKm!)
           : null,
+      event: entity.event != null
+          ? EventKajianModel.fromEntity(entity.event!)
+          : null,
     );
   }
 
@@ -131,6 +135,7 @@ abstract class DataKajianScheduleModel with _$DataKajianScheduleModel {
       histories: histories?.map((e) => e.toEntity()).toList() ?? [],
       customSchedules: customSchedules?.map((e) => e.toEntity()).toList() ?? [],
       distanceInKm: distanceInKm?.toString() ?? emptyString,
+      event: event?.toEntity(),
     );
   }
 }
@@ -522,6 +527,84 @@ abstract class LinksMetaModel with _$LinksMetaModel {
       url: url ?? emptyString,
       label: label ?? emptyString,
       active: active ?? false,
+    );
+  }
+}
+
+@freezed
+abstract class EventKajianModel with _$EventKajianModel {
+  const factory EventKajianModel({
+    int? id,
+    @JsonKey(name: 'schedule_id') String? scheduleId,
+    @JsonKey(name: 'organiser_id') String? organiserId,
+    String? type,
+    String? title,
+    String? body,
+    @JsonKey(name: 'theme_id') String? themeId,
+    @JsonKey(name: 'ustadz_id') String? ustadzId,
+    String? date,
+    @JsonKey(name: 'time_start') String? timeStart,
+    @JsonKey(name: 'time_end') String? timeEnd,
+    @JsonKey(name: 'location_id') String? locationId,
+    @JsonKey(name: 'online_link') String? onlineLink,
+    @JsonKey(name: 'registration_link') String? registrationLink,
+    dynamic price,
+    dynamic quota,
+    String? status,
+    @JsonKey(name: 'created_at') String? createdAt,
+    @JsonKey(name: 'updated_at') String? updatedAt,
+  }) = _EventKajianModel;
+
+  const EventKajianModel._();
+
+  factory EventKajianModel.fromJson(Map<String, dynamic> json) =>
+      _$EventKajianModelFromJson(json);
+
+  factory EventKajianModel.fromEntity(EventKajian entity) {
+    return EventKajianModel(
+      id: entity.id,
+      scheduleId: entity.scheduleId,
+      organiserId: entity.organiserId,
+      type: entity.type,
+      title: entity.title,
+      body: entity.body,
+      themeId: entity.themeId,
+      ustadzId: entity.ustadzId,
+      date: entity.date,
+      timeStart: entity.timeStart,
+      timeEnd: entity.timeEnd,
+      locationId: entity.locationId,
+      onlineLink: entity.onlineLink,
+      registrationLink: entity.registrationLink,
+      price: entity.price,
+      quota: entity.quota,
+      status: entity.status,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
+  EventKajian toEntity() {
+    return EventKajian(
+      id: id ?? 0,
+      scheduleId: scheduleId,
+      organiserId: organiserId,
+      type: type,
+      title: title,
+      body: body,
+      themeId: themeId,
+      ustadzId: ustadzId,
+      date: date,
+      timeStart: timeStart,
+      timeEnd: timeEnd,
+      locationId: locationId,
+      onlineLink: onlineLink,
+      registrationLink: registrationLink,
+      price: price,
+      quota: quota,
+      status: status,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 }

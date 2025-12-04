@@ -6,6 +6,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/core/utils/extension/extension.dart';
+import 'package:quranku/core/utils/extension/string_ext.dart';
+import 'package:quranku/features/kajian/domain/entities/kajian_schedule.codegen.dart';
 import 'package:quranku/features/kajian/presentation/bloc/kajian/kajian_bloc.dart';
 
 import '../../../../core/components/spacer.dart';
@@ -224,6 +226,8 @@ class _RecitationInfo extends StatelessWidget {
         }
         final imageUrl = state.recommendedKajian?.studyLocation.pictureUrl ??
             AssetConst.mosqueDummyImageUrl;
+        final isEvent = state.recommendedKajian?.typeLabel.toUpperCase()== 'EVENT';
+        final EventKajian? kajianEvent = state.recommendedKajian?.event;
         return Row(
           children: [
             Expanded(
@@ -245,46 +249,66 @@ class _RecitationInfo extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        LabelTag(
-                          title: LocaleKeys.islamicStudiesNearbyInformationLabel
-                              .tr(),
-                          backgroundColor: context.theme.colorScheme.primary,
-                          foregroundColor: context.theme.colorScheme.onPrimary,
-                        ),
-                        ...?state.recommendedKajian?.themes.map((e) {
-                          final randomColors = [
-                            Pair(
-                              context.theme.colorScheme.secondary,
-                              context.theme.colorScheme.onSecondary,
-                            ),
-                            Pair(
-                              context.theme.colorScheme.tertiary,
-                              context.theme.colorScheme.onTertiary,
-                            ),
-                            Pair(
-                              context.theme.colorScheme.surface,
-                              context.theme.colorScheme.onSurface,
-                            ),
-                            Pair(
-                              context.theme.colorScheme.primaryContainer,
-                              context.theme.colorScheme.onPrimaryContainer,
-                            ),
-                            Pair(
-                              context.theme.colorScheme.secondaryContainer,
-                              context.theme.colorScheme.onSecondaryContainer,
-                            ),
-                            Pair(
-                              context.theme.colorScheme.tertiaryContainer,
-                              context.theme.colorScheme.onTertiaryContainer,
-                            ),
-                          ];
-                          randomColors.shuffle();
-                          return LabelTag(
-                            title: e.theme,
-                            backgroundColor: randomColors.first.first,
-                            foregroundColor: randomColors.first.second,
-                          );
-                        }),
+                        if (isEvent &&
+                            (kajianEvent?.type != null &&
+                                kajianEvent!.type!.isNotEmpty)) ...[
+                          LabelTag(
+                            title: LocaleKeys.event.tr().capitalize(),
+                            backgroundColor: context.theme.colorScheme.primary,
+                            foregroundColor:
+                                context.theme.colorScheme.onPrimary,
+                          ),
+                          LabelTag(
+                            title: kajianEvent.type!.capitalize(),
+                            backgroundColor: context.theme.colorScheme.primary,
+                            foregroundColor:
+                                context.theme.colorScheme.onPrimary,
+                          ),
+                        ],
+                        if (!isEvent) ...[
+                          LabelTag(
+                            title: LocaleKeys
+                                .islamicStudiesNearbyInformationLabel
+                                .tr(),
+                            backgroundColor: context.theme.colorScheme.primary,
+                            foregroundColor:
+                                context.theme.colorScheme.onPrimary,
+                          ),
+                          ...?state.recommendedKajian?.themes.map((e) {
+                            final randomColors = [
+                              Pair(
+                                context.theme.colorScheme.secondary,
+                                context.theme.colorScheme.onSecondary,
+                              ),
+                              Pair(
+                                context.theme.colorScheme.tertiary,
+                                context.theme.colorScheme.onTertiary,
+                              ),
+                              Pair(
+                                context.theme.colorScheme.surface,
+                                context.theme.colorScheme.onSurface,
+                              ),
+                              Pair(
+                                context.theme.colorScheme.primaryContainer,
+                                context.theme.colorScheme.onPrimaryContainer,
+                              ),
+                              Pair(
+                                context.theme.colorScheme.secondaryContainer,
+                                context.theme.colorScheme.onSecondaryContainer,
+                              ),
+                              Pair(
+                                context.theme.colorScheme.tertiaryContainer,
+                                context.theme.colorScheme.onTertiaryContainer,
+                              ),
+                            ];
+                            randomColors.shuffle();
+                            return LabelTag(
+                              title: e.theme,
+                              backgroundColor: randomColors.first.first,
+                              foregroundColor: randomColors.first.second,
+                            );
+                          })
+                        ],
                       ],
                     ),
                   ),

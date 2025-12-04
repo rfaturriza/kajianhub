@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/components/search_box.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/core/utils/extension/extension.dart';
 import 'package:quranku/core/utils/extension/string_ext.dart';
 import 'package:quranku/features/kajian/domain/entities/day_kajian.codegen.dart';
+import 'package:quranku/features/kajian/domain/entities/kajian_type.codegen.dart';
 import 'package:quranku/features/kajian/domain/entities/prayer_kajian.codegen.dart';
 import 'package:quranku/generated/locale_keys.g.dart';
 
@@ -182,6 +184,19 @@ class _FilterRowSection extends StatelessWidget {
                               onSelected: (_) {
                                 context.read<KajianBloc>().add(
                                       const KajianEvent.onChangeFilterDate(
+                                        null,
+                                      ),
+                                    );
+                              },
+                            ),
+                          ],
+                          if (state.filter.kajianTypeId != null) ...[
+                            _filterChip(
+                              context: context,
+                              label: state.filter.kajianTypeId!.first,
+                              onSelected: (_) {
+                                context.read<KajianBloc>().add(
+                                      const KajianEvent.onChangeKajianTypeId(
                                         null,
                                       ),
                                     );
@@ -387,7 +402,7 @@ class _FilterRowSection extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: FilterChip(
-        label: Text(label),
+        label: Text(label.splitMapJoin('|', onMatch: (m) => ', ')),
         selected: selected,
         onSelected: (bool value) {
           onSelected(value);
@@ -460,6 +475,8 @@ class _KajianBottomSheetFilter extends StatelessWidget {
                 ),
                 const _DatePickerSection(),
                 const VSpacer(height: 10),
+                const _KajianTypeSection(),
+                const VSpacer(height: 10),
                 const _ProvinceFilterSection(),
                 const VSpacer(height: 10),
                 const _CityFilterSection(),
@@ -479,15 +496,13 @@ class _KajianBottomSheetFilter extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            color: context.theme.colorScheme.surface,
+          Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 40),
-                backgroundColor: context.theme.colorScheme.onPrimary,
-                foregroundColor: context.theme.colorScheme.primary,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(40),
               ),
+              icon: const Icon(Symbols.tune),
               onPressed: () {
                 context.read<KajianBloc>().add(
                       KajianEvent.fetchKajian(
@@ -497,7 +512,9 @@ class _KajianBottomSheetFilter extends StatelessWidget {
                     );
                 context.pop();
               },
-              child: Text(LocaleKeys.apply.tr()),
+              label: Text(
+                LocaleKeys.apply.tr(),
+              ),
             ),
           ),
         ],
@@ -773,6 +790,34 @@ class _DayFilterSection extends StatelessWidget {
           onSelected: (value) {
             context.read<KajianBloc>().add(
                   KajianEvent.onChangeDailySchedulesDayId(
+                    value,
+                  ),
+                );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _KajianTypeSection extends StatelessWidget {
+  const _KajianTypeSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<KajianBloc, KajianState>(
+      buildWhen: (previous, current) {
+        return previous.filter.kajianTypeId != current.filter.kajianTypeId;
+      },
+      builder: (context, state) {
+        return ItemOnBottomSheet(
+          title: LocaleKeys.kajianType.tr(),
+          isShowAllButton: false,
+          selected: state.filter.kajianTypeId,
+          items: KajianType.types.map((e) => Pair(e.name, e.id)).toList(),
+          onSelected: (value) {
+            context.read<KajianBloc>().add(
+                  KajianEvent.onChangeKajianTypeId(
                     value,
                   ),
                 );

@@ -7,9 +7,9 @@ part 'prayers_response_model.codegen.g.dart';
 @freezed
 abstract class PrayersResponseModel with _$PrayersResponseModel {
   const factory PrayersResponseModel({
-    required List<PrayerModel> data,
-    required PrayerPaginationLinksModel links,
-    required PrayerPaginationMetaModel meta,
+    List<PrayerModel>? data,
+    PrayerPaginationLinksModel? links,
+    PrayerPaginationMetaModel? meta,
   }) = _PrayersResponseModel;
 
   factory PrayersResponseModel.fromJson(Map<String, dynamic> json) =>
@@ -32,13 +32,13 @@ abstract class PrayerPaginationLinksModel with _$PrayerPaginationLinksModel {
 @freezed
 abstract class PrayerPaginationMetaModel with _$PrayerPaginationMetaModel {
   const factory PrayerPaginationMetaModel({
-    @JsonKey(name: 'current_page') required int currentPage,
-    required int from,
-    @JsonKey(name: 'last_page') required int lastPage,
-    required String path,
-    @JsonKey(name: 'per_page') required int perPage,
-    required int to,
-    required int total,
+    @JsonKey(name: 'current_page') int? currentPage,
+    int? from,
+    @JsonKey(name: 'last_page') int? lastPage,
+    String? path,
+    @JsonKey(name: 'per_page') int? perPage,
+    int? to,
+    int? total,
   }) = _PrayerPaginationMetaModel;
 
   factory PrayerPaginationMetaModel.fromJson(Map<String, dynamic> json) =>

@@ -71,8 +71,15 @@ class _PrayScreenContent extends StatelessWidget {
               }
 
               if (state.prayers.isEmpty && state.status.isSuccess) {
-                return Center(
-                  child: Text(LocaleKeys.prayEmpty.tr()),
+                return ErrorScreen(
+                  message: LocaleKeys.prayEmpty.tr(),
+                  onRefresh: () {
+                    context.read<PrayBloc>().add(
+                          PrayEvent.fetchPrayers(
+                            query: state.searchQuery,
+                          ),
+                        );
+                  },
                 );
               }
 

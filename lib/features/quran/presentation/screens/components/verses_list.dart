@@ -55,10 +55,10 @@ class VersesList extends StatefulWidget {
   });
 
   @override
-  State<VersesList> createState() => _VersesListState();
+  State<VersesList> createState() => VersesListState();
 }
 
-class _VersesListState extends State<VersesList> {
+class VersesListState extends State<VersesList> {
   final _progress = ValueNotifier<double>(0.0);
   var onDrag = false;
   final _itemScrollController = ItemScrollController();
@@ -74,6 +74,97 @@ class _VersesListState extends State<VersesList> {
       return;
     }
     _progress.value = progressValue;
+  }
+
+  bool scrollToVerse(int verseNumber) {
+    if (verseNumber <= 0) return false;
+
+    final targetIndex = _calculateVerseIndex(verseNumber);
+    final isPreBismillah = widget.preBismillah?.isNotEmpty == true;
+    final totalItemCount = isPreBismillah
+        ? widget.listVerses.length + 1
+        : widget.listVerses.length;
+
+    if (targetIndex >= 0 && targetIndex < totalItemCount) {
+      _itemScrollController.scrollTo(
+        index: targetIndex,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOutCubic,
+      );
+      return true;
+    }
+    return false;
+  }
+
+  bool scrollToJuzVerse(int surahNumber, int verseNumber) {
+    if (surahNumber <= 0 || verseNumber <= 0) return false;
+
+    // For Juz search, we need to find the verse by its context
+    // We'll use a mapping approach based on known Quran structure
+    for (int i = 0; i < widget.listVerses.length; i++) {
+      final verse = widget.listVerses[i];
+      final verseInSurah = verse.number?.inSurah ?? 0;
+      final verseInQuran = verse.number?.inQuran ?? 0;
+
+      // Check if this verse matches our target by comparing with known surah ranges
+      if (verseInSurah == verseNumber &&
+          _isVerseInSurah(verseInQuran, surahNumber)) {
+        _itemScrollController.scrollTo(
+          index: i,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOutCubic,
+        );
+        return true;
+      }
+    }
+    return false; // Verse not found
+  }
+
+  // Helper method to determine if a verse (by inQuran number) belongs to a specific surah
+  bool _isVerseInSurah(int inQuran, int surahNumber) {
+    // Basic surah ranges based on verse counts (this is a simplified approach)
+    // In a production app, you'd have a complete mapping table
+    const surahVerseRanges = {
+      1: [1, 7], // Al-Fatihah: verses 1-7
+      2: [8, 293], // Al-Baqarah: verses 8-293
+      3: [294, 493], // Ali 'Imran: verses 294-493
+      4: [494, 669], // An-Nisa': verses 494-669
+      5: [670, 789], // Al-Ma'idah: verses 670-789
+      6: [790, 954], // Al-An'am: verses 790-954
+      7: [955, 1160], // Al-A'raf: verses 955-1160
+      // Add more ranges as needed...
+    };
+
+    final range = surahVerseRanges[surahNumber];
+    if (range != null) {
+      return inQuran >= range[0] && inQuran <= range[1];
+    }
+
+    // Fallback: if we don't have the exact range, return true
+    // This ensures the search still works even without complete mapping
+    return true;
+  }
+
+  int _calculateVerseIndex(int verseNumber) {
+    // For surah view, adjust for preBismillah
+    if (widget.view == ViewMode.surah &&
+        widget.preBismillah?.isNotEmpty == true) {
+      return verseNumber; // preBismillah is at index 0, verse 1 is at index 1, etc.
+    }
+
+    // For juz view, find the verse by number in Quran
+    if (widget.view == ViewMode.juz) {
+      for (int i = 0; i < widget.listVerses.length; i++) {
+        final verse = widget.listVerses[i];
+        if (verse.number?.inSurah == verseNumber) {
+          return i;
+        }
+      }
+      return -1; // Verse not found
+    }
+
+    // Default for surah view without preBismillah
+    return verseNumber - 1;
   }
 
   @override

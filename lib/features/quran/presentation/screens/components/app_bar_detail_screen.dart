@@ -35,11 +35,13 @@ class SliverAppBarDetailScreen extends StatelessWidget
     this.isBookmarked = false,
     required this.title,
     required this.onPressedBookmark,
+    this.onPressedSearch,
   });
 
   final bool isBookmarked;
   final String title;
   final Function()? onPressedBookmark;
+  final Function()? onPressedSearch;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +53,12 @@ class SliverAppBarDetailScreen extends StatelessWidget
         title,
       ),
       actions: [
+        if (onPressedSearch != null)
+          IconButton(
+            onPressed: onPressedSearch,
+            icon: const Icon(Symbols.search_rounded),
+            color: context.theme.colorScheme.tertiary,
+          ),
         IconButton(
           onPressed: onPressedBookmark,
           icon: () {

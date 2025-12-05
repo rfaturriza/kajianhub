@@ -234,6 +234,7 @@ class _SuggestedPrayers extends StatelessWidget {
                   context.pushNamed(
                     RootRouter.prayDetailRoute.name,
                     pathParameters: {'id': prayer.id.toString()},
+                    extra: prayer,
                   );
                 },
               ),

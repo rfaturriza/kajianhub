@@ -38,18 +38,21 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> with WidgetsBindingObserver {
+  late final AuthBloc _authBloc;
   late final GoRouter _router;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // Initialize router once to prevent recreation on hot reload
-    _router = router(sl<AuthBloc>());
+    // Initialize AuthBloc and router once to prevent recreation on hot reload
+    _authBloc = sl<AuthBloc>()..add(AuthCheckRequested());
+    _router = router(_authBloc);
   }
 
   @override
   void dispose() {
+    _authBloc.close();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -99,8 +102,8 @@ class _AppState extends State<App> with WidgetsBindingObserver {
           create: (context) =>
               sl<StylingSettingBloc>()..add(const StylingSettingEvent.init()),
         ),
-        BlocProvider<AuthBloc>(
-          create: (context) => sl<AuthBloc>()..add(AuthCheckRequested()),
+        BlocProvider<AuthBloc>.value(
+          value: _authBloc,
         ),
       ],
       child: OKToast(

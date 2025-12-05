@@ -227,6 +227,7 @@ class KajianHubRemoteDataSourceImpl implements KajianHubRemoteDataSource {
   }) async {
     const endpoint = 'kajian/ustadz';
     try {
+      _dio.options.receiveTimeout = const Duration(seconds: 10);
       final response = await _dio.get(
         endpoint,
         queryParameters: {

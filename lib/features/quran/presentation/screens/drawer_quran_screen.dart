@@ -144,6 +144,14 @@ class _ListItemMenu extends StatelessWidget {
           },
           withDecoration: false,
         ),
+        ButtonDrawer(
+          icon: Symbols.counter_1,
+          title: LocaleKeys.tasbih.tr(),
+          onTap: () {
+            context.pushNamed(RootRouter.tasbihRoute.name);
+          },
+          withDecoration: false,
+        ),
         if (ustadAiConfig.show) ...[
           ButtonDrawer(
             icon: Symbols.star_shine,

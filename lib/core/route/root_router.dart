@@ -159,4 +159,10 @@ class RootRouter {
     path: '/:id',
     parent: buletinRoute,
   );
+
+  static const RouteModel tasbihRoute = RouteModel(
+    name: 'tasbih',
+    path: '/tasbih',
+    parent: rootRoute,
+  );
 }

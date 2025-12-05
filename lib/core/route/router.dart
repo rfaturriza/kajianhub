@@ -45,6 +45,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/profile_screen.dart';
 import '../../features/buletin/presentation/screens/buletin_screen.dart';
 import '../../features/buletin/presentation/screens/buletin_detail_screen.dart';
+import '../../features/tasbih/presentation/screens/tasbih_screen.dart';
 import '../../injection.dart';
 import '../components/error_screen.dart';
 import 'root_router.dart';
@@ -350,6 +351,11 @@ GoRouter router(AuthBloc authBloc) => GoRouter(
                   },
                 ),
               ],
+            ),
+            GoRoute(
+              name: RootRouter.tasbihRoute.name,
+              path: RootRouter.tasbihRoute.path,
+              builder: (_, __) => const TasbihScreen(),
             ),
             GoRoute(
               name: RootRouter.error.name,

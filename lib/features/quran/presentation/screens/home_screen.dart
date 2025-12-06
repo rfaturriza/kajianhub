@@ -16,9 +16,6 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final appBar = MainAppBar(
       onPressedMenu: () {},
-      onPressedQibla: () {
-        context.pushNamed(RootRouter.qiblaRoute.name);
-      },
       onPressedAuth: () {
         context.pushNamed(RootRouter.profileRoute.name);
       },

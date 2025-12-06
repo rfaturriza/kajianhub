@@ -12,12 +12,10 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({
     super.key,
     required this.onPressedMenu,
-    required this.onPressedQibla,
     required this.onPressedAuth,
   });
 
   final void Function() onPressedMenu;
-  final void Function() onPressedQibla;
   final void Function() onPressedAuth;
 
   @override
@@ -32,13 +30,6 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       elevation: 0,
       actions: [
-        IconButton(
-          onPressed: onPressedQibla,
-          icon: Icon(
-            Symbols.explore_rounded,
-            color: context.theme.colorScheme.onSurface,
-          ),
-        ),
         BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             if (state is AuthAuthenticated) {

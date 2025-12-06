@@ -1,131 +1,127 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:quranku/core/components/spacer.dart';
 import 'package:quranku/core/utils/extension/context_ext.dart';
 import 'package:quranku/features/shalat/presentation/components/shalat_info_card.dart';
+import 'package:quranku/injection.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../../generated/locale_keys.g.dart';
 import '../../../../kajian/presentation/components/kajian_nearby_card.dart';
+import '../../../domain/entities/carousel_event.codegen.dart';
+import '../../bloc/carousel_events/carousel_events_bloc.dart';
 
-class CarouselSliderSection extends StatefulWidget {
+class CarouselSliderSection extends StatelessWidget {
   const CarouselSliderSection({super.key});
 
   @override
-  State<CarouselSliderSection> createState() => _CarouselSliderSectionState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => sl<CarouselEventsBloc>(),
+      child: const _CarouselSliderView(),
+    );
+  }
 }
 
-class _CarouselSliderSectionState extends State<CarouselSliderSection> {
+class _CarouselSliderView extends StatefulWidget {
+  const _CarouselSliderView();
+
+  @override
+  State<_CarouselSliderView> createState() => _CarouselSliderViewState();
+}
+
+class _CarouselSliderViewState extends State<_CarouselSliderView> {
   int _currentIndex = 0;
   final CarouselSliderController _carouselController =
       CarouselSliderController();
 
-  // Dummy data for carousel slides
-  // TODO: Replace with real data from API
-  final List<CarouselSlideData> _carouselData = [
-    CarouselSlideData(
-      id: 'shalat_info',
-      type: CarouselSlideType.shalatInfo,
-    ),
-    CarouselSlideData(
-      id: 'kajian_nearby_event',
-      type: CarouselSlideType.nearbyEvent,
-    ),
-    CarouselSlideData(
-      id: 'kajian_1',
-      type: CarouselSlideType.event,
-      imageUrl:
-          'https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      title: 'Kajian Tafsir Al-Quran',
-      description:
-          'Memahami makna mendalam ayat-ayat Al-Quran dengan metode tafsir modern',
-      location: 'Masjid Al-Ikhlas, Jakarta Selatan',
-      date: DateTime.now().add(const Duration(days: 3)),
-    ),
-    CarouselSlideData(
-      id: 'kajian_2',
-      type: CarouselSlideType.event,
-      imageUrl:
-          'https://images.unsplash.com/photo-1591604021695-0c72c2d50f1e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      title: 'Daurah Hadits Bukhari',
-      description:
-          'Kajian mendalam kitab Shahih Bukhari bersama Ustadz terkenal',
-      location: 'Islamic Center, Bandung',
-      date: DateTime.now().add(const Duration(days: 7)),
-    ),
-    CarouselSlideData(
-      id: 'kajian_3',
-      type: CarouselSlideType.event,
-      imageUrl:
-          'https://images.unsplash.com/photo-1609220136736-443140cffec6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      title: 'Sesi Tanya Jawab Agama',
-      description:
-          'Ruang diskusi terbuka untuk berbagai pertanyaan seputar Islam',
-      location: 'Pesantren Modern, Yogyakarta',
-      date: DateTime.now().add(const Duration(days: 5)),
-    ),
-    CarouselSlideData(
-      id: 'kajian_4',
-      type: CarouselSlideType.event,
-      imageUrl:
-          'https://images.unsplash.com/photo-1544816155-12df9643f363?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      title: 'Workshop Tahfidz Al-Quran',
-      description:
-          'Pelatihan menghafal Al-Quran dengan teknik mudah dan efektif',
-      location: 'Pondok Tahfidz As-Salam, Bogor',
-      date: DateTime.now().add(const Duration(days: 10)),
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CarouselSlider.builder(
-          carouselController: _carouselController,
-          itemCount: _carouselData.length,
-          itemBuilder: (context, index, realIndex) {
-            final slideData = _carouselData[index];
-
-            if (slideData.type == CarouselSlideType.shalatInfo) {
-              return const ShalatInfoCard();
-            } else if (slideData.type == CarouselSlideType.nearbyEvent) {
-              return KajianNearbyCard();
-            } else {
-              return CarouselEventCard(
-                data: slideData,
-              );
-            }
-          },
-          options: CarouselOptions(
-            height: 200,
-            viewportFraction: 0.9,
-            initialPage: 0,
-            enableInfiniteScroll: true,
-            reverse: false,
-            autoPlay: true,
-            autoPlayInterval: const Duration(seconds: 5),
-            autoPlayAnimationDuration: const Duration(milliseconds: 800),
-            enlargeCenterPage: true,
-            scrollDirection: Axis.horizontal,
-            onPageChanged: (index, reason) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
+    return BlocBuilder<CarouselEventsBloc, CarouselEventsState>(
+      builder: (context, state) {
+        // Build static slides and dynamic event slides
+        final staticSlides = [
+          const CarouselSlideData(
+            id: 'shalat_info',
+            type: CarouselSlideType.shalatInfo,
           ),
-        ),
-        const VSpacer(height: 8),
-        _buildIndicators(),
-      ],
+          const CarouselSlideData(
+            id: 'kajian_nearby_event',
+            type: CarouselSlideType.nearbyEvent,
+          ),
+        ];
+
+        final eventSlides = state.events
+            .map((event) => CarouselSlideData(
+                  id: event.id.toString(),
+                  type: CarouselSlideType.event,
+                  imageUrl: event.imageUrl,
+                  title: event.title,
+                  description: event.description,
+                  date: event.eventDate,
+                  carouselEvent: event,
+                ))
+            .toList();
+
+        final allSlides = [...staticSlides, ...eventSlides];
+
+        if (allSlides.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          children: [
+            CarouselSlider.builder(
+              carouselController: _carouselController,
+              itemCount: allSlides.length,
+              itemBuilder: (context, index, realIndex) {
+                final slideData = allSlides[index];
+
+                if (slideData.type == CarouselSlideType.shalatInfo) {
+                  return const ShalatInfoCard();
+                } else if (slideData.type == CarouselSlideType.nearbyEvent) {
+                  return KajianNearbyCard();
+                } else {
+                  return CarouselEventCard(
+                    data: slideData,
+                  );
+                }
+              },
+              options: CarouselOptions(
+                height: 200,
+                viewportFraction: 0.9,
+                initialPage: 0,
+                enableInfiniteScroll: allSlides.length > 1,
+                autoPlay: allSlides.length > 1,
+                autoPlayInterval: const Duration(seconds: 5),
+                autoPlayAnimationDuration: const Duration(seconds: 1),
+                enlargeCenterPage: true,
+                scrollDirection: Axis.horizontal,
+                onPageChanged: (index, reason) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                },
+              ),
+            ),
+            if (allSlides.length > 1) ...[
+              const VSpacer(height: 8),
+              _buildIndicators(allSlides.length),
+            ],
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildIndicators() {
+  Widget _buildIndicators(int count) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: _carouselData.asMap().entries.map((entry) {
-        int index = entry.key;
+      children: List.generate(count, (index) {
         return GestureDetector(
           onTap: () => _carouselController.animateToPage(index),
           child: Container(
@@ -140,7 +136,7 @@ class _CarouselSliderSectionState extends State<CarouselSliderSection> {
             ),
           ),
         );
-      }).toList(),
+      }),
     );
   }
 }
@@ -154,122 +150,153 @@ class CarouselEventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: context.theme.cardColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Stack(
-          children: [
-            // Background image
-            Positioned.fill(
-              child: CachedNetworkImage(
-                imageUrl: data.imageUrl ?? '',
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: context.theme.colorScheme.surfaceContainerHighest,
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
-                errorWidget: (context, url, error) => Container(
-                  color: context.theme.colorScheme.surfaceContainerHighest,
-                  child: Icon(
-                    Icons.error,
-                    color: context.theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ),
-            // Gradient overlay
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withValues(alpha: 0.7),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            // Content
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    data.title ?? '',
-                    style: context.textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const VSpacer(height: 4),
-                  Text(
-                    data.description ?? '',
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const VSpacer(height: 8),
-                  Row(
-                    children: [
-                      Icon(
-                        Symbols.location_on,
-                        size: 14,
-                        color: Colors.white.withValues(alpha: 0.8),
-                      ),
-                      const HSpacer(width: 4),
-                      Expanded(
-                        child: Text(
-                          data.location ?? '',
-                          style: context.textTheme.bodySmall?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.8),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const HSpacer(width: 12),
-                      Icon(
-                        Symbols.calendar_today,
-                        size: 14,
-                        color: Colors.white.withValues(alpha: 0.8),
-                      ),
-                      const HSpacer(width: 4),
-                      Text(
-                        formatDate(data.date),
-                        style: context.textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.8),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+    void launchLink() async {
+      try {
+        if (await canLaunchUrl(Uri.parse(data.link!))) {
+          await launchUrl(
+            Uri.parse(data.link!),
+            mode: LaunchMode.externalApplication,
+          );
+        }
+      } catch (e) {
+        // Handle error if needed
+      }
+    }
+
+    return GestureDetector(
+      onTap: launchLink,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: context.theme.cardColor,
+          boxShadow: [
+            BoxShadow(
+              color: context.theme.colorScheme.onSurface.withValues(alpha: 0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
           ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Stack(
+            children: [
+              // Background image
+              Positioned.fill(
+                child: CachedNetworkImage(
+                  imageUrl: data.imageUrl ?? '',
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(
+                    color: context.theme.colorScheme.surfaceContainerHighest,
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) {
+                    return Container(
+                      color: context.theme.colorScheme.surfaceContainerHighest,
+                      child: Icon(
+                        Symbols.broken_image,
+                        size: 32,
+                        color: context.theme.colorScheme.onSurfaceVariant,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              // Gradient overlay
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        context.theme.colorScheme.onSurface
+                            .withValues(alpha: 0.7),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // Content
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: 16,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      data.title ?? '',
+                      style: context.textTheme.titleMedium?.copyWith(
+                        color: context.theme.colorScheme.surface,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const VSpacer(height: 4),
+                    Text(
+                      data.description ?? '',
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: context.theme.colorScheme.surface
+                            .withValues(alpha: 0.9),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (data.location != null || data.date != null) ...[
+                      const VSpacer(height: 8),
+                      Row(
+                        children: [
+                          if (data.location != null) ...[
+                            Icon(
+                              Symbols.location_on,
+                              size: 14,
+                              color: context.theme.colorScheme.surface
+                                  .withValues(alpha: 0.8),
+                            ),
+                            const HSpacer(width: 4),
+                            Expanded(
+                              child: Text(
+                                data.location!,
+                                style: context.textTheme.bodySmall?.copyWith(
+                                  color: context.theme.colorScheme.surface
+                                      .withValues(alpha: 0.8),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                          if (data.date != null) ...[
+                            if (data.location != null) const HSpacer(width: 12),
+                            Icon(
+                              Symbols.calendar_today,
+                              size: 14,
+                              color: context.theme.colorScheme.surface
+                                  .withValues(alpha: 0.8),
+                            ),
+                            const HSpacer(width: 4),
+                            Text(
+                              formatDate(data.date),
+                              style: context.textTheme.bodySmall?.copyWith(
+                                color: context.theme.colorScheme.surface
+                                    .withValues(alpha: 0.8),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -283,11 +310,11 @@ String formatDate(DateTime? date) {
   final difference = date.difference(now).inDays;
 
   if (difference == 0) {
-    return 'Hari ini';
+    return LocaleKeys.today.tr();
   } else if (difference == 1) {
-    return 'Besok';
+    return LocaleKeys.tomorrow.tr();
   } else if (difference <= 7) {
-    return '$difference hari lagi';
+    return DateFormat.E().format(date);
   } else {
     return '${date.day}/${date.month}';
   }
@@ -298,19 +325,23 @@ class CarouselSlideData {
   final String id;
   final CarouselSlideType type;
   final String? imageUrl;
+  final String? link;
   final String? title;
   final String? description;
   final String? location;
   final DateTime? date;
+  final CarouselEvent? carouselEvent;
 
   const CarouselSlideData({
     required this.id,
     required this.type,
     this.imageUrl,
+    this.link,
     this.title,
     this.description,
     this.location,
     this.date,
+    this.carouselEvent,
   });
 }
 

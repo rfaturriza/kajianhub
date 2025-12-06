@@ -15,6 +15,7 @@ class NetworkConfig {
   static const baseUrlQuran = 'https://rizz-quran-api.vercel.app/';
   static const baseUrlShalat = 'https://api.myquran.com/';
   static const baseUrlKajianHub = 'https://kajianhub.com/api/';
+  static const baseImageUrl = 'https://kajianhub.com/storage/images/';
 
   static final _baseOptions = BaseOptions(
     baseUrl: baseUrlQuran,

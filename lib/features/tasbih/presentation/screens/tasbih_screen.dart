@@ -139,6 +139,7 @@ class _TasbihView extends StatelessWidget {
   void _showSettingsBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      showDragHandle: false,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => BlocProvider.value(
@@ -306,7 +307,7 @@ class _TasbihView extends StatelessWidget {
     );
   }
 
-  void _showCounterOptionsDialog(BuildContext context, counter) {
+  void _showCounterOptionsDialog(BuildContext context, TasbihCounter counter) {
     final tasbihBloc = context.read<TasbihBloc>();
 
     showDialog(
@@ -364,7 +365,7 @@ class _TasbihView extends StatelessWidget {
     );
   }
 
-  void _showEditTargetDialog(BuildContext context, counter) {
+  void _showEditTargetDialog(BuildContext context, TasbihCounter counter) {
     final targetController =
         TextEditingController(text: counter.target.toString());
     final tasbihBloc = context.read<TasbihBloc>();
@@ -408,7 +409,7 @@ class _TasbihView extends StatelessWidget {
 }
 
 class _MainCounterSection extends StatelessWidget {
-  final dynamic selectedCounter;
+  final TasbihCounter? selectedCounter;
   final VoidCallback onSettings;
 
   const _MainCounterSection({
@@ -455,7 +456,7 @@ class _MainCounterSection extends StatelessWidget {
                 p.arabicFontSize != c.arabicFontSize,
             builder: (context, stylingState) {
               return Text(
-                selectedCounter.arabicText,
+                selectedCounter?.arabicText ?? '',
                 style: context.textTheme.headlineLarge?.copyWith(
                   fontFamily: stylingState.fontFamilyArabic,
                   fontSize: stylingState.arabicFontSize,
@@ -467,9 +468,9 @@ class _MainCounterSection extends StatelessWidget {
           const VSpacer(height: 12),
 
           // Transliteration
-          if (selectedCounter.transliteration.isNotEmpty)
+          if (selectedCounter?.transliteration.isNotEmpty ?? false)
             Text(
-              selectedCounter.transliteration,
+              selectedCounter?.transliteration ?? '',
               style: context.textTheme.titleMedium?.copyWith(
                 fontStyle: FontStyle.italic,
                 color: context.theme.colorScheme.onSurfaceVariant,
@@ -479,9 +480,9 @@ class _MainCounterSection extends StatelessWidget {
           const VSpacer(height: 8),
 
           // Translation
-          if (selectedCounter.translation.isNotEmpty)
+          if (selectedCounter?.translation.isNotEmpty ?? false)
             Text(
-              selectedCounter.translation,
+              selectedCounter?.translation ?? '',
               style: context.textTheme.bodyMedium?.copyWith(
                 color: context.theme.colorScheme.onSurfaceVariant,
               ),
@@ -509,13 +510,13 @@ class _MainCounterSection extends StatelessWidget {
                           width: 100,
                           height: 100,
                           child: CircularProgressIndicator(
-                            value: selectedCounter.progress,
+                            value: selectedCounter?.progress ?? 0.0,
                             strokeWidth: 8,
                             strokeCap: StrokeCap.round,
                             backgroundColor:
                                 context.theme.colorScheme.surfaceContainer,
                             valueColor: AlwaysStoppedAnimation(
-                              selectedCounter.isTargetReached
+                              (selectedCounter?.isTargetReached ?? false)
                                   ? context.theme.colorScheme.primary
                                   : context.theme.colorScheme.secondary,
                             ),
@@ -525,16 +526,17 @@ class _MainCounterSection extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              selectedCounter.count.toString(),
+                              selectedCounter?.count.toString() ?? '0',
                               style: context.textTheme.headlineLarge?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: selectedCounter.isTargetReached
-                                    ? context.theme.colorScheme.primary
-                                    : context.theme.colorScheme.onSurface,
+                                color:
+                                    (selectedCounter?.isTargetReached ?? false)
+                                        ? context.theme.colorScheme.primary
+                                        : context.theme.colorScheme.onSurface,
                               ),
                             ),
                             Text(
-                              '/ ${selectedCounter.target}',
+                              '/ ${selectedCounter?.target ?? 0}',
                               style: context.textTheme.bodySmall?.copyWith(
                                 color:
                                     context.theme.colorScheme.onSurfaceVariant,
@@ -553,7 +555,7 @@ class _MainCounterSection extends StatelessWidget {
                         // Reset Button
                         IconButton.outlined(
                           onPressed: () => context.read<TasbihBloc>().add(
-                                TasbihEvent.resetCounter(selectedCounter.id),
+                                TasbihEvent.resetCounter(selectedCounter!.id),
                               ),
                           icon: const Icon(Symbols.refresh),
                           iconSize: 20,
@@ -579,7 +581,7 @@ class _MainCounterSection extends StatelessWidget {
                 // Action Buttons
                 GestureDetector(
                   onTap: () => context.read<TasbihBloc>().add(
-                        TasbihEvent.incrementCounter(selectedCounter.id),
+                        TasbihEvent.incrementCounter(selectedCounter!.id),
                       ),
                   child: Container(
                     padding: const EdgeInsets.all(48),
@@ -607,7 +609,7 @@ class _MainCounterSection extends StatelessWidget {
           ),
 
           // Target Reached Indicator
-          if (selectedCounter.isTargetReached) ...[
+          if (selectedCounter?.isTargetReached ?? false) ...[
             const VSpacer(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -647,16 +649,26 @@ class _MainCounterSection extends StatelessWidget {
                     iconAlignment: IconAlignment.end,
                     onPressed: () {
                       final list = TasbihCounter.defaultTasbihList;
-                      final currentIndex =
-                          list.indexWhere((c) => c.id == selectedCounter.id);
+                      final currentIndex = list.indexWhere(
+                        (c) => c.id == selectedCounter?.id,
+                      );
                       final nextIndex = (currentIndex + 1) % list.length;
                       final nextCounter = list[nextIndex];
                       context.read<TasbihBloc>().add(
                             TasbihEvent.selectCounter(nextCounter.id),
                           );
                     },
-                    icon: const Icon(Symbols.navigate_next),
-                    label: Text(LocaleKeys.next.tr()),
+                    icon: const Icon(
+                      Symbols.navigate_next,
+                      size: 20,
+                    ),
+                    label: Text(
+                      LocaleKeys.next.tr(),
+                      style: context.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: context.theme.colorScheme.onSecondary,
+                      ),
+                    ),
                     style: FilledButton.styleFrom(
                       backgroundColor: context.theme.colorScheme.secondary,
                       foregroundColor: context.theme.colorScheme.onSecondary,
@@ -673,10 +685,10 @@ class _MainCounterSection extends StatelessWidget {
 }
 
 class _CounterSelectionSection extends StatelessWidget {
-  final List<dynamic> counters;
+  final List<TasbihCounter> counters;
   final String? selectedCounterId;
   final Function(String) onCounterSelected;
-  final Function(dynamic) onCounterLongPress;
+  final Function(TasbihCounter) onCounterLongPress;
 
   const _CounterSelectionSection({
     required this.counters,

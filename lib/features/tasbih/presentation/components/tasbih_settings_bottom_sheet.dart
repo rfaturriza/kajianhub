@@ -49,7 +49,7 @@ class TasbihSettingsBottomSheet extends StatelessWidget {
                       const HSpacer(width: 12),
                       Text(
                         LocaleKeys.tasbihSettings.tr(),
-                        style: context.textTheme.titleLarge?.copyWith(
+                        style: context.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),

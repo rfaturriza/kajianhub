@@ -93,7 +93,7 @@ class _CarouselSliderViewState extends State<_CarouselSliderView> {
               },
               options: CarouselOptions(
                 height: 200,
-                viewportFraction: 0.9,
+                viewportFraction: 0.85,
                 initialPage: 0,
                 enableInfiniteScroll: allSlides.length > 1,
                 autoPlay: allSlides.length > 1,
@@ -229,6 +229,33 @@ class CarouselEventCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    Row(
+                      children: data.tags
+                          .map((tag) => Container(
+                                margin: const EdgeInsets.only(
+                                  bottom: 4,
+                                  right: 6,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: context
+                                      .theme.colorScheme.primaryContainer,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  tag,
+                                  style: context.textTheme.labelSmall?.copyWith(
+                                    color: context
+                                        .theme.colorScheme.onPrimaryContainer,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ))
+                          .toList(),
+                    ),
                     Text(
                       data.title ?? '',
                       style: context.textTheme.titleMedium?.copyWith(
@@ -314,15 +341,16 @@ String formatDate(DateTime? date) {
   } else if (difference == 1) {
     return LocaleKeys.tomorrow.tr();
   } else if (difference <= 7) {
-    return DateFormat.E().format(date);
+    return DateFormat.EEEE().format(date);
   } else {
-    return '${date.day}/${date.month}';
+    return DateFormat.yMMMd().format(date);
   }
 }
 
 // Data models for carousel slides
 class CarouselSlideData {
   final String id;
+  final List<String> tags;
   final CarouselSlideType type;
   final String? imageUrl;
   final String? link;
@@ -335,6 +363,7 @@ class CarouselSlideData {
   const CarouselSlideData({
     required this.id,
     required this.type,
+    this.tags = const [],
     this.imageUrl,
     this.link,
     this.title,

@@ -227,6 +227,12 @@ class _RecitationInfo extends StatelessWidget {
             description: description,
             location: state.recommendedKajian?.studyLocation.name,
             imageUrl: imageUrl,
+            tags: [
+              LocaleKeys.nearby.tr(),
+              ...?state.recommendedKajian?.themes.map(
+                (e) => e.theme,
+              )
+            ],
             date: DateTime.now(),
           ),
         );

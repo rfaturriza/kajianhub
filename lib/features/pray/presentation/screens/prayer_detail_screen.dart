@@ -70,7 +70,8 @@ class _PrayerDetailContent extends StatelessWidget {
                   // Share implementation would go here
                   try {
                     Clipboard.setData(ClipboardData(text: shareText));
-                    context.showInfoToast(LocaleKeys.prayCopiedToClipboard.tr());
+                    context
+                        .showInfoToast(LocaleKeys.prayCopiedToClipboard.tr());
                   } catch (e) {
                     context.showErrorToast(LocaleKeys.defaultErrorMessage.tr());
                   }
@@ -160,12 +161,15 @@ class _PrayerContent extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: BlocBuilder<StylingSettingBloc, StylingSettingState>(
-                buildWhen: (p, c) => p.fontFamilyArabic != c.fontFamilyArabic,
+                buildWhen: (p, c) =>
+                    p.fontFamilyArabic != c.fontFamilyArabic ||
+                    p.arabicFontSize != c.arabicFontSize,
                 builder: (context, stylingState) {
                   return Text(
                     prayer.arabicText,
                     style: context.textTheme.titleLarge?.copyWith(
                       height: 2.0,
+                      fontSize: stylingState.arabicFontSize,
                       fontFamily: stylingState.fontFamilyArabic,
                       color: context.theme.colorScheme.onSurface,
                     ),

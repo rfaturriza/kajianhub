@@ -10,6 +10,7 @@ import 'package:quranku/features/bookmark/domain/entities/surah_bookmark.codegen
 import 'package:quranku/features/quran/presentation/bloc/audioVerse/audio_verse_bloc.dart';
 import 'package:quranku/features/quran/presentation/screens/components/app_bar_detail_screen.dart';
 import 'package:quranku/features/quran/presentation/screens/components/bottom_nav_player.dart';
+import 'package:quranku/features/quran/presentation/screens/components/search_verse_dialog.dart';
 import 'package:quranku/features/quran/presentation/screens/components/verses_list.dart';
 
 import '../../../../generated/locale_keys.g.dart';
@@ -61,7 +62,7 @@ class DetailSurahScreen extends StatelessWidget {
   }
 }
 
-class _DetailSurahScaffold extends StatelessWidget {
+class _DetailSurahScaffold extends StatefulWidget {
   final Surah? surah;
   final int? jumpToVerse;
 
@@ -71,10 +72,35 @@ class _DetailSurahScaffold extends StatelessWidget {
   });
 
   @override
+  State<_DetailSurahScaffold> createState() => _DetailSurahScaffoldState();
+}
+
+class _DetailSurahScaffoldState extends State<_DetailSurahScaffold> {
+  final GlobalKey<VersesListState> _versesListKey =
+      GlobalKey<VersesListState>();
+
+  void _showSearchDialog(BuildContext context, int maxVerses) {
+    showDialog(
+      context: context,
+      builder: (context) => SearchVerseDialog(
+        maxVerses: maxVerses,
+        onVerseSelected: (verseNumber) {
+          final found =
+              _versesListKey.currentState?.scrollToVerse(verseNumber) ?? false;
+          if (!found) {
+            context.showErrorToast(LocaleKeys.verseNotFound.tr());
+          }
+        },
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final audioBloc = context.watch<AudioVerseBloc>();
     final surahDetailBloc = context.read<SurahDetailBloc>();
-    final surahName = surah?.name?.transliteration?.asLocale(context.locale);
+    final surahName =
+        widget.surah?.name?.transliteration?.asLocale(context.locale);
     return Scaffold(
       body: BlocConsumer<SurahDetailBloc, SurahDetailState>(
         listener: (context, state) {
@@ -121,6 +147,10 @@ class _DetailSurahScaffold extends StatelessWidget {
                 SliverAppBarDetailScreen(
                   isBookmarked: detailSurah?.isBookmarked ?? false,
                   title: surahName ?? emptyString,
+                  onPressedSearch: (state.detailSurahResult?.isRight() ?? false)
+                      ? () => _showSearchDialog(
+                          context, detailSurah?.numberOfVerses ?? 0)
+                      : null,
                   onPressedBookmark: (state.detailSurahResult?.isRight() ??
                           false)
                       ? () {
@@ -151,7 +181,8 @@ class _DetailSurahScaffold extends StatelessWidget {
                   final verses = detailSurah?.verses;
 
                   return VersesList(
-                    toVerses: jumpToVerse,
+                    key: _versesListKey,
+                    toVerses: widget.jumpToVerse,
                     view: ViewMode.surah,
                     listVerses: verses ?? [],
                     tajweedWords: detailSurah?.tajweedWords ?? [],
@@ -164,7 +195,8 @@ class _DetailSurahScaffold extends StatelessWidget {
                     message: failure?.message,
                     onRefresh: () {
                       surahDetailBloc.add(
-                        FetchSurahDetailEvent(surahNumber: surah?.number),
+                        FetchSurahDetailEvent(
+                            surahNumber: widget.surah?.number),
                       );
                     },
                   );

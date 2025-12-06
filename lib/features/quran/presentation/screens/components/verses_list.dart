@@ -55,10 +55,10 @@ class VersesList extends StatefulWidget {
   });
 
   @override
-  State<VersesList> createState() => _VersesListState();
+  State<VersesList> createState() => VersesListState();
 }
 
-class _VersesListState extends State<VersesList> {
+class VersesListState extends State<VersesList> {
   final _progress = ValueNotifier<double>(0.0);
   var onDrag = false;
   final _itemScrollController = ItemScrollController();
@@ -74,6 +74,48 @@ class _VersesListState extends State<VersesList> {
       return;
     }
     _progress.value = progressValue;
+  }
+
+  bool scrollToVerse(int verseNumber) {
+    if (verseNumber <= 0) return false;
+
+    final targetIndex = _calculateVerseIndex(verseNumber);
+    final isPreBismillah = widget.preBismillah?.isNotEmpty == true;
+    final totalItemCount = isPreBismillah
+        ? widget.listVerses.length + 1
+        : widget.listVerses.length;
+
+    if (targetIndex >= 0 && targetIndex < totalItemCount) {
+      _itemScrollController.scrollTo(
+        index: targetIndex,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOutCubic,
+      );
+      return true;
+    }
+    return false;
+  }
+  
+  int _calculateVerseIndex(int verseNumber) {
+    // For surah view, adjust for preBismillah
+    if (widget.view == ViewMode.surah &&
+        widget.preBismillah?.isNotEmpty == true) {
+      return verseNumber; // preBismillah is at index 0, verse 1 is at index 1, etc.
+    }
+
+    // For juz view, find the verse by number in Quran
+    if (widget.view == ViewMode.juz) {
+      for (int i = 0; i < widget.listVerses.length; i++) {
+        final verse = widget.listVerses[i];
+        if (verse.number?.inSurah == verseNumber) {
+          return i;
+        }
+      }
+      return -1; // Verse not found
+    }
+
+    // Default for surah view without preBismillah
+    return verseNumber - 1;
   }
 
   @override

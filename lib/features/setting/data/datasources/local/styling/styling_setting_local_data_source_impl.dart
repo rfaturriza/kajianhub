@@ -3,6 +3,7 @@ import 'package:hive_ce/hive.dart';
 import 'package:injectable/injectable.dart';
 import 'package:quranku/features/setting/data/datasources/local/styling/styling_setting_local_data_source.dart';
 
+import '../../../../../../core/constants/font_constants.dart';
 import '../../../../../../core/constants/hive_constants.dart';
 import '../../../../../../core/error/failures.dart';
 import '../../../../domain/entities/last_read_reminder_mode_entity.dart';
@@ -20,7 +21,10 @@ class StylingSettingLocalDataSourceImpl
   Future<Either<Failure, String?>> getArabicFontFamily() async {
     try {
       var box = await hive.openBox(HiveConst.languageBox);
-      final String? fontFamily = await box.get(HiveConst.arabicFontFamilyKey);
+      final String fontFamily = await box.get(
+        HiveConst.arabicFontFamilyKey,
+        defaultValue: FontConst.meQuran,
+      );
       return right(fontFamily);
     } catch (e) {
       return left(
@@ -156,9 +160,11 @@ class StylingSettingLocalDataSourceImpl
   Future<Either<Failure, LastReadReminderModes>> getLastReadReminder() async {
     try {
       var box = await hive.openBox(HiveConst.settingBox);
-      final mode = box.get(HiveConst.lastReadRemindersModeKey);
-      final LastReadReminderModes isReminders =
-          LastReadReminderModes.values.firstWhere(
+      final String mode = box.get(
+        HiveConst.lastReadRemindersModeKey,
+        defaultValue: LastReadReminderModes.autoSave.name,
+      );
+      final isReminders = LastReadReminderModes.values.firstWhere(
         (e) => e.name == mode,
       );
       return right(isReminders);

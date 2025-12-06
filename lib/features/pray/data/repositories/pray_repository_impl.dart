@@ -29,7 +29,7 @@ class PrayRepositoryImpl implements PrayRepository {
         orderBy: orderBy,
         sortBy: sortBy,
       );
-      return Right(result.data.map((model) => model.toEntity()).toList());
+      return Right(result.data?.map((model) => model.toEntity()).toList() ?? []);
     } catch (e) {
       return Left(ServerFailure());
     }
